@@ -62,6 +62,7 @@ const App: React.FC = () => {
         try {
           const res = await axios.get<Contact[]>('http://192.168.31.185:4000/users');
           setContacts(res.data.filter(c => c.id !== userId));
+          console.log('Contacts fetched:', res.data);
         } catch (err) {
           const error = err as AxiosError<{ error?: string }>;
           console.error('Failed to fetch contacts:', error.response?.data?.error || error.message);
@@ -75,12 +76,14 @@ const App: React.FC = () => {
     if (userId && selectedChatId) {
       const fetchMessages = async () => {
         try {
+          console.log('Fetching messages for userId:', userId, 'contactId:', selectedChatId);
           const res = await axios.get<Message[]>(
             `http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`
           );
+          console.log('Messages received:', res.data);
           setMessages(res.data);
           if (chatRef.current) {
-            chatRef.current.scrollTop = chatRef.current.scrollHeight; // Автоскрол донизу
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
           }
         } catch (err) {
           const error = err as AxiosError<{ error?: string }>;
@@ -95,8 +98,11 @@ const App: React.FC = () => {
     if (searchQuery) {
       const searchUsers = async () => {
         try {
+          console.log('Searching users with query:', searchQuery);
           const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
-          setSearchResults(res.data.filter(c => c.id !== userId));
+          const filteredResults = res.data.filter(c => c.id !== userId);
+          setSearchResults(filteredResults);
+          console.log('Search results:', filteredResults);
         } catch (err) {
           const error = err as AxiosError<{ error?: string }>;
           console.error('Failed to search users:', error.response?.data?.error || error.message);
@@ -183,14 +189,13 @@ const App: React.FC = () => {
         text: input,
         timestamp: Date.now(),
       });
-      setMessages(prev => [
-        ...prev,
-        { id: res.data.id, userId, contactId: selectedChatId, text: input, timestamp: Date.now() },
-      ]);
+      const newMessage = { id: res.data.id, userId, contactId: selectedChatId, text: input, timestamp: Date.now() };
+      setMessages(prev => [...prev, newMessage]);
       setInput('');
       if (chatRef.current) {
-        chatRef.current.scrollTop = chatRef.current.scrollHeight; // Автоскрол донизу
+        chatRef.current.scrollTop = chatRef.current.scrollHeight;
       }
+      console.log('Message sent:', newMessage);
     } catch (err) {
       const error = err as AxiosError<{ error?: string }>;
       console.error('Failed to send message:', error.response?.data?.error || error.message);
@@ -203,6 +208,7 @@ const App: React.FC = () => {
   };
 
   const handleContactSelect = (contact: Contact) => {
+    console.log('Selected contact:', contact);
     setSelectedChatId(contact.id);
     setSearchQuery('');
     setSearchResults([]);
@@ -212,7 +218,8 @@ const App: React.FC = () => {
   };
 
   const themeClass = isDarkTheme ? 'bg-dark text-light' : 'bg-light text-dark';
-  const hasConversations = contacts.some(contact => messages.some(msg => msg.contactId === contact.id || msg.userId === contact.id));
+
+  console.log('Rendering App. userId:', userId, 'selectedChatId:', selectedChatId, 'messages:', messages);
 
   if (!userId || !identityKeyPair) {
     return (
@@ -280,78 +287,68 @@ const App: React.FC = () => {
           </div>
         )}
       </div>
-      {hasConversations ? (
-        <>
-          <div className="mb-2" style={{ maxHeight: '30vh', overflowY: 'auto', border: '1px solid #ccc', borderRadius: '5px' }}>
-            {contacts
-              .filter(contact => messages.some(msg => msg.contactId === contact.id || msg.userId === contact.id))
-              .map(contact => (
-                <div
-                  key={contact.id}
-                  className={`p-2 ${isDarkTheme ? 'bg-secondary' : 'bg-light'} border-bottom ${
-                    selectedChatId === contact.id ? 'bg-primary text-white' : ''
-                  }`}
-                  onClick={() => setSelectedChatId(contact.id)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {contact.email}
-                </div>
-              ))}
-          </div>
-          <div
-            ref={chatRef}
-            className={`chat flex-grow-1 overflow-auto mb-2 p-3 rounded border ${
-              isDarkTheme ? 'bg-secondary text-light' : 'bg-light text-dark'
-            }`}
-          >
-            {selectedChatId ? (
-              messages.length > 0 ? (
-                messages.map(msg => (
-                  <div
-                    key={msg.id}
-                    className={`d-flex mb-2 ${msg.userId === userId ? 'justify-content-end' : 'justify-content-start'}`}
-                  >
-                    <div
-                      className={`p-2 rounded ${
-                        msg.userId === userId
-                          ? 'bg-primary text-white'
-                          : isDarkTheme
-                          ? 'bg-dark text-light'
-                          : 'bg-secondary text-white'
-                      }`}
-                      style={{ maxWidth: '70%', wordBreak: 'break-word' }}
-                    >
-                      {msg.text}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center">Немає повідомлень</p>
-              )
-            ) : (
-              <p className="text-center">Виберіть чат</p>
-            )}
-          </div>
-          {selectedChatId && (
-            <div className="input-group">
-              <input
-                type="text"
-                className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Повідомлення..."
-              />
-              <button className="btn btn-primary" onClick={sendMessage}>
-                Надіслати
-              </button>
+      <div className="mb-2" style={{ maxHeight: '30vh', overflowY: 'auto', border: '1px solid #ccc', borderRadius: '5px' }}>
+        {contacts
+          .filter(contact => messages.some(msg => msg.contactId === contact.id || msg.userId === contact.id))
+          .map(contact => (
+            <div
+              key={contact.id}
+              className={`p-2 ${isDarkTheme ? 'bg-secondary' : 'bg-light'} border-bottom ${
+                selectedChatId === contact.id ? 'bg-primary text-white' : ''
+              }`}
+              onClick={() => setSelectedChatId(contact.id)}
+              style={{ cursor: 'pointer' }}
+            >
+              {contact.email}
             </div>
-          )}
-        </>
-      ) : (
-        <div className="flex-grow-1 d-flex justify-content-center align-items-center">
-          <button className="btn btn-primary" onClick={() => setSearchQuery('')}>
-            Пошук
+          ))}
+      </div>
+      <div
+        ref={chatRef}
+        className={`chat flex-grow-1 overflow-auto mb-2 p-3 rounded border ${
+          isDarkTheme ? 'bg-secondary text-light' : 'bg-light text-dark'
+        }`}
+      >
+        {selectedChatId ? (
+          messages.length > 0 ? (
+            messages.map(msg => (
+              <div
+                key={msg.id}
+                className={`d-flex mb-2 ${msg.userId === userId ? 'justify-content-end' : 'justify-content-start'}`}
+              >
+                <div
+                  className={`p-2 rounded ${
+                    msg.userId === userId
+                      ? 'bg-primary text-white'
+                      : isDarkTheme
+                      ? 'bg-dark text-light'
+                      : 'bg-secondary text-white'
+                  }`}
+                  style={{ maxWidth: '70%', wordBreak: 'break-word' }}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center">Немає повідомлень</p>
+          )
+        ) : (
+          <p className="text-center">Виберіть чат</p>
+        )}
+      </div>
+      {selectedChatId && (
+        <div className="input-group">
+          <input
+            type="text"
+            className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Повідомлення..."
+          />
+          <button className="btn btn-primary" onClick={sendMessage}>
+            Надіслати
           </button>
         </div>
       )}
