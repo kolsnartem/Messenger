@@ -3,10 +3,6 @@ import axios, { AxiosError } from 'axios';
 import * as signal from '@privacyresearch/libsignal-protocol-typescript';
 import * as CryptoJS from 'crypto-js';
 
-interface ServerError {
-  error?: string;
-}
-
 interface IdentityKeyPair {
   pubKey: ArrayBuffer;
   privKey: ArrayBuffer;
@@ -36,43 +32,39 @@ const App: React.FC = () => {
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('App mounted. userId:', userId, 'identityKeyPair:', identityKeyPair);
     const initSignal = async () => {
       try {
         console.log('Initializing Signal...');
         const storedKeyPair = localStorage.getItem('signalKeyPair');
         if (storedKeyPair) {
-          console.log('Found stored key pair:', storedKeyPair);
           const parsed = JSON.parse(storedKeyPair);
           setIdentityKeyPair({
             pubKey: Buffer.from(parsed.publicKey, 'base64'),
             privKey: Buffer.from(parsed.privateKey, 'base64'),
           });
-          console.log('Identity key pair set successfully.');
-        } else {
-          console.log('No stored key pair found.');
         }
       } catch (err) {
-        console.error('Error in initSignal:', err);
+        const error = err as Error;
+        console.error('Error in initSignal:', error.message);
       }
     };
     initSignal();
-  }, [userId, identityKeyPair]);
+  }, []);
 
   useEffect(() => {
     if (userId) {
-      console.log('Fetching contacts for userId:', userId);
       const fetchContacts = async () => {
         try {
           const res = await axios.get<Contact[]>('http://192.168.31.185:4000/users');
           setContacts(res.data.filter(c => c.id !== userId));
-          console.log('Contacts fetched:', res.data);
         } catch (err) {
-          const axiosErr = err as AxiosError<ServerError>;
-          console.error('Failed to fetch contacts:', axiosErr.message);
+          const error = err as AxiosError<{ error?: string }>;
+          console.error('Failed to fetch contacts:', error.response?.data?.error || error.message);
         }
       };
       fetchContacts();
@@ -81,20 +73,40 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (userId && selectedChatId) {
-      console.log('Fetching messages for userId:', userId, 'selectedChatId:', selectedChatId);
       const fetchMessages = async () => {
         try {
-          const res = await axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`);
+          const res = await axios.get<Message[]>(
+            `http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`
+          );
           setMessages(res.data);
-          console.log('Messages fetched:', res.data);
+          if (chatRef.current) {
+            chatRef.current.scrollTop = chatRef.current.scrollHeight; // Автоскрол донизу
+          }
         } catch (err) {
-          const axiosErr = err as AxiosError<ServerError>;
-          console.error('Failed to fetch messages:', axiosErr.message);
+          const error = err as AxiosError<{ error?: string }>;
+          console.error('Failed to fetch messages:', error.response?.data?.error || error.message);
         }
       };
       fetchMessages();
     }
   }, [userId, selectedChatId]);
+
+  useEffect(() => {
+    if (searchQuery) {
+      const searchUsers = async () => {
+        try {
+          const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
+          setSearchResults(res.data.filter(c => c.id !== userId));
+        } catch (err) {
+          const error = err as AxiosError<{ error?: string }>;
+          console.error('Failed to search users:', error.response?.data?.error || error.message);
+        }
+      };
+      searchUsers();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery, userId]);
 
   const generateKeyPair = async (): Promise<IdentityKeyPair> => {
     const keyPair = await signal.KeyHelper.generateIdentityKeyPair();
@@ -105,7 +117,6 @@ const App: React.FC = () => {
       privateKey: privateKeySerialized,
     };
     localStorage.setItem('signalKeyPair', JSON.stringify(keyPairSerialized));
-    console.log('Generated and stored key pair:', keyPairSerialized);
     return keyPair;
   };
 
@@ -129,9 +140,9 @@ const App: React.FC = () => {
       console.log('Registered userId:', res.data.id);
       alert('Реєстрація успішна!');
     } catch (err) {
-      const axiosErr = err as AxiosError<ServerError>;
-      console.error('Registration failed:', axiosErr.message);
-      alert('Помилка реєстрації: ' + (axiosErr.response?.data?.error || axiosErr.message));
+      const error = err as AxiosError<{ error?: string }>;
+      console.error('Registration failed:', error.response?.data?.error || error.message);
+      alert('Помилка реєстрації: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -139,42 +150,33 @@ const App: React.FC = () => {
     if (!email || !password) return alert('Заповніть усі поля');
     try {
       console.log('Starting login with email:', email);
-      const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
-      console.log('Sending login request:', { email, password: hashedPassword });
+      console.log('Sending login request:', { email, password });
       const res = await axios.post<{ id: string; publicKey: string }>('http://192.168.31.185:4000/login', {
         email,
-        password: hashedPassword,
+        password,
       });
       console.log('Login response:', res.data);
-      let storedKeyPair = localStorage.getItem('signalKeyPair');
-      if (!storedKeyPair) {
-        console.log('No stored key pair found, generating new one...');
-        const newKeys = await generateKeyPair(); // Генеруємо новий ключ, якщо старий втрачено
-        storedKeyPair = localStorage.getItem('signalKeyPair'); // Оновлюємо після генерації
-        setIdentityKeyPair(newKeys);
-      } else {
-        const parsed = JSON.parse(storedKeyPair);
-        setIdentityKeyPair({
-          pubKey: Buffer.from(parsed.publicKey, 'base64'),
-          privKey: Buffer.from(parsed.privateKey, 'base64'),
-        });
-      }
+      const storedKeyPair = localStorage.getItem('signalKeyPair');
+      if (!storedKeyPair) return alert('Приватний ключ втрачено. Потрібна повторна реєстрація.');
+      const parsed = JSON.parse(storedKeyPair);
+      setIdentityKeyPair({
+        pubKey: Buffer.from(parsed.publicKey, 'base64'),
+        privKey: Buffer.from(parsed.privateKey, 'base64'),
+      });
       localStorage.setItem('userId', res.data.id);
       setUserId(res.data.id);
       console.log('Logged in userId:', res.data.id);
       alert('Вхід успішний!');
     } catch (err) {
-      const axiosErr = err as AxiosError<ServerError>;
-      console.error('Login failed:', axiosErr.message);
-      alert('Помилка входу: ' + (axiosErr.response?.data?.error || axiosErr.message));
+      const error = err as AxiosError<{ error?: string }>;
+      console.error('Login failed:', error.response?.data?.error || error.message);
+      alert('Помилка входу: ' + (error.response?.data?.error || error.message));
     }
   };
 
   const sendMessage = async () => {
     if (!input || !userId || !selectedChatId) return;
     try {
-      const recipient = contacts.find(c => c.id === selectedChatId);
-      if (!recipient) return;
       const res = await axios.post<{ id: string }>('http://192.168.31.185:4000/messages', {
         userId,
         contactId: selectedChatId,
@@ -186,11 +188,13 @@ const App: React.FC = () => {
         { id: res.data.id, userId, contactId: selectedChatId, text: input, timestamp: Date.now() },
       ]);
       setInput('');
-      console.log('Message sent:', res.data.id);
+      if (chatRef.current) {
+        chatRef.current.scrollTop = chatRef.current.scrollHeight; // Автоскрол донизу
+      }
     } catch (err) {
-      const axiosErr = err as AxiosError<ServerError>;
-      console.error('Failed to send message:', axiosErr.message);
-      alert('Помилка відправки: ' + (axiosErr.response?.data?.error || axiosErr.message));
+      const error = err as AxiosError<{ error?: string }>;
+      console.error('Failed to send message:', error.response?.data?.error || error.message);
+      alert('Помилка відправки: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -198,9 +202,17 @@ const App: React.FC = () => {
     if (event.key === 'Enter') sendMessage();
   };
 
-  const themeClass = isDarkTheme ? 'bg-dark text-light' : 'bg-light text-dark';
+  const handleContactSelect = (contact: Contact) => {
+    setSelectedChatId(contact.id);
+    setSearchQuery('');
+    setSearchResults([]);
+    if (!contacts.some(c => c.id === contact.id)) {
+      setContacts(prev => [...prev, contact]);
+    }
+  };
 
-  console.log('Rendering App. userId:', userId, 'identityKeyPair:', !!identityKeyPair);
+  const themeClass = isDarkTheme ? 'bg-dark text-light' : 'bg-light text-dark';
+  const hasConversations = contacts.some(contact => messages.some(msg => msg.contactId === contact.id || msg.userId === contact.id));
 
   if (!userId || !identityKeyPair) {
     return (
@@ -245,61 +257,104 @@ const App: React.FC = () => {
           {isDarkTheme ? 'Світла' : 'Темна'}
         </button>
       </div>
-      <div className="mb-2" style={{ maxHeight: '30vh', overflowY: 'auto', border: '1px solid #ccc', borderRadius: '5px' }}>
-        {contacts.map(contact => (
-          <div
-            key={contact.id}
-            className={`p-2 ${isDarkTheme ? 'bg-secondary' : 'bg-light'} border-bottom`}
-            onClick={() => setSelectedChatId(contact.id)}
-            style={{ cursor: 'pointer' }}
-          >
-            {contact.email}
-          </div>
-        ))}
-      </div>
-      <div
-        ref={chatRef}
-        className={`chat flex-grow-1 overflow-auto mb-2 p-3 rounded border ${
-          isDarkTheme ? 'bg-secondary text-light' : 'bg-light text-dark'
-        }`}
-      >
-        {selectedChatId ? (
-          messages.map(msg => (
-            <div
-              key={msg.id}
-              className={`d-flex mb-2 ${msg.userId === userId ? 'justify-content-end' : 'justify-content-start'}`}
-            >
-              <div
-                className={`p-2 rounded ${
-                  msg.userId === userId
-                    ? 'bg-primary text-white'
-                    : isDarkTheme
-                    ? 'bg-dark text-light'
-                    : 'bg-secondary text-white'
-                }`}
-                style={{ maxWidth: '70%', wordBreak: 'break-word' }}
-              >
-                {msg.text}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-center">Виберіть контакт для початку чату</p>
-        )}
-      </div>
-      <div className="input-group">
+      <div className="mb-2">
         <input
           type="text"
           className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Повідомлення..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Пошук користувачів..."
         />
-        <button className="btn btn-primary" onClick={sendMessage}>
-          Надіслати
-        </button>
+        {searchResults.length > 0 && (
+          <div className="mt-1" style={{ maxHeight: '20vh', overflowY: 'auto', border: '1px solid #ccc', borderRadius: '5px' }}>
+            {searchResults.map(result => (
+              <div
+                key={result.id}
+                className={`p-2 ${isDarkTheme ? 'bg-secondary' : 'bg-light'} border-bottom`}
+                onClick={() => handleContactSelect(result)}
+                style={{ cursor: 'pointer' }}
+              >
+                {result.email}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+      {hasConversations ? (
+        <>
+          <div className="mb-2" style={{ maxHeight: '30vh', overflowY: 'auto', border: '1px solid #ccc', borderRadius: '5px' }}>
+            {contacts
+              .filter(contact => messages.some(msg => msg.contactId === contact.id || msg.userId === contact.id))
+              .map(contact => (
+                <div
+                  key={contact.id}
+                  className={`p-2 ${isDarkTheme ? 'bg-secondary' : 'bg-light'} border-bottom ${
+                    selectedChatId === contact.id ? 'bg-primary text-white' : ''
+                  }`}
+                  onClick={() => setSelectedChatId(contact.id)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {contact.email}
+                </div>
+              ))}
+          </div>
+          <div
+            ref={chatRef}
+            className={`chat flex-grow-1 overflow-auto mb-2 p-3 rounded border ${
+              isDarkTheme ? 'bg-secondary text-light' : 'bg-light text-dark'
+            }`}
+          >
+            {selectedChatId ? (
+              messages.length > 0 ? (
+                messages.map(msg => (
+                  <div
+                    key={msg.id}
+                    className={`d-flex mb-2 ${msg.userId === userId ? 'justify-content-end' : 'justify-content-start'}`}
+                  >
+                    <div
+                      className={`p-2 rounded ${
+                        msg.userId === userId
+                          ? 'bg-primary text-white'
+                          : isDarkTheme
+                          ? 'bg-dark text-light'
+                          : 'bg-secondary text-white'
+                      }`}
+                      style={{ maxWidth: '70%', wordBreak: 'break-word' }}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center">Немає повідомлень</p>
+              )
+            ) : (
+              <p className="text-center">Виберіть чат</p>
+            )}
+          </div>
+          {selectedChatId && (
+            <div className="input-group">
+              <input
+                type="text"
+                className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Повідомлення..."
+              />
+              <button className="btn btn-primary" onClick={sendMessage}>
+                Надіслати
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="flex-grow-1 d-flex justify-content-center align-items-center">
+          <button className="btn btn-primary" onClick={() => setSearchQuery('')}>
+            Пошук
+          </button>
+        </div>
+      )}
     </div>
   );
 };

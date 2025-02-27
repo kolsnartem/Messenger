@@ -20,6 +20,17 @@ db.serialize(() => {
       publicKey TEXT NOT NULL
     )
   `);
+  db.run(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id TEXT PRIMARY KEY,
+      userId TEXT,
+      contactId TEXT,
+      text TEXT,
+      timestamp INTEGER,
+      FOREIGN KEY (userId) REFERENCES users(id),
+      FOREIGN KEY (contactId) REFERENCES users(id)
+    )
+  `);
 });
 
 app.post('/register', (req, res) => {
@@ -59,6 +70,71 @@ app.post('/login', (req, res) => {
     console.log('Login successful:', { id: user.id, email });
     res.json({ id: user.id, publicKey: user.publicKey });
   });
+});
+
+app.get('/users', (req, res) => {
+  db.all('SELECT id, email, publicKey FROM users', (err, rows) => {
+    if (err) {
+      console.error('Users fetch error:', err);
+      return res.status(500).json({ error: 'Failed to fetch users' });
+    }
+    res.json(rows);
+  });
+});
+
+app.get('/search', (req, res) => {
+  const { query } = req.query;
+  if (!query) return res.status(400).json({ error: 'Query parameter is required' });
+
+  db.all(
+    'SELECT id, email, publicKey FROM users WHERE email LIKE ?',
+    [`${query}%`],
+    (err, rows) => {
+      if (err) {
+        console.error('Search error:', err);
+        return res.status(500).json({ error: 'Failed to search users' });
+      }
+      console.log('Search results:', rows);
+      res.json(rows);
+    }
+  );
+});
+
+app.post('/messages', (req, res) => {
+  const { userId, contactId, text, timestamp } = req.body;
+  if (!userId || !contactId || !text || !timestamp) return res.status(400).json({ error: 'Missing fields' });
+
+  const id = Date.now().toString();
+  db.run(
+    'INSERT INTO messages (id, userId, contactId, text, timestamp) VALUES (?, ?, ?, ?, ?)',
+    [id, userId, contactId, text, timestamp],
+    err => {
+      if (err) {
+        console.error('Message save error:', err);
+        return res.status(500).json({ error: 'Failed to save message' });
+      }
+      console.log('Message saved:', { id, userId, contactId, text });
+      res.status(201).json({ id });
+    }
+  );
+});
+
+app.get('/messages', (req, res) => {
+  const { userId, contactId } = req.query;
+  if (!userId || !contactId) return res.status(400).json({ error: 'Missing userId or contactId' });
+
+  db.all(
+    'SELECT * FROM messages WHERE (userId = ? AND contactId = ?) OR (userId = ? AND contactId = ?)',
+    [userId, contactId, contactId, userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Messages fetch error:', err);
+        return res.status(500).json({ error: 'Failed to fetch messages' });
+      }
+      console.log('Messages fetched:', rows);
+      res.json(rows);
+    }
+  );
 });
 
 app.listen(4000, () => console.log('Server running on port 4000'));
