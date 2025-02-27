@@ -1,12 +1,13 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const WebSocket = require('ws');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const db = new sqlite3.Database('./messenger.db', err => {
+const db = new sqlite3.Database('./messenger.db', (err) => {
   if (err) console.error('DB error:', err);
   else console.log('Connected to SQLite');
 });
@@ -40,13 +41,9 @@ app.post('/register', (req, res) => {
   const id = Date.now().toString();
   db.run(
     'INSERT INTO users (id, email, password, publicKey) VALUES (?, ?, ?, ?)',
-    [id, email, password, publicKey], // Зберігаємо пароль як є (захешований клієнтом)
-    err => {
-      if (err) {
-        console.error('Register error:', err);
-        return res.status(500).json({ error: 'Registration failed' });
-      }
-      console.log('User registered:', { id, email });
+    [id, email, password, publicKey],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Registration failed' });
       res.status(201).json({ id });
     }
   );
@@ -57,27 +54,25 @@ app.post('/login', (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
 
   db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
-    if (err || !user) {
-      console.log('Login failed: User not found or DB error', { email, err });
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    if (password !== user.password) {
-      console.log('Login failed: Password mismatch', { email });
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    console.log('Login successful:', { id: user.id, email });
+    if (err || !user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (password !== user.password) return res.status(401).json({ error: 'Invalid credentials' });
     res.json({ id: user.id, publicKey: user.publicKey });
+  });
+});
+
+app.put('/update-keys', (req, res) => {
+  const { userId, publicKey } = req.body;
+  if (!userId || !publicKey) return res.status(400).json({ error: 'Missing fields' });
+
+  db.run('UPDATE users SET publicKey = ? WHERE id = ?', [publicKey, userId], (err) => {
+    if (err) return res.status(500).json({ error: 'Failed to update keys' });
+    res.status(200).json({ message: 'Keys updated' });
   });
 });
 
 app.get('/users', (req, res) => {
   db.all('SELECT id, email, publicKey FROM users', (err, rows) => {
-    if (err) {
-      console.error('Users fetch error:', err);
-      return res.status(500).json({ error: 'Failed to fetch users' });
-    }
+    if (err) return res.status(500).json({ error: 'Failed to fetch users' });
     res.json(rows);
   });
 });
@@ -86,18 +81,10 @@ app.get('/search', (req, res) => {
   const { query } = req.query;
   if (!query) return res.status(400).json({ error: 'Query parameter is required' });
 
-  db.all(
-    'SELECT id, email, publicKey FROM users WHERE email LIKE ?',
-    [`${query}%`],
-    (err, rows) => {
-      if (err) {
-        console.error('Search error:', err);
-        return res.status(500).json({ error: 'Failed to search users' });
-      }
-      console.log('Search results:', rows);
-      res.json(rows);
-    }
-  );
+  db.all('SELECT id, email, publicKey FROM users WHERE email LIKE ?', [`${query}%`], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Failed to search users' });
+    res.json(rows);
+  });
 });
 
 app.post('/messages', (req, res) => {
@@ -108,12 +95,12 @@ app.post('/messages', (req, res) => {
   db.run(
     'INSERT INTO messages (id, userId, contactId, text, timestamp) VALUES (?, ?, ?, ?, ?)',
     [id, userId, contactId, text, timestamp],
-    err => {
-      if (err) {
-        console.error('Message save error:', err);
-        return res.status(500).json({ error: 'Failed to save message' });
-      }
-      console.log('Message saved:', { id, userId, contactId, text });
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Failed to save message' });
+      const message = { id, userId, contactId, text, timestamp };
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) client.send(JSON.stringify(message));
+      });
       res.status(201).json({ id });
     }
   );
@@ -127,14 +114,16 @@ app.get('/messages', (req, res) => {
     'SELECT * FROM messages WHERE (userId = ? AND contactId = ?) OR (userId = ? AND contactId = ?)',
     [userId, contactId, contactId, userId],
     (err, rows) => {
-      if (err) {
-        console.error('Messages fetch error:', err);
-        return res.status(500).json({ error: 'Failed to fetch messages' });
-      }
-      console.log('Messages fetched:', rows);
+      if (err) return res.status(500).json({ error: 'Failed to fetch messages' });
       res.json(rows);
     }
   );
 });
 
-app.listen(4000, () => console.log('Server running on port 4000'));
+const server = app.listen(4000, () => console.log('Server running on port 4000'));
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+  console.log('WebSocket client connected');
+  ws.on('close', () => console.log('WebSocket client disconnected'));
+});
