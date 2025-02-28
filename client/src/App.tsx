@@ -9,12 +9,12 @@ interface Message { id: string; userId: string; contactId: string; text: string;
 interface Contact { id: string; email: string; publicKey: string }
 
 const App: React.FC = () => {
-  const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
-  const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('userEmail'));
+  const [userId, setUserId] = useState<string | null>(() => localStorage.getItem('userId'));
+  const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem('userEmail'));
   const [identityKeyPair, setIdentityKeyPair] = useState<IdentityKeyPair | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(() => localStorage.getItem('selectedChatId'));
   const [input, setInput] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,10 +23,12 @@ const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // To prevent auth flash
   const chatRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const isScrolledUp = useRef(false);
 
+  // Initialize keys and check auth state
   useEffect(() => {
     const init = async () => {
       const storedKeyPair = localStorage.getItem('signalKeyPair');
@@ -37,10 +39,12 @@ const App: React.FC = () => {
           privKey: Buffer.from(privateKey, 'base64'),
         });
       }
+      setIsLoading(false); // Done initializing
     };
     init();
   }, []);
 
+  // WebSocket setup
   useEffect(() => {
     if (!userId) return;
 
@@ -63,6 +67,7 @@ const App: React.FC = () => {
     return () => { wsRef.current?.close(); };
   }, [userId, selectedChatId]);
 
+  // Fetch contacts and messages
   useEffect(() => {
     if (!userId) return;
 
@@ -84,6 +89,7 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [userId, selectedChatId]);
 
+  // Search handler
   useEffect(() => {
     if (!searchQuery || !userId) return setSearchResults([]);
     
@@ -93,6 +99,15 @@ const App: React.FC = () => {
     };
     search();
   }, [searchQuery, userId]);
+
+  // Persist selected chat
+  useEffect(() => {
+    if (selectedChatId) {
+      localStorage.setItem('selectedChatId', selectedChatId);
+    } else {
+      localStorage.removeItem('selectedChatId');
+    }
+  }, [selectedChatId]);
 
   const generateKeyPair = async (): Promise<IdentityKeyPair> => {
     const keyPair = await signal.KeyHelper.generateIdentityKeyPair();
@@ -166,6 +181,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('selectedChatId');
     setUserId(null);
     setUserEmail(null);
     setIdentityKeyPair(null);
@@ -176,6 +192,10 @@ const App: React.FC = () => {
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
   const selectedContact = contacts.find(c => c.id === selectedChatId);
+
+  if (isLoading) {
+    return null; // Prevent flash by rendering nothing during init
+  }
 
   if (!userId || !identityKeyPair) {
     return (
@@ -202,8 +222,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh' }}>
-      <div className="p-2 border-bottom" style={{ position: 'sticky', top: 0, background: isDarkTheme ? '#212529' : '#fff' }}>
+    <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'relative' }}>
+      <div className="p-2 border-bottom" style={{ position: 'sticky', top: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 10 }}>
         <div className="d-flex justify-content-between align-items-center">
           <div style={{ position: 'relative' }}>
             <h4 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -232,30 +252,50 @@ const App: React.FC = () => {
       </div>
 
       {isSearchOpen && (
-        <div className="p-2 border-bottom" style={{ position: 'sticky', top: selectedChatId ? 100 : 60, background: isDarkTheme ? '#212529' : '#fff' }}>
-          <input
-            type="text"
-            className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search users..."
-          />
-          {searchResults.map(result => (
-            <div
-              key={result.id}
-              className="p-2 border-bottom"
-              onClick={() => handleContactSelect(result)}
-              style={{ cursor: 'pointer' }}
-            >
-              {result.email}
-            </div>
-          ))}
+        <div
+          className="border-bottom"
+          style={{
+            position: 'absolute',
+            top: selectedChatId ? 100 : 60,
+            left: 0,
+            right: 0,
+            background: isDarkTheme ? '#212529' : '#fff',
+            zIndex: 20,
+            height: selectedChatId ? 'calc(100vh - 160px)' : 'calc(100vh - 120px)', // Adjust height to reach input bar
+          }}
+        >
+          <div className="p-2">
+            <input
+              type="text"
+              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search users..."
+            />
+          </div>
+          <div style={{ overflowY: 'auto', height: 'calc(100% - 60px)' }}>
+            {searchResults.map(result => (
+              <div
+                key={result.id}
+                className="p-2 border-bottom"
+                onClick={() => handleContactSelect(result)}
+                style={{ cursor: 'pointer' }}
+              >
+                {result.email}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      <div ref={chatRef} className="flex-grow-1 overflow-auto p-2" onScroll={() => {
-        if (chatRef.current) isScrolledUp.current = chatRef.current.scrollHeight - chatRef.current.scrollTop > chatRef.current.clientHeight + 60;
-      }}>
+      <div
+        ref={chatRef}
+        className="flex-grow-1 overflow-auto p-2"
+        style={{ filter: isSearchOpen && selectedChatId ? 'blur(5px)' : 'none', transition: 'filter 0.3s' }}
+        onScroll={() => {
+          if (chatRef.current) isScrolledUp.current = chatRef.current.scrollHeight - chatRef.current.scrollTop > chatRef.current.clientHeight + 60;
+        }}
+      >
         {selectedChatId ? (
           messages.length ? messages.map(msg => (
             <div key={msg.id} className={`d-flex mb-2 ${msg.isMine ? 'justify-content-end' : ''}`}>
@@ -265,11 +305,25 @@ const App: React.FC = () => {
               </div>
             </div>
           )) : <p className="text-center">No messages</p>
-        ) : <p className="text-center">Select a chat</p>}
+        ) : null}
       </div>
 
+      {!selectedChatId && !isSearchOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 5,
+          }}
+        >
+          <p className="text-center">Select a chat</p>
+        </div>
+      )}
+
       {selectedChatId && (
-        <div className="p-2 border-top" style={{ position: 'sticky', bottom: 0, background: isDarkTheme ? '#212529' : '#fff' }}>
+        <div className="p-2 border-top" style={{ position: 'sticky', bottom: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 10 }}>
           <style>
             {`
               .message-input::placeholder {
