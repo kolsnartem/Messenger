@@ -5,7 +5,7 @@ import * as CryptoJS from 'crypto-js';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync } from 'react-icons/fa';
 
 interface IdentityKeyPair { pubKey: ArrayBuffer; privKey: ArrayBuffer }
-interface Message { id: string; userId: string; contactId: string; text: string; timestamp: number; isMine: boolean }
+interface Message { id: string; userId: string; contactId: string; text: string; timestamp: number; isMine?: boolean }
 interface Contact { id: string; email: string; publicKey: string }
 
 const App: React.FC = () => {
@@ -23,12 +23,12 @@ const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // To prevent auth flash
+  const [isLoading, setIsLoading] = useState(true);
   const chatRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const isScrolledUp = useRef(false);
+  const shouldScrollToBottom = useRef(true);
 
-  // Initialize keys and check auth state
   useEffect(() => {
     const init = async () => {
       const storedKeyPair = localStorage.getItem('signalKeyPair');
@@ -39,49 +39,57 @@ const App: React.FC = () => {
           privKey: Buffer.from(privateKey, 'base64'),
         });
       }
-      setIsLoading(false); // Done initializing
+      setIsLoading(false);
     };
     init();
   }, []);
 
-  // WebSocket setup
+  useEffect(() => {
+    if (shouldScrollToBottom.current && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   useEffect(() => {
     if (!userId) return;
 
     wsRef.current = new WebSocket('ws://192.168.31.185:4000');
     wsRef.current.onmessage = (event) => {
       const msg: Message = JSON.parse(event.data);
-      if ((msg.userId === selectedChatId && msg.contactId === userId) || 
-          (msg.contactId === selectedChatId && msg.userId === userId)) {
+      if ((msg.userId === userId && msg.contactId === selectedChatId) || 
+          (msg.contactId === userId && msg.userId === selectedChatId)) {
         setMessages(prev => {
           if (prev.some(m => m.id === msg.id)) return prev;
-          const updated = [...prev, msg].sort((a, b) => a.timestamp - b.timestamp);
-          if (chatRef.current && !isScrolledUp.current) {
-            chatRef.current.scrollTop = chatRef.current.scrollHeight;
-          }
-          return updated;
+          const newMsg = { ...msg, isMine: msg.userId === userId };
+          return [...prev, newMsg].sort((a, b) => a.timestamp - b.timestamp);
         });
+        shouldScrollToBottom.current = true;
       }
     };
 
     return () => { wsRef.current?.close(); };
   }, [userId, selectedChatId]);
 
-  // Fetch contacts and messages
   useEffect(() => {
     if (!userId) return;
 
     const fetchData = async () => {
-      const [contactsRes, messagesRes] = await Promise.all([
-        axios.get<Contact[]>('http://192.168.31.185:4000/users'),
-        selectedChatId 
-          ? axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`)
-          : Promise.resolve({ data: [] as Message[] })
-      ]);
-      
-      setContacts(contactsRes.data.filter(c => c.id !== userId));
-      setMessages(messagesRes.data.sort((a, b) => a.timestamp - b.timestamp));
-      if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+      try {
+        const [contactsRes, messagesRes] = await Promise.all([
+          axios.get<Contact[]>('http://192.168.31.185:4000/users'),
+          selectedChatId 
+            ? axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`)
+            : Promise.resolve({ data: [] as Message[] })
+        ]);
+        
+        setContacts(contactsRes.data.filter(c => c.id !== userId));
+        setMessages(messagesRes.data.map(msg => ({
+          ...msg,
+          isMine: msg.userId === userId
+        })).sort((a, b) => a.timestamp - b.timestamp));
+      } catch (err) {
+        console.error('Fetch data error:', err);
+      }
     };
 
     fetchData();
@@ -89,7 +97,6 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [userId, selectedChatId]);
 
-  // Search handler
   useEffect(() => {
     if (!searchQuery || !userId) return setSearchResults([]);
     
@@ -100,7 +107,6 @@ const App: React.FC = () => {
     search();
   }, [searchQuery, userId]);
 
-  // Persist selected chat
   useEffect(() => {
     if (selectedChatId) {
       localStorage.setItem('selectedChatId', selectedChatId);
@@ -108,6 +114,12 @@ const App: React.FC = () => {
       localStorage.removeItem('selectedChatId');
     }
   }, [selectedChatId]);
+
+  const handleScroll = () => {
+    if (!chatRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatRef.current;
+    shouldScrollToBottom.current = scrollHeight - scrollTop - clientHeight < 30;
+  };
 
   const generateKeyPair = async (): Promise<IdentityKeyPair> => {
     const keyPair = await signal.KeyHelper.generateIdentityKeyPair();
@@ -162,11 +174,13 @@ const App: React.FC = () => {
 
     setInput('');
     try {
-      await axios.post('http://192.168.31.185:4000/messages', newMessage);
-      setMessages(prev => [...prev, newMessage].sort((a, b) => a.timestamp - b.timestamp)); // Add new message to state immediately
-      if (chatRef.current) {
-        chatRef.current.scrollTop = chatRef.current.scrollHeight; // Scroll to bottom
-      }
+      await axios.post('http://192.168.31.185:4000/messages', {
+        id: newMessage.id,
+        userId: newMessage.userId,
+        contactId: newMessage.contactId,
+        text: newMessage.text,
+        timestamp: newMessage.timestamp
+      });
     } catch (err) {
       alert('Sending error');
     }
@@ -177,6 +191,7 @@ const App: React.FC = () => {
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
+    shouldScrollToBottom.current = true;
   };
 
   const handleLogout = () => {
@@ -192,15 +207,13 @@ const App: React.FC = () => {
   };
 
   const handleUpdate = () => {
-    window.location.reload(); // Refresh the page
+    window.location.reload();
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
-  const selectedContact = contacts.find(c => c.id === selectedChatId);
+  const selectedContact = contacts.find(c => c.id === selectedChatId) || null;
 
-  if (isLoading) {
-    return null; // Prevent flash by rendering nothing during init
-  }
+  if (isLoading) return null;
 
   if (!userId || !identityKeyPair) {
     return (
@@ -238,29 +251,29 @@ const App: React.FC = () => {
               <div
                 style={{
                   position: 'fixed',
-                  top: 55, // Below the header
-                  left: 10, // Positioned in the left part of the screen
+                  top: 55,
+                  left: 10,
                   background: isDarkTheme ? '#212529' : '#fff',
                   border: '1px solid #ccc',
                   borderRadius: '4px',
-                  zIndex: 1000, // Ensure it’s on top of everything
+                  zIndex: 1000,
                   padding: '5px',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center', // Center buttons symmetrically
+                  alignItems: 'center',
                 }}
               >
                 <button
                   className="btn btn-sm btn-success mb-2"
                   onClick={handleUpdate}
-                  style={{ width: '150px', fontSize: '0.875rem' }} // Uniform size
+                  style={{ width: '150px', fontSize: '0.875rem' }}
                 >
                   <FaSync /> Update
                 </button>
                 <button
                   className="btn btn-sm btn-outline-danger"
                   onClick={handleLogout}
-                  style={{ width: '150px', fontSize: '0.875rem' }} // Uniform size
+                  style={{ width: '150px', fontSize: '0.875rem' }}
                 >
                   <FaSignOutAlt /> Logout
                 </button>
@@ -277,21 +290,33 @@ const App: React.FC = () => {
           </div>
         </div>
         {selectedChatId && (
-          <h6 className="m-0 text-center mt-2 border-top pt-2">Chat with {selectedContact?.email || 'unknown'}</h6>
+          <div className="p-2 border-top d-flex align-items-center mt-2">
+            <div 
+              className="rounded-circle me-2 d-flex align-items-center justify-content-center"
+              style={{ 
+                width: '32px', 
+                height: '32px', 
+                background: isDarkTheme ? '#6c757d' : '#e9ecef',
+                color: isDarkTheme ? '#fff' : '#212529'
+              }}
+            >
+              {selectedContact?.email.charAt(0).toUpperCase() || '?'}
+            </div>
+            <h6 className="m-0">{selectedContact?.email || 'Loading...'}</h6>
+          </div>
         )}
       </div>
 
       {isSearchOpen && (
         <div
-          className=""
           style={{
-            position: 'fixed', // Fixed position flush with header
-            top: 40, // Directly below the header, no gap
+            position: 'fixed',
+            top: 40,
             left: 0,
             right: 0,
             background: isDarkTheme ? '#212529' : '#fff',
-            zIndex: 30, // Above chat but below dropdown
-            padding: '0', // No padding to ensure flush alignment
+            zIndex: 30,
+            padding: '0',
           }}
         >
           <div className="container p-2">
@@ -318,60 +343,81 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div
+      <div 
         ref={chatRef}
-        className="flex-grow-1 overflow-auto p-2"
-        style={{ filter: isSearchOpen && selectedChatId ? 'blur(5px)' : 'none', transition: 'filter 0.3s' }}
-        onScroll={() => {
-          if (chatRef.current) isScrolledUp.current = chatRef.current.scrollHeight - chatRef.current.scrollTop > chatRef.current.clientHeight + 60;
+        className="flex-grow-1 p-3"
+        style={{ 
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          filter: isSearchOpen && selectedChatId ? 'blur(5px)' : 'none',
+          transition: 'filter 0.3s',
+          justifyContent: messages.length === 0 && selectedChatId ? 'flex-end' : 'flex-start'
         }}
+        onScroll={handleScroll}
       >
         {selectedChatId ? (
-          messages.length ? messages.map(msg => (
-            <div key={msg.id} className={`d-flex mb-2 ${msg.isMine ? 'justify-content-end' : ''}`}>
-              <div className={`p-2 rounded ${msg.isMine ? 'bg-primary text-white' : 'bg-gray-300'}`}>
-                {msg.text}
-                <small className="d-block mt-1 text-muted">{new Date(msg.timestamp).toLocaleTimeString()}</small>
-              </div>
+          messages.length > 0 ? (
+            <>
+              {messages.map(msg => (
+                <div 
+                  key={msg.id} 
+                  className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2`}
+                >
+                  <div 
+                    className={`p-2 rounded-3 ${
+                      msg.isMine 
+                        ? 'bg-primary text-white' 
+                        : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'
+                    }`}
+                    style={{ 
+                      maxWidth: '75%',
+                      position: 'relative',
+                      borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    <div>{msg.text}</div>
+                    <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </>
+          ) : (
+            <div className="text-muted text-center" style={{ marginBottom: '10px' }}>
+              No messages yet. Start your conversation!
             </div>
-          )) : <p className="text-center">No messages</p>
-        ) : null}
+          )
+        ) : (
+          <div className="h-100 d-flex justify-content-center align-items-center text-muted">
+            Select a chat
+          </div>
+        )}
       </div>
-
-      {!selectedChatId && !isSearchOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 5,
-          }}
-        >
-          <p className="text-center">Select a chat</p>
-        </div>
-      )}
 
       {selectedChatId && (
         <div className="p-2 border-top" style={{ position: 'sticky', bottom: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 10 }}>
-          <style>
-            {`
-              .message-input::placeholder {
-                color: ${isDarkTheme ? '#aaa' : '#888'};
-              }
-            `}
-          </style>
-          <div className="d-flex">
+          <div className="d-flex align-items-center">
             <input
               type="text"
-              className={`form-control me-2 message-input ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
-              style={{ color: isDarkTheme ? '#fff' : '#000' }}
+              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyPress={e => e.key === 'Enter' && sendMessage()}
               placeholder="Message..."
+              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }}
             />
-            <button className="btn btn-primary" onClick={sendMessage}>Send</button>
+            <button 
+              className="btn btn-primary ms-2 d-flex align-items-center justify-content-center" 
+              onClick={sendMessage}
+              style={{ borderRadius: '20px', minWidth: '60px', height: '38px' }}
+              disabled={!input.trim()}
+            >
+              Send
+            </button>
           </div>
         </div>
       )}
