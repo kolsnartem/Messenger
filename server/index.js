@@ -8,8 +8,11 @@ app.use(cors());
 app.use(express.json());
 
 const db = new sqlite3.Database('./messenger.db', (err) => {
-  if (err) console.error('DB error:', err);
-  else console.log('Connected to SQLite');
+  if (err) {
+    console.error('DB error:', err);
+    throw err;
+  }
+  console.log('Connected to SQLite');
 });
 
 db.serialize(() => {
@@ -26,8 +29,9 @@ db.serialize(() => {
       id TEXT PRIMARY KEY,
       userId TEXT,
       contactId TEXT,
-      text TEXT,
-      timestamp INTEGER,
+      text TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      isMine BOOLEAN NOT NULL,
       FOREIGN KEY (userId) REFERENCES users(id),
       FOREIGN KEY (contactId) REFERENCES users(id)
     )
@@ -39,14 +43,13 @@ app.post('/register', (req, res) => {
   if (!email || !password || !publicKey) return res.status(400).json({ error: 'Missing fields' });
 
   const id = Date.now().toString();
-  db.run(
-    'INSERT INTO users (id, email, password, publicKey) VALUES (?, ?, ?, ?)',
-    [id, email, password, publicKey],
-    (err) => {
-      if (err) return res.status(500).json({ error: 'Registration failed' });
-      res.status(201).json({ id });
+  db.run('INSERT INTO users (id, email, password, publicKey) VALUES (?, ?, ?, ?)', [id, email, password, publicKey], (err) => {
+    if (err) {
+      console.error('Register error:', err);
+      return res.status(500).json({ error: 'Registration failed' });
     }
-  );
+    res.status(201).json({ id });
+  });
 });
 
 app.post('/login', (req, res) => {
@@ -54,8 +57,8 @@ app.post('/login', (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
 
   db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
-    if (err || !user) return res.status(401).json({ error: 'Invalid credentials' });
-    if (password !== user.password) return res.status(401).json({ error: 'Invalid credentials' });
+    if (err) return res.status(500).json({ error: 'Server error' });
+    if (!user || password !== user.password) return res.status(401).json({ error: 'Invalid credentials' });
     res.json({ id: user.id, publicKey: user.publicKey });
   });
 });
@@ -88,20 +91,26 @@ app.get('/search', (req, res) => {
 });
 
 app.post('/messages', (req, res) => {
-  const { userId, contactId, text, timestamp } = req.body;
-  if (!userId || !contactId || !text || !timestamp) return res.status(400).json({ error: 'Missing fields' });
+  const { id, userId, contactId, text, timestamp, isMine } = req.body;
+  if (!userId || !contactId || !text || !timestamp || isMine === undefined) {
+    console.error('Missing fields in message:', req.body);
+    return res.status(400).json({ error: 'Missing fields' });
+  }
 
-  const id = Date.now().toString();
+  const messageId = id || Date.now().toString(); // Використовуємо переданий ID або генеруємо новий
   db.run(
-    'INSERT INTO messages (id, userId, contactId, text, timestamp) VALUES (?, ?, ?, ?, ?)',
-    [id, userId, contactId, text, timestamp],
+    'INSERT INTO messages (id, userId, contactId, text, timestamp, isMine) VALUES (?, ?, ?, ?, ?, ?)',
+    [messageId, userId, contactId, text, timestamp, isMine],
     (err) => {
-      if (err) return res.status(500).json({ error: 'Failed to save message' });
-      const message = { id, userId, contactId, text, timestamp };
+      if (err) {
+        console.error('Message save error:', err);
+        return res.status(500).json({ error: 'Failed to save message' });
+      }
+      const message = { id: messageId, userId, contactId, text, timestamp, isMine };
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) client.send(JSON.stringify(message));
       });
-      res.status(201).json({ id });
+      res.status(201).json({ id: messageId });
     }
   );
 });
@@ -115,7 +124,7 @@ app.get('/messages', (req, res) => {
     [userId, contactId, contactId, userId],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Failed to fetch messages' });
-      res.json(rows);
+      res.json(rows.sort((a, b) => a.timestamp - b.timestamp));
     }
   );
 });
