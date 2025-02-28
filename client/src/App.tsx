@@ -38,16 +38,14 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Додано для анімації завантаження
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const chatRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const contactsRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const isScrolledUp = useRef<boolean>(false);
 
   useEffect(() => {
-    // Анімація завантаження сайту
-    const timer = setTimeout(() => setIsLoading(false), 500); // Імітація завантаження
+    const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -74,7 +72,7 @@ const App: React.FC = () => {
         ) {
           setMessages((prev) => {
             if (!prev.some((msg) => msg.id === newMessage.id)) {
-              const updatedMessages = [...prev, newMessage].sort((b, a) => b.timestamp - a.timestamp); // Сортування знизу вгору
+              const updatedMessages = [...prev, newMessage].sort((b, a) => b.timestamp - a.timestamp);
               if (chatRef.current && !isScrolledUp.current) {
                 chatRef.current.scrollTop = chatRef.current.scrollHeight;
               }
@@ -113,7 +111,7 @@ const App: React.FC = () => {
           const res = await axios.get<Message[]>(
             `http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`
           );
-          const sortedMessages = res.data.sort((b, a) => b.timestamp - a.timestamp); // Сортування знизу вгору
+          const sortedMessages = res.data.sort((b, a) => b.timestamp - a.timestamp);
           setMessages(sortedMessages);
         }
       }, 5000);
@@ -128,7 +126,7 @@ const App: React.FC = () => {
         const res = await axios.get<Message[]>(
           `http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`
         );
-        const sortedMessages = res.data.sort((b, a) => b.timestamp - a.timestamp); // Сортування знизу вгору
+        const sortedMessages = res.data.sort((b, a) => b.timestamp - a.timestamp);
         setMessages(sortedMessages);
         if (chatRef.current) {
           chatRef.current.scrollTop = chatRef.current.scrollHeight;
@@ -149,6 +147,14 @@ const App: React.FC = () => {
       setSearchResults([]);
     }
   }, [searchQuery, userId]);
+
+  useEffect(() => {
+    if (selectedChatId) {
+      setIsSearchOpen(false);
+      setSearchQuery('');
+      setSearchResults([]);
+    }
+  }, [selectedChatId]);
 
   const generateKeyPair = async (): Promise<IdentityKeyPair> => {
     const keyPair = await signal.KeyHelper.generateIdentityKeyPair();
@@ -209,12 +215,12 @@ const App: React.FC = () => {
   };
 
   const sendMessage = async () => {
-    if (!input || !userId || !selectedChatId) return;
+    if (!input.trim() || !userId || !selectedChatId) return;
     const newMessage: Message = {
       id: Date.now().toString(),
       userId,
       contactId: selectedChatId,
-      text: input,
+      text: input.trim(),
       timestamp: Date.now(),
       isMine: true,
     };
@@ -237,15 +243,26 @@ const App: React.FC = () => {
   };
 
   const handleContactSelect = (contact: Contact) => {
+    console.log('Selecting contact:', contact.email);
     setSelectedChatId(contact.id);
+    setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
-    setIsSearchOpen(false); // Явно закриваємо пошук при виборі чату
+    // Забезпечуємо, що UI оновлюється після вибору
+    setTimeout(() => {
+      setIsSearchOpen(false);
+    }, 0);
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
   };
 
   const toggleSearch = () => {
     setIsSearchOpen((prev) => !prev);
-    if (!isSearchOpen) setSearchQuery('');
+    if (!isSearchOpen) {
+      setSearchQuery('');
+      setSearchResults([]);
+    }
   };
 
   const handleScroll = () => {
@@ -292,7 +309,6 @@ const App: React.FC = () => {
 
   return (
     <div className={`d-flex flex-column ${themeClass} ${isLoading ? 'loading' : 'loaded'}`} style={{ height: '100vh', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      {/* Фіксована верхня панель з анімацією */}
       <div ref={headerRef} className="d-flex justify-content-between align-items-center p-2 border-bottom" style={{ position: 'sticky', top: 0, zIndex: 1000, background: isDarkTheme ? '#212529' : '#fff', animation: 'slideDown 0.5s ease-in-out' }}>
         <h4 className="m-0" style={{ fontSize: '0.9rem' }}>Мої чати ({userEmail})</h4>
         <div className="d-flex align-items-center">
@@ -305,9 +321,8 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Пошук з анімацією (тільки вгорі, не в чаті) */}
       {isSearchOpen && (
-        <div className="search-panel p-2 border-bottom" style={{ maxHeight: '20vh', overflowY: 'auto', transition: 'max-height 0.5s ease-in-out', animation: 'slideDown 0.5s ease-in-out' }}>
+        <div className="search-panel p-2 border-bottom" style={{ position: 'sticky', top: headerRef.current?.offsetHeight || 50, zIndex: 950, background: isDarkTheme ? '#212529' : '#fff', maxHeight: '20vh', overflowY: 'auto', animation: 'slideDown 0.5s ease-in-out' }}>
           <input
             type="text"
             className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
@@ -335,40 +350,35 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Фіксований заголовок чату */}
-      {selectedChatId && !isSearchOpen && (
-        <div className="p-2 border-bottom" style={{ position: 'sticky', top: headerRef.current?.offsetHeight || 50, zIndex: 900, background: isDarkTheme ? '#212529' : '#fff', padding: '0.5rem', animation: 'slideDown 0.5s ease-in-out' }}>
+      {/* Видалено список контактів (contactsRef), оскільки він створював проблему */}
+      {selectedChatId && (
+        <div className="p-2 border-bottom" style={{ position: 'sticky', top: headerRef.current?.offsetHeight || 0, zIndex: 900, background: isDarkTheme ? '#212529' : '#fff', padding: '0.5rem', animation: 'slideDown 0.5s ease-in-out' }}>
           <h6 className="m-0 text-center" style={{ fontSize: '0.9rem' }}>Чат з {selectedContact?.email || 'невідомим'}</h6>
         </div>
       )}
 
-      {/* Список контактів */}
-      <div ref={contactsRef} className="p-2" style={{ maxHeight: '20vh', overflowY: 'auto', borderBottom: `1px solid ${isDarkTheme ? '#555' : '#ccc'}` }}>
-        {contacts
-          .filter((contact) => messages.some((msg) => msg.contactId === contact.id || msg.userId === contact.id))
-          .map((contact) => (
-            <div
-              key={contact.id}
-              className={`p-2 ${isDarkTheme ? 'bg-secondary' : 'bg-light'} border-bottom ${selectedChatId === contact.id ? 'bg-primary text-white' : ''}`}
-              onClick={() => setSelectedChatId(contact.id)}
-              style={{ cursor: 'pointer', fontSize: '0.9rem', transition: 'background-color 0.2s ease' }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = selectedChatId === contact.id ? '#007bff' : isDarkTheme ? '#333' : '#e9ecef')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = selectedChatId === contact.id ? '#007bff' : isDarkTheme ? '#212529' : '#f8f9fa')}
-            >
-              {contact.email}
-            </div>
-          ))}
-      </div>
+      <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
+        {selectedChatId && !messages.length && (
+          <div
+            className="text-center p-2 border-bottom"
+            style={{
+              position: 'sticky',
+              top: (headerRef.current?.offsetHeight || 50) + (selectedChatId ? 40 : 0),
+              zIndex: 850,
+              background: isDarkTheme ? '#212529' : '#fff',
+            }}
+          >
+            <p className="m-0" style={{ fontSize: '0.9rem' }}>Немає повідомлень</p>
+          </div>
+        )}
 
-      {/* Чат відображається знизу вгору з анімацією для нових повідомлень */}
-      <div
-        ref={chatRef}
-        className={`flex-grow-1 overflow-auto p-2 ${isDarkTheme ? 'bg-secondary text-light' : 'bg-light text-dark'}`}
-        style={{ minHeight: 0, padding: '0.5rem', flexDirection: 'column-reverse' }} // Знизу вгору
-        onScroll={handleScroll}
-      >
-        {selectedChatId ? (
-          messages.length > 0 ? (
+        <div
+          ref={chatRef}
+          className={`flex-grow-1 overflow-auto p-2 ${isDarkTheme ? 'bg-secondary text-light' : 'bg-light text-dark'}`}
+          style={{ minHeight: 0 }}
+          onScroll={handleScroll}
+        >
+          {selectedChatId && messages.length > 0 ? (
             messages.map((msg) => (
               <div
                 key={msg.id}
@@ -376,25 +386,32 @@ const App: React.FC = () => {
                 style={{ animation: 'fadeInSlide 0.5s ease-in-out' }}
               >
                 <div
-                  className={`p-2 rounded ${msg.isMine ? 'bg-primary text-white' : isDarkTheme ? 'bg-dark text-light' : 'bg-secondary text-white'}`}
-                  style={{ maxWidth: '70%', wordBreak: 'break-word', borderRadius: '10px' }}
+                  className={`p-2 rounded ${msg.isMine ? 'bg-primary text-white' : isDarkTheme ? 'bg-dark text-light' : 'bg-gray-300 text-dark'}`}
+                  style={{ maxWidth: '70%', wordBreak: 'break-word', borderRadius: '10px', backgroundColor: msg.isMine ? '#007bff' : isDarkTheme ? '#343a40' : '#e9ecef' }}
                 >
                   {msg.text}
-                  <small className={`d-block mt-1 ${isDarkTheme ? 'text-muted' : 'text-muted'}`} style={{ fontSize: '0.7rem' }}>
+                  <small className={`d-block mt-1 ${isDarkTheme ? 'text-muted' : 'text-muted'}`} style={{ fontSize: '0.7rem', color: isDarkTheme ? '#ccc' : '#666' }}>
                     {new Date(msg.timestamp).toLocaleTimeString()}
                   </small>
                 </div>
               </div>
             ))
-          ) : (
-            <p className="text-center" style={{ fontSize: '0.9rem', padding: '0.5rem' }}>Немає повідомлень</p>
-          )
-        ) : (
-          <p className="text-center" style={{ fontSize: '0.9rem', padding: '0.5rem' }}>Виберіть чат</p>
-        )}
+          ) : !selectedChatId ? (
+            <div
+              className="text-center p-2 border-bottom"
+              style={{
+                position: 'sticky',
+                top: headerRef.current?.offsetHeight || 50,
+                zIndex: 850,
+                background: isDarkTheme ? '#212529' : '#fff',
+              }}
+            >
+              <p className="m-0" style={{ fontSize: '0.9rem' }}>Виберіть чат</p>
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      {/* Панель вводу */}
       {selectedChatId && (
         <div className="p-2 border-top" style={{ position: 'sticky', bottom: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 800 }}>
           <div className="d-flex align-items-center">
@@ -421,7 +438,6 @@ const App: React.FC = () => {
   );
 };
 
-// CSS-анімації (додаємо в окремий файл або в <style> у компоненті)
 const styles = `
   .loading {
     opacity: 0;
@@ -447,19 +463,14 @@ const styles = `
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
   }
-  .search-panel {
-    max-height: 0;
-    overflow: hidden;
-  }
-  .search-panel[style*="max-height: 20vh"] {
-    max-height: 20vh;
-  }
-  .message-animation {
-    animation: fadeInSlide 0.5s ease-in-out;
-  }
   button:hover {
     transform: scale(1.05);
     transition: transform 0.2s ease;
+  }
+  .search-panel:not([style*="max-height: 20vh"]) {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
   }
 `;
 
