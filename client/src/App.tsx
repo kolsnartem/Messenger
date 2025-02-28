@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios, { AxiosError } from 'axios';
 import * as signal from '@privacyresearch/libsignal-protocol-typescript';
 import * as CryptoJS from 'crypto-js';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync } from 'react-icons/fa';
 
 interface IdentityKeyPair { pubKey: ArrayBuffer; privKey: ArrayBuffer }
 interface Message { id: string; userId: string; contactId: string; text: string; timestamp: number; isMine: boolean }
@@ -163,8 +163,9 @@ const App: React.FC = () => {
     setInput('');
     try {
       await axios.post('http://192.168.31.185:4000/messages', newMessage);
-      if (chatRef.current && !isScrolledUp.current) {
-        chatRef.current.scrollTop = chatRef.current.scrollHeight;
+      setMessages(prev => [...prev, newMessage].sort((a, b) => a.timestamp - b.timestamp)); // Add new message to state immediately
+      if (chatRef.current) {
+        chatRef.current.scrollTop = chatRef.current.scrollHeight; // Scroll to bottom
       }
     } catch (err) {
       alert('Sending error');
@@ -188,6 +189,10 @@ const App: React.FC = () => {
     setSelectedChatId(null);
     setMessages([]);
     setContacts([]);
+  };
+
+  const handleUpdate = () => {
+    window.location.reload(); // Refresh the page
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
@@ -223,15 +228,40 @@ const App: React.FC = () => {
 
   return (
     <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'relative' }}>
-      <div className="p-2 border-bottom" style={{ position: 'sticky', top: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 10 }}>
+      <div className="p-2 border-bottom" style={{ position: 'sticky', top: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 20 }}>
         <div className="d-flex justify-content-between align-items-center">
           <div style={{ position: 'relative' }}>
             <h4 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               MSNGR ({userEmail})
             </h4>
             {isMenuOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, background: isDarkTheme ? '#212529' : '#fff', border: '1px solid #ccc', borderRadius: '4px', zIndex: 10 }}>
-                <button className="btn btn-sm btn-outline-danger w-100" onClick={handleLogout}>
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 55, // Below the header
+                  left: 10, // Positioned in the left part of the screen
+                  background: isDarkTheme ? '#212529' : '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  zIndex: 1000, // Ensure it’s on top of everything
+                  padding: '5px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center', // Center buttons symmetrically
+                }}
+              >
+                <button
+                  className="btn btn-sm btn-success mb-2"
+                  onClick={handleUpdate}
+                  style={{ width: '150px', fontSize: '0.875rem' }} // Uniform size
+                >
+                  <FaSync /> Update
+                </button>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={handleLogout}
+                  style={{ width: '150px', fontSize: '0.875rem' }} // Uniform size
+                >
                   <FaSignOutAlt /> Logout
                 </button>
               </div>
@@ -253,18 +283,18 @@ const App: React.FC = () => {
 
       {isSearchOpen && (
         <div
-          className="border-bottom"
+          className=""
           style={{
-            position: 'absolute',
-            top: selectedChatId ? 100 : 60,
+            position: 'fixed', // Fixed position flush with header
+            top: 40, // Directly below the header, no gap
             left: 0,
             right: 0,
             background: isDarkTheme ? '#212529' : '#fff',
-            zIndex: 20,
-            height: selectedChatId ? 'calc(100vh - 160px)' : 'calc(100vh - 120px)', // Adjust height to reach input bar
+            zIndex: 30, // Above chat but below dropdown
+            padding: '0', // No padding to ensure flush alignment
           }}
         >
-          <div className="p-2">
+          <div className="container p-2">
             <input
               type="text"
               className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
@@ -273,11 +303,11 @@ const App: React.FC = () => {
               placeholder="Search users..."
             />
           </div>
-          <div style={{ overflowY: 'auto', height: 'calc(100% - 60px)' }}>
+          <div style={{ overflowY: 'auto', maxHeight: selectedChatId ? 'calc(100vh - 160px)' : 'calc(100vh - 60px)' }}>
             {searchResults.map(result => (
               <div
                 key={result.id}
-                className="p-2 border-bottom"
+                className="p-2 border-bottom container"
                 onClick={() => handleContactSelect(result)}
                 style={{ cursor: 'pointer' }}
               >
