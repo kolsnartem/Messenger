@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^7.1.0",
     "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",
     "@signalapp/libsignal-client": "^0.67.1",
     "@testing-library/dom": "^10.4.0",
@@ -55,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^27.5.2",
     "@types/node": "^20.0.0",

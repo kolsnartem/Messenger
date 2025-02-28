@@ -2,220 +2,140 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios, { AxiosError } from 'axios';
 import * as signal from '@privacyresearch/libsignal-protocol-typescript';
 import * as CryptoJS from 'crypto-js';
-import { FaSearch, FaSun, FaMoon } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt } from 'react-icons/fa';
 
-interface IdentityKeyPair {
-  pubKey: ArrayBuffer;
-  privKey: ArrayBuffer;
-}
-
-interface Message {
-  id: string;
-  userId: string;
-  contactId: string;
-  text: string;
-  timestamp: number;
-  isMine: boolean;
-}
-
-interface Contact {
-  id: string;
-  email: string;
-  publicKey: string;
-}
+interface IdentityKeyPair { pubKey: ArrayBuffer; privKey: ArrayBuffer }
+interface Message { id: string; userId: string; contactId: string; text: string; timestamp: number; isMine: boolean }
+interface Contact { id: string; email: string; publicKey: string }
 
 const App: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('userEmail'));
   const [identityKeyPair, setIdentityKeyPair] = useState<IdentityKeyPair | null>(null);
-  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [input, setInput] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const isScrolledUp = useRef<boolean>(false);
+  const isScrolledUp = useRef(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
+    const init = async () => {
+      const storedKeyPair = localStorage.getItem('signalKeyPair');
+      if (storedKeyPair) {
+        const { publicKey, privateKey } = JSON.parse(storedKeyPair);
+        setIdentityKeyPair({
+          pubKey: Buffer.from(publicKey, 'base64'),
+          privKey: Buffer.from(privateKey, 'base64'),
+        });
+      }
+    };
+    init();
   }, []);
 
   useEffect(() => {
-    const initSignal = async () => {
-      const storedKeyPair = localStorage.getItem('signalKeyPair');
-      if (storedKeyPair) {
-        const parsed = JSON.parse(storedKeyPair);
-        setIdentityKeyPair({
-          pubKey: Buffer.from(parsed.publicKey, 'base64'),
-          privKey: Buffer.from(parsed.privateKey, 'base64'),
+    if (!userId) return;
+
+    wsRef.current = new WebSocket('ws://192.168.31.185:4000');
+    wsRef.current.onmessage = (event) => {
+      const msg: Message = JSON.parse(event.data);
+      if ((msg.userId === selectedChatId && msg.contactId === userId) || 
+          (msg.contactId === selectedChatId && msg.userId === userId)) {
+        setMessages(prev => {
+          if (prev.some(m => m.id === msg.id)) return prev;
+          const updated = [...prev, msg].sort((a, b) => a.timestamp - b.timestamp);
+          if (chatRef.current && !isScrolledUp.current) {
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
+          }
+          return updated;
         });
       }
     };
-    initSignal();
 
-    if (userId) {
-      wsRef.current = new WebSocket('ws://192.168.31.185:4000');
-      wsRef.current.onmessage = (event) => {
-        const newMessage: Message = JSON.parse(event.data);
-        if (
-          (newMessage.userId === selectedChatId && newMessage.contactId === userId) ||
-          (newMessage.contactId === selectedChatId && newMessage.userId === userId)
-        ) {
-          setMessages((prev) => {
-            if (!prev.some((msg) => msg.id === newMessage.id)) {
-              const updatedMessages = [...prev, newMessage].sort((b, a) => b.timestamp - a.timestamp);
-              if (chatRef.current && !isScrolledUp.current) {
-                chatRef.current.scrollTop = chatRef.current.scrollHeight;
-              }
-              return updatedMessages;
-            }
-            return prev;
-          });
-        }
-      };
-      wsRef.current.onclose = () => {
-        console.log('WebSocket closed');
-        setTimeout(() => {
-          if (!wsRef.current) {
-            wsRef.current = new WebSocket('ws://192.168.31.185:4000');
-          }
-        }, 2000);
-      };
-      wsRef.current.onerror = (err) => console.error('WebSocket error:', err);
-    }
+    return () => { wsRef.current?.close(); };
+  }, [userId, selectedChatId]);
 
-    return () => {
-      if (wsRef.current) wsRef.current.close();
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchData = async () => {
+      const [contactsRes, messagesRes] = await Promise.all([
+        axios.get<Contact[]>('http://192.168.31.185:4000/users'),
+        selectedChatId 
+          ? axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`)
+          : Promise.resolve({ data: [] as Message[] })
+      ]);
+      
+      setContacts(contactsRes.data.filter(c => c.id !== userId));
+      setMessages(messagesRes.data.sort((a, b) => a.timestamp - b.timestamp));
+      if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
     };
+
+    fetchData();
+    const interval = setInterval(() => selectedChatId && fetchData(), 5000);
+    return () => clearInterval(interval);
   }, [userId, selectedChatId]);
 
   useEffect(() => {
-    if (userId) {
-      const fetchContacts = async () => {
-        const res = await axios.get<Contact[]>('http://192.168.31.185:4000/users');
-        setContacts(res.data.filter((c) => c.id !== userId));
-      };
-      fetchContacts();
-
-      const pollMessages = setInterval(async () => {
-        if (selectedChatId) {
-          const res = await axios.get<Message[]>(
-            `http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`
-          );
-          const sortedMessages = res.data.sort((b, a) => b.timestamp - a.timestamp);
-          setMessages(sortedMessages);
-        }
-      }, 5000);
-
-      return () => clearInterval(pollMessages);
-    }
-  }, [userId, selectedChatId]);
-
-  useEffect(() => {
-    if (userId && selectedChatId) {
-      const fetchMessages = async () => {
-        const res = await axios.get<Message[]>(
-          `http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`
-        );
-        const sortedMessages = res.data.sort((b, a) => b.timestamp - a.timestamp);
-        setMessages(sortedMessages);
-        if (chatRef.current) {
-          chatRef.current.scrollTop = chatRef.current.scrollHeight;
-        }
-      };
-      fetchMessages();
-    }
-  }, [userId, selectedChatId]);
-
-  useEffect(() => {
-    if (searchQuery && userId) {
-      const searchUsers = async () => {
-        const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
-        setSearchResults(res.data.filter((c) => c.id !== userId));
-      };
-      searchUsers();
-    } else {
-      setSearchResults([]);
-    }
+    if (!searchQuery || !userId) return setSearchResults([]);
+    
+    const search = async () => {
+      const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
+      setSearchResults(res.data.filter(c => c.id !== userId));
+    };
+    search();
   }, [searchQuery, userId]);
-
-  useEffect(() => {
-    if (selectedChatId) {
-      setIsSearchOpen(false);
-      setSearchQuery('');
-      setSearchResults([]);
-    }
-  }, [selectedChatId]);
 
   const generateKeyPair = async (): Promise<IdentityKeyPair> => {
     const keyPair = await signal.KeyHelper.generateIdentityKeyPair();
-    const publicKeySerialized = Buffer.from(keyPair.pubKey).toString('base64');
-    const privateKeySerialized = Buffer.from(keyPair.privKey).toString('base64');
-    localStorage.setItem('signalKeyPair', JSON.stringify({ publicKey: publicKeySerialized, privateKey: privateKeySerialized }));
+    localStorage.setItem('signalKeyPair', JSON.stringify({
+      publicKey: Buffer.from(keyPair.pubKey).toString('base64'),
+      privateKey: Buffer.from(keyPair.privKey).toString('base64')
+    }));
     return keyPair;
   };
 
-  const handleRegister = async () => {
-    if (!email || !password) return alert('Заповніть усі поля');
+  const handleAuth = async (isLogin: boolean) => {
+    if (!email || !password) return alert('Fill in all fields');
     const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
-    const keys = await generateKeyPair();
-    const publicKeySerialized = Buffer.from(keys.pubKey).toString('base64');
-    const res = await axios.post<{ id: string }>('http://192.168.31.185:4000/register', {
-      email,
-      password: hashedPassword,
-      publicKey: publicKeySerialized,
-    });
-    localStorage.setItem('userId', res.data.id);
-    localStorage.setItem('userEmail', email);
-    setUserId(res.data.id);
-    setUserEmail(email);
-    setIdentityKeyPair(keys);
-    alert('Реєстрація успішна!');
-  };
-
-  const handleLogin = async () => {
-    if (!email || !password) return alert('Заповніть усі поля');
+    
     try {
-      const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
-      const res = await axios.post<{ id: string; publicKey: string }>('http://192.168.31.185:4000/login', {
-        email,
-        password: hashedPassword,
-      });
-      let keys: IdentityKeyPair;
-      const storedKeyPair = localStorage.getItem('signalKeyPair');
-      if (!storedKeyPair) {
-        keys = await generateKeyPair();
-        await axios.put(`http://192.168.31.185:4000/update-keys`, {
-          userId: res.data.id,
-          publicKey: Buffer.from(keys.pubKey).toString('base64'),
-        });
-      } else {
-        const parsed = JSON.parse(storedKeyPair);
-        keys = { pubKey: Buffer.from(parsed.publicKey, 'base64'), privKey: Buffer.from(parsed.privateKey, 'base64') };
+      const endpoint = isLogin ? '/login' : '/register';
+      const keys = isLogin ? identityKeyPair || await generateKeyPair() : await generateKeyPair();
+      const publicKey = Buffer.from(keys.pubKey).toString('base64');
+      
+      const res = await axios.post<{ id: string; publicKey?: string }>(
+        `http://192.168.31.185:4000${endpoint}`, 
+        { email, password: hashedPassword, ...(isLogin ? {} : { publicKey }) }
+      );
+
+      if (isLogin && !identityKeyPair) {
+        await axios.put('http://192.168.31.185:4000/update-keys', { userId: res.data.id, publicKey });
       }
+
       localStorage.setItem('userId', res.data.id);
       localStorage.setItem('userEmail', email);
       setUserId(res.data.id);
       setUserEmail(email);
       setIdentityKeyPair(keys);
-      alert('Вхід успішний!');
+      alert(isLogin ? 'Login successful!' : 'Registration successful!');
     } catch (err) {
       const error = err as AxiosError<{ error?: string }>;
-      alert('Помилка входу: ' + (error.response?.data?.error || error.message));
+      alert(`Error: ${error.response?.data?.error || error.message}`);
     }
   };
 
   const sendMessage = async () => {
     if (!input.trim() || !userId || !selectedChatId) return;
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       userId,
@@ -227,251 +147,152 @@ const App: React.FC = () => {
 
     setInput('');
     try {
-      await axios.post<{ id: string }>('http://192.168.31.185:4000/messages', newMessage);
+      await axios.post('http://192.168.31.185:4000/messages', newMessage);
       if (chatRef.current && !isScrolledUp.current) {
         chatRef.current.scrollTop = chatRef.current.scrollHeight;
       }
     } catch (err) {
-      const error = err as AxiosError<{ error?: string }>;
-      console.error('Failed to send message:', error.response?.data?.error || error.message);
-      alert('Помилка відправки: ' + (error.response?.data?.error || error.message));
+      alert('Sending error');
     }
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') sendMessage();
-  };
-
   const handleContactSelect = (contact: Contact) => {
-    console.log('Selecting contact:', contact.email);
     setSelectedChatId(contact.id);
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
-    // Забезпечуємо, що UI оновлюється після вибору
-    setTimeout(() => {
-      setIsSearchOpen(false);
-    }, 0);
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }
   };
 
-  const toggleSearch = () => {
-    setIsSearchOpen((prev) => !prev);
-    if (!isSearchOpen) {
-      setSearchQuery('');
-      setSearchResults([]);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
+    setUserId(null);
+    setUserEmail(null);
+    setIdentityKeyPair(null);
+    setSelectedChatId(null);
+    setMessages([]);
+    setContacts([]);
   };
 
-  const handleScroll = () => {
-    if (chatRef.current) {
-      const isAtBottom = chatRef.current.scrollHeight - chatRef.current.scrollTop <= chatRef.current.clientHeight + 60;
-      isScrolledUp.current = !isAtBottom;
-    }
-  };
-
-  const themeClass = isDarkTheme ? 'bg-dark text-light' : 'bg-light text-dark';
-  const selectedContact = contacts.find((c) => c.id === selectedChatId);
+  const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
+  const selectedContact = contacts.find(c => c.id === selectedChatId);
 
   if (!userId || !identityKeyPair) {
     return (
-      <div className={`container vh-100 d-flex flex-column justify-content-center ${themeClass} p-3 ${isLoading ? 'loading' : ''}`}>
-        <h3 className="text-center mb-4">Мій месенджер</h3>
-        <div className="mb-3">
-          <input
-            type="email"
-            className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Електронна пошта"
-            autoComplete="email"
-          />
-          <input
-            type="password"
-            className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Пароль"
-            autoComplete="current-password"
-          />
-          <button className="btn btn-primary w-100 mb-2" onClick={handleLogin}>
-            Увійти
-          </button>
-          <button className="btn btn-secondary w-100" onClick={handleRegister}>
-            Зареєструватися
-          </button>
-        </div>
+      <div className={`container vh-100 d-flex flex-column justify-content-center ${themeClass} p-3`}>
+        <h3 className="text-center mb-4">My Messenger</h3>
+        <input
+          type="email"
+          className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="Email"
+        />
+        <input
+          type="password"
+          className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          placeholder="Password"
+        />
+        <button className="btn btn-primary w-100 mb-2" onClick={() => handleAuth(true)}>Login</button>
+        <button className="btn btn-secondary w-100" onClick={() => handleAuth(false)}>Register</button>
       </div>
     );
   }
 
   return (
-    <div className={`d-flex flex-column ${themeClass} ${isLoading ? 'loading' : 'loaded'}`} style={{ height: '100vh', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div ref={headerRef} className="d-flex justify-content-between align-items-center p-2 border-bottom" style={{ position: 'sticky', top: 0, zIndex: 1000, background: isDarkTheme ? '#212529' : '#fff', animation: 'slideDown 0.5s ease-in-out' }}>
-        <h4 className="m-0" style={{ fontSize: '0.9rem' }}>Мої чати ({userEmail})</h4>
-        <div className="d-flex align-items-center">
-          <button className={`btn btn-sm btn-outline-${isDarkTheme ? 'light' : 'dark'} me-2`} onClick={toggleSearch} style={{ animation: 'fadeIn 0.5s ease-in-out' }}>
-            <FaSearch />
-          </button>
-          <button className={`btn btn-sm btn-outline-${isDarkTheme ? 'light' : 'dark'}`} onClick={() => setIsDarkTheme(!isDarkTheme)} style={{ animation: 'fadeIn 0.5s ease-in-out 0.2s' }}>
-            {isDarkTheme ? <FaMoon /> : <FaSun />}
-          </button>
+    <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh' }}>
+      <div className="p-2 border-bottom" style={{ position: 'sticky', top: 0, background: isDarkTheme ? '#212529' : '#fff' }}>
+        <div className="d-flex justify-content-between align-items-center">
+          <div style={{ position: 'relative' }}>
+            <h4 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              MSNGR ({userEmail})
+            </h4>
+            {isMenuOpen && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, background: isDarkTheme ? '#212529' : '#fff', border: '1px solid #ccc', borderRadius: '4px', zIndex: 10 }}>
+                <button className="btn btn-sm btn-outline-danger w-100" onClick={handleLogout}>
+                  <FaSignOutAlt /> Logout
+                </button>
+              </div>
+            )}
+          </div>
+          <div>
+            <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+              <FaSearch />
+            </button>
+            <button className="btn btn-sm btn-outline-secondary" onClick={() => setIsDarkTheme(!isDarkTheme)}>
+              {isDarkTheme ? <FaMoon /> : <FaSun />}
+            </button>
+          </div>
         </div>
+        {selectedChatId && (
+          <h6 className="m-0 text-center mt-2 border-top pt-2">Chat with {selectedContact?.email || 'unknown'}</h6>
+        )}
       </div>
 
       {isSearchOpen && (
-        <div className="search-panel p-2 border-bottom" style={{ position: 'sticky', top: headerRef.current?.offsetHeight || 50, zIndex: 950, background: isDarkTheme ? '#212529' : '#fff', maxHeight: '20vh', overflowY: 'auto', animation: 'slideDown 0.5s ease-in-out' }}>
+        <div className="p-2 border-bottom" style={{ position: 'sticky', top: selectedChatId ? 100 : 60, background: isDarkTheme ? '#212529' : '#fff' }}>
           <input
             type="text"
-            className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
+            className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Пошук користувачів..."
-            autoFocus
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search users..."
           />
-          {searchResults.length > 0 && (
-            <div className="mt-2" style={{ maxHeight: '15vh', overflowY: 'auto', border: `1px solid ${isDarkTheme ? '#555' : '#ccc'}`, borderRadius: '5px' }}>
-              {searchResults.map((result) => (
-                <div
-                  key={result.id}
-                  className={`p-2 ${isDarkTheme ? 'bg-secondary' : 'bg-light'} border-bottom`}
-                  onClick={() => handleContactSelect(result)}
-                  style={{ cursor: 'pointer', fontSize: '0.9rem', transition: 'background-color 0.2s ease' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDarkTheme ? '#333' : '#e9ecef')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDarkTheme ? '#212529' : '#f8f9fa')}
-                >
-                  {result.email}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Видалено список контактів (contactsRef), оскільки він створював проблему */}
-      {selectedChatId && (
-        <div className="p-2 border-bottom" style={{ position: 'sticky', top: headerRef.current?.offsetHeight || 0, zIndex: 900, background: isDarkTheme ? '#212529' : '#fff', padding: '0.5rem', animation: 'slideDown 0.5s ease-in-out' }}>
-          <h6 className="m-0 text-center" style={{ fontSize: '0.9rem' }}>Чат з {selectedContact?.email || 'невідомим'}</h6>
-        </div>
-      )}
-
-      <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
-        {selectedChatId && !messages.length && (
-          <div
-            className="text-center p-2 border-bottom"
-            style={{
-              position: 'sticky',
-              top: (headerRef.current?.offsetHeight || 50) + (selectedChatId ? 40 : 0),
-              zIndex: 850,
-              background: isDarkTheme ? '#212529' : '#fff',
-            }}
-          >
-            <p className="m-0" style={{ fontSize: '0.9rem' }}>Немає повідомлень</p>
-          </div>
-        )}
-
-        <div
-          ref={chatRef}
-          className={`flex-grow-1 overflow-auto p-2 ${isDarkTheme ? 'bg-secondary text-light' : 'bg-light text-dark'}`}
-          style={{ minHeight: 0 }}
-          onScroll={handleScroll}
-        >
-          {selectedChatId && messages.length > 0 ? (
-            messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`d-flex mb-2 ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} message-animation`}
-                style={{ animation: 'fadeInSlide 0.5s ease-in-out' }}
-              >
-                <div
-                  className={`p-2 rounded ${msg.isMine ? 'bg-primary text-white' : isDarkTheme ? 'bg-dark text-light' : 'bg-gray-300 text-dark'}`}
-                  style={{ maxWidth: '70%', wordBreak: 'break-word', borderRadius: '10px', backgroundColor: msg.isMine ? '#007bff' : isDarkTheme ? '#343a40' : '#e9ecef' }}
-                >
-                  {msg.text}
-                  <small className={`d-block mt-1 ${isDarkTheme ? 'text-muted' : 'text-muted'}`} style={{ fontSize: '0.7rem', color: isDarkTheme ? '#ccc' : '#666' }}>
-                    {new Date(msg.timestamp).toLocaleTimeString()}
-                  </small>
-                </div>
-              </div>
-            ))
-          ) : !selectedChatId ? (
+          {searchResults.map(result => (
             <div
-              className="text-center p-2 border-bottom"
-              style={{
-                position: 'sticky',
-                top: headerRef.current?.offsetHeight || 50,
-                zIndex: 850,
-                background: isDarkTheme ? '#212529' : '#fff',
-              }}
+              key={result.id}
+              className="p-2 border-bottom"
+              onClick={() => handleContactSelect(result)}
+              style={{ cursor: 'pointer' }}
             >
-              <p className="m-0" style={{ fontSize: '0.9rem' }}>Виберіть чат</p>
+              {result.email}
             </div>
-          ) : null}
+          ))}
         </div>
+      )}
+
+      <div ref={chatRef} className="flex-grow-1 overflow-auto p-2" onScroll={() => {
+        if (chatRef.current) isScrolledUp.current = chatRef.current.scrollHeight - chatRef.current.scrollTop > chatRef.current.clientHeight + 60;
+      }}>
+        {selectedChatId ? (
+          messages.length ? messages.map(msg => (
+            <div key={msg.id} className={`d-flex mb-2 ${msg.isMine ? 'justify-content-end' : ''}`}>
+              <div className={`p-2 rounded ${msg.isMine ? 'bg-primary text-white' : 'bg-gray-300'}`}>
+                {msg.text}
+                <small className="d-block mt-1 text-muted">{new Date(msg.timestamp).toLocaleTimeString()}</small>
+              </div>
+            </div>
+          )) : <p className="text-center">No messages</p>
+        ) : <p className="text-center">Select a chat</p>}
       </div>
 
       {selectedChatId && (
-        <div className="p-2 border-top" style={{ position: 'sticky', bottom: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 800 }}>
-          <div className="d-flex align-items-center">
+        <div className="p-2 border-top" style={{ position: 'sticky', bottom: 0, background: isDarkTheme ? '#212529' : '#fff' }}>
+          <style>
+            {`
+              .message-input::placeholder {
+                color: ${isDarkTheme ? '#aaa' : '#888'};
+              }
+            `}
+          </style>
+          <div className="d-flex">
             <input
               type="text"
-              className={`form-control me-2 ${isDarkTheme ? 'bg-dark text-light border-light' : 'bg-white text-dark'}`}
+              className={`form-control me-2 message-input ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
+              style={{ color: isDarkTheme ? '#fff' : '#000' }}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Повідомлення..."
-              style={{ flex: 1, borderRadius: '20px', padding: '0.5rem 1rem', transition: 'all 0.3s ease' }}
+              onChange={e => setInput(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && sendMessage()}
+              placeholder="Message..."
             />
-            <button
-              className="btn btn-primary"
-              onClick={sendMessage}
-              style={{ minWidth: '100px', borderRadius: '20px', padding: '0.5rem 1rem', transition: 'all 0.3s ease', animation: 'pulse 0.5s ease-in-out' }}
-            >
-              Надіслати
-            </button>
+            <button className="btn btn-primary" onClick={sendMessage}>Send</button>
           </div>
         </div>
       )}
     </div>
   );
 };
-
-const styles = `
-  .loading {
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-  }
-  .loaded {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  @keyframes slideDown {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  @keyframes fadeInSlide {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-  button:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease;
-  }
-  .search-panel:not([style*="max-height: 20vh"]) {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-in-out;
-  }
-`;
 
 export default App;
