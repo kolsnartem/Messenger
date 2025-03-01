@@ -45,7 +45,7 @@ const App: React.FC = () => {
   const anchorRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const isInitialMount = useRef(true);
-  const prevMessageCount = useRef(0); // Для відстеження нових повідомлень
+  const prevMessageCount = useRef(0);
 
   useEffect(() => {
     const init = async () => {
@@ -77,7 +77,7 @@ const App: React.FC = () => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     }
-    prevMessageCount.current = messages.length; // Оновлюємо кількість повідомлень
+    prevMessageCount.current = messages.length;
   }, [messages, selectedChatId, userId]);
 
   useEffect(() => {
@@ -282,12 +282,12 @@ const App: React.FC = () => {
             animation: slideIn 0.3s ease-out forwards;
           }
           .input-placeholder-dark::placeholder {
-            color: #b0b0b0; /* Світло-сірий для темної теми, менш яскравий ніж #fff */
+            color: #b0b0b0;
           }
         `}
       </style>
       <div 
-        className="p-2 border-bottom" 
+        className="p-2" 
         style={{ 
           position: 'sticky', 
           top: 0, 
@@ -343,7 +343,7 @@ const App: React.FC = () => {
           </div>
         </div>
         {selectedChatId && (
-          <div className="p-2 border-top d-flex align-items-center mt-2">
+          <div className="p-2 d-flex align-items-center mt-2">
             <div 
               className="rounded-circle me-2 d-flex align-items-center justify-content-center"
               style={{ 
@@ -457,7 +457,7 @@ const App: React.FC = () => {
 
       {selectedChatId && (
         <div 
-          className="p-2 border-top" 
+          className="p-2" 
           style={{ 
             position: 'sticky', 
             bottom: 0, 
