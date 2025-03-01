@@ -46,11 +46,29 @@ db.serialize(() => {
 const clients = new Map();
 
 wss.on('connection', (ws) => {
+  console.log('New WebSocket connection established');
+
   ws.on('message', (message) => {
-    // Обробка вхідних повідомлень якщо потрібно
+    const msg = JSON.parse(message);
+    console.log(`Received WebSocket message: From ${msg.userId} to ${msg.contactId} (ID: ${msg.id})`);
+
+    // Збереження повідомлення в базу даних
+    db.run(
+      'INSERT INTO messages (id, userId, contactId, text, timestamp) VALUES (?, ?, ?, ?, ?)',
+      [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp],
+      (err) => {
+        if (err) {
+          console.error('Failed to save WebSocket message to DB:', err);
+        } else {
+          console.log(`WebSocket message saved to DB: ${msg.id}`);
+          broadcastMessage(msg); // Розсилка повідомлення всім клієнтам
+        }
+      }
+    );
   });
 
   ws.on('close', () => {
+    console.log('WebSocket connection closed');
     clients.forEach((value, key) => {
       if (value === ws) {
         clients.delete(key);
@@ -79,6 +97,7 @@ app.post('/register', (req, res) => {
       [email, password, publicKey],
       function(err) {
         if (err) return res.status(500).json({ error: 'Registration failed' });
+        console.log(`User registered: ${email} (ID: ${this.lastID})`);
         res.json({ id: this.lastID.toString() });
       }
     );
@@ -93,6 +112,7 @@ app.post('/login', (req, res) => {
     (err, row) => {
       if (err) return res.status(500).json({ error: 'Database error' });
       if (!row) return res.status(401).json({ error: 'Invalid credentials' });
+      console.log(`User logged in: ${email} (ID: ${row.id})`);
       res.json({ id: row.id.toString() });
     }
   );
@@ -105,6 +125,7 @@ app.put('/update-keys', (req, res) => {
     [publicKey, userId],
     (err) => {
       if (err) return res.status(500).json({ error: 'Update failed' });
+      console.log(`Updated keys for user ID: ${userId}`);
       res.json({ success: true });
     }
   );
@@ -158,8 +179,11 @@ app.post('/messages', (req, res) => {
     'INSERT INTO messages (id, userId, contactId, text, timestamp) VALUES (?, ?, ?, ?, ?)',
     [id, userId, contactId, text, timestamp],
     (err) => {
-      if (err) return res.status(500).json({ error: 'Failed to send message' });
-      
+      if (err) {
+        console.error(`Failed to save HTTP message to DB: ${id}`, err);
+        return res.status(500).json({ error: 'Failed to send message' });
+      }
+      console.log(`HTTP message saved to DB: From ${userId} to ${contactId} (ID: ${id})`);
       const message = { id, userId, contactId, text, timestamp };
       broadcastMessage(message);
       res.json({ success: true });

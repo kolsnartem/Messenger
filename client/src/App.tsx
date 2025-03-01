@@ -54,6 +54,7 @@ const App: React.FC = () => {
     if (!userId) return;
 
     wsRef.current = new WebSocket('ws://192.168.31.185:4000');
+    wsRef.current.onopen = () => console.log('WebSocket connected');
     wsRef.current.onmessage = (event) => {
       const msg: Message = JSON.parse(event.data);
       if ((msg.userId === userId && msg.contactId === selectedChatId) || 
@@ -66,6 +67,8 @@ const App: React.FC = () => {
         shouldScrollToBottom.current = true;
       }
     };
+    wsRef.current.onerror = (err) => console.error('WebSocket error:', err);
+    wsRef.current.onclose = () => console.log('WebSocket closed');
 
     return () => { wsRef.current?.close(); };
   }, [userId, selectedChatId]);
@@ -160,8 +163,8 @@ const App: React.FC = () => {
     }
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || !userId || !selectedChatId) return;
+  const sendMessage = () => {
+    if (!input.trim() || !userId || !selectedChatId || !wsRef.current) return;
     
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -172,18 +175,22 @@ const App: React.FC = () => {
       isMine: true,
     };
 
+    // Optimistically add the message to the sender's UI
+    setMessages(prev => {
+      if (prev.some(m => m.id === newMessage.id)) return prev;
+      return [...prev, newMessage].sort((a, b) => a.timestamp - b.timestamp);
+    });
     setInput('');
-    try {
-      await axios.post('http://192.168.31.185:4000/messages', {
-        id: newMessage.id,
-        userId: newMessage.userId,
-        contactId: newMessage.contactId,
-        text: newMessage.text,
-        timestamp: newMessage.timestamp
-      });
-    } catch (err) {
-      alert('Sending error');
-    }
+    shouldScrollToBottom.current = true;
+
+    // Send the message via WebSocket
+    wsRef.current.send(JSON.stringify(newMessage));
+
+    // Optionally persist the message to the server via HTTP (non-blocking)
+    axios.post('http://192.168.31.185:4000/messages', newMessage).catch(err => {
+      console.error('Failed to persist message:', err);
+      // Optionally handle failure (e.g., remove message from UI if it fails)
+    });
   };
 
   const handleContactSelect = (contact: Contact) => {
