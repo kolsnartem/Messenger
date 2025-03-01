@@ -4,9 +4,25 @@ import * as signal from '@privacyresearch/libsignal-protocol-typescript';
 import * as CryptoJS from 'crypto-js';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync } from 'react-icons/fa';
 
-interface IdentityKeyPair { pubKey: ArrayBuffer; privKey: ArrayBuffer }
-interface Message { id: string; userId: string; contactId: string; text: string; timestamp: number; isMine?: boolean }
-interface Contact { id: string; email: string; publicKey: string }
+interface IdentityKeyPair {
+  pubKey: ArrayBuffer;
+  privKey: ArrayBuffer;
+}
+
+interface Message {
+  id: string;
+  userId: string;
+  contactId: string;
+  text: string;
+  timestamp: number;
+  isMine?: boolean;
+}
+
+interface Contact {
+  id: string;
+  email: string;
+  publicKey: string;
+}
 
 const App: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(() => localStorage.getItem('userId'));
@@ -26,6 +42,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null); // Референція для фіксації "грані" над кнопкою Send
   const wsRef = useRef<WebSocket | null>(null);
   const shouldScrollToBottom = useRef(true);
 
@@ -45,10 +62,19 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (shouldScrollToBottom.current && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (chatRef.current && (messagesEndRef.current || anchorRef.current)) {
+      const scrollToPosition = () => {
+        if (selectedChatId && messages.length === 0 && anchorRef.current) {
+          // Якщо чат пустий, скролимо до "грані" над кнопкою Send
+          anchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        } else if (shouldScrollToBottom.current && messagesEndRef.current) {
+          // Якщо є повідомлення, скролимо до кінця чату
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+      scrollToPosition();
     }
-  }, [messages]);
+  }, [messages, selectedChatId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -152,7 +178,7 @@ const App: React.FC = () => {
       }
 
       localStorage.setItem('userId', res.data.id);
-      localStorage.setItem('userEmail', email);
+      localStorage.removeItem('userEmail', email); // Використовуємо removeItem для очищення, якщо потрібно
       setUserId(res.data.id);
       setUserEmail(email);
       setIdentityKeyPair(keys);
@@ -175,7 +201,6 @@ const App: React.FC = () => {
       isMine: true,
     };
 
-    // Optimistically add the message to the sender's UI
     setMessages(prev => {
       if (prev.some(m => m.id === newMessage.id)) return prev;
       return [...prev, newMessage].sort((a, b) => a.timestamp - b.timestamp);
@@ -183,13 +208,10 @@ const App: React.FC = () => {
     setInput('');
     shouldScrollToBottom.current = true;
 
-    // Send the message via WebSocket
     wsRef.current.send(JSON.stringify(newMessage));
 
-    // Optionally persist the message to the server via HTTP (non-blocking)
     axios.post('http://192.168.31.185:4000/messages', newMessage).catch(err => {
       console.error('Failed to persist message:', err);
-      // Optionally handle failure (e.g., remove message from UI if it fails)
     });
   };
 
@@ -356,48 +378,51 @@ const App: React.FC = () => {
         style={{ 
           overflowY: 'auto',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'column-reverse', // Змінив на column-reverse для відображення знизу вгору
           filter: isSearchOpen && selectedChatId ? 'blur(5px)' : 'none',
           transition: 'filter 0.3s',
-          justifyContent: messages.length === 0 && selectedChatId ? 'flex-end' : 'flex-start'
         }}
         onScroll={handleScroll}
       >
         {selectedChatId ? (
-          messages.length > 0 ? (
-            <>
-              {messages.map(msg => (
-                <div 
-                  key={msg.id} 
-                  className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2`}
-                >
+          <>
+            {/* Віртуальна "грань" над кнопкою Send для пустих чатів */}
+            <div ref={anchorRef} style={{ height: '0' }} />
+            {messages.length > 0 ? (
+              <>
+                {messages.slice().reverse().map(msg => ( // Реверсуємо масив для відображення знизу вгору
                   <div 
-                    className={`p-2 rounded-3 ${
-                      msg.isMine 
-                        ? 'bg-primary text-white' 
-                        : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'
-                    }`}
-                    style={{ 
-                      maxWidth: '75%',
-                      position: 'relative',
-                      borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                      wordBreak: 'break-word'
-                    }}
+                    key={msg.id} 
+                    className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2`}
                   >
-                    <div>{msg.text}</div>
-                    <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
-                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div 
+                      className={`p-2 rounded-3 ${
+                        msg.isMine 
+                          ? 'bg-primary text-white' 
+                          : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'
+                      }`}
+                      style={{ 
+                        maxWidth: '75%',
+                        position: 'relative',
+                        borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      <div>{msg.text}</div>
+                      <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </>
-          ) : (
-            <div className="text-muted text-center" style={{ marginBottom: '10px' }}>
-              No messages yet. Start your conversation!
-            </div>
-          )
+                ))}
+                <div ref={messagesEndRef} />
+              </>
+            ) : (
+              <div className="text-muted text-center" style={{ marginBottom: '60px' }}> // Додано відступ для пустих чатів
+                No messages yet. Start your conversation!
+              </div>
+            )}
+          </>
         ) : (
           <div className="h-100 d-flex justify-content-center align-items-center text-muted">
             Select a chat
