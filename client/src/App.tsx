@@ -42,7 +42,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const anchorRef = useRef<HTMLDivElement>(null); // Додаємо назад для позиціонування над кнопкою Send
+  const anchorRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const isInitialMount = useRef(true);
 
@@ -66,10 +66,8 @@ const App: React.FC = () => {
 
     const scrollToPosition = () => {
       if (messages.length === 0 && anchorRef.current) {
-        // Якщо чат пустий, скролимо до "грані" над кнопкою Send
         anchorRef.current.scrollIntoView({ behavior: 'auto' });
       } else if (messagesEndRef.current) {
-        // Якщо є повідомлення, скролимо до кінця
         messagesEndRef.current.scrollIntoView({ behavior: isInitialMount.current ? 'auto' : 'smooth' });
       }
     };
@@ -266,6 +264,23 @@ const App: React.FC = () => {
 
   return (
     <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'relative' }}>
+      <style>
+        {`
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .message-enter {
+            animation: slideIn 0.3s ease-out forwards;
+          }
+        `}
+      </style>
       <div className="p-2 border-bottom" style={{ position: 'sticky', top: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 20 }}>
         <div className="d-flex justify-content-between align-items-center">
           <div style={{ position: 'relative' }}>
@@ -381,13 +396,15 @@ const App: React.FC = () => {
       >
         {selectedChatId ? (
           <>
-            <div style={{ flexGrow: 1 }} /> {/* Простір зверху для позиціонування першого повідомлення знизу */}
+            <div style={{ flexGrow: 1 }} />
             {messages.length > 0 ? (
               <>
-                {messages.map(msg => (
+                {messages.map((msg, index) => (
                   <div 
                     key={msg.id} 
-                    className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2`}
+                    className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 ${
+                      index === messages.length - 1 && !isInitialMount.current ? 'message-enter' : ''
+                    }`}
                   >
                     <div 
                       className={`p-2 rounded-3 ${
@@ -416,7 +433,7 @@ const App: React.FC = () => {
                 No messages yet. Start your conversation!
               </div>
             )}
-            <div ref={anchorRef} style={{ height: '1px' }} /> {/* Грань над кнопкою Send */}
+            <div ref={anchorRef} style={{ height: '1px' }} />
           </>
         ) : (
           <div className="h-100 d-flex justify-content-center align-items-center text-muted">
