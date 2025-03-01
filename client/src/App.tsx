@@ -45,6 +45,7 @@ const App: React.FC = () => {
   const anchorRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const isInitialMount = useRef(true);
+  const prevMessageCount = useRef(0); // Для відстеження нових повідомлень
 
   useEffect(() => {
     const init = async () => {
@@ -76,6 +77,7 @@ const App: React.FC = () => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     }
+    prevMessageCount.current = messages.length; // Оновлюємо кількість повідомлень
   }, [messages, selectedChatId, userId]);
 
   useEffect(() => {
@@ -279,9 +281,20 @@ const App: React.FC = () => {
           .message-enter {
             animation: slideIn 0.3s ease-out forwards;
           }
+          .input-placeholder-dark::placeholder {
+            color: #b0b0b0; /* Світло-сірий для темної теми, менш яскравий ніж #fff */
+          }
         `}
       </style>
-      <div className="p-2 border-bottom" style={{ position: 'sticky', top: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 20 }}>
+      <div 
+        className="p-2 border-bottom" 
+        style={{ 
+          position: 'sticky', 
+          top: 0, 
+          background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
+          zIndex: 20 
+        }}
+      >
         <div className="d-flex justify-content-between align-items-center">
           <div style={{ position: 'relative' }}>
             <h4 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -354,7 +367,7 @@ const App: React.FC = () => {
             top: 40,
             left: 0,
             right: 0,
-            background: isDarkTheme ? '#212529' : '#fff',
+            background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)',
             zIndex: 30,
             padding: '0',
           }}
@@ -403,7 +416,7 @@ const App: React.FC = () => {
                   <div 
                     key={msg.id} 
                     className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 ${
-                      index === messages.length - 1 && !isInitialMount.current ? 'message-enter' : ''
+                      index >= prevMessageCount.current && !isInitialMount.current ? 'message-enter' : ''
                     }`}
                   >
                     <div 
@@ -443,11 +456,19 @@ const App: React.FC = () => {
       </div>
 
       {selectedChatId && (
-        <div className="p-2 border-top" style={{ position: 'sticky', bottom: 0, background: isDarkTheme ? '#212529' : '#fff', zIndex: 10 }}>
+        <div 
+          className="p-2 border-top" 
+          style={{ 
+            position: 'sticky', 
+            bottom: 0, 
+            background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
+            zIndex: 10 
+          }}
+        >
           <div className="d-flex align-items-center">
             <input
               type="text"
-              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
+              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light input-placeholder-dark' : ''}`}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyPress={e => e.key === 'Enter' && sendMessage()}
