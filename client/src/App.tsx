@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios, { AxiosError } from 'axios';
 import * as signal from '@privacyresearch/libsignal-protocol-typescript';
 import * as CryptoJS from 'crypto-js';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
 
 interface IdentityKeyPair {
   pubKey: ArrayBuffer;
@@ -22,6 +22,7 @@ interface Contact {
   id: string;
   email: string;
   publicKey: string;
+  lastMessage?: Message;
 }
 
 const App: React.FC = () => {
@@ -83,7 +84,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!userId) return;
 
-    wsRef.current = new WebSocket('ws://192.168.31.185:4000');
+    wsRef.current = new WebSocket(`ws://192.168.31.185:4000?userId=${userId}`);
     wsRef.current.onopen = () => console.log('WebSocket connected');
     wsRef.current.onmessage = (event) => {
       const msg: Message = JSON.parse(event.data);
@@ -95,6 +96,7 @@ const App: React.FC = () => {
           return [...prev, newMsg].sort((a, b) => a.timestamp - b.timestamp);
         });
       }
+      updateContactsWithLastMessage(msg);
     };
     wsRef.current.onerror = (err) => console.error('WebSocket error:', err);
     wsRef.current.onclose = () => console.log('WebSocket closed');
@@ -107,14 +109,23 @@ const App: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const [contactsRes, messagesRes] = await Promise.all([
+        const [contactsRes, messagesRes, allMessagesRes] = await Promise.all([
           axios.get<Contact[]>('http://192.168.31.185:4000/users'),
           selectedChatId 
             ? axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`)
-            : Promise.resolve({ data: [] as Message[] })
+            : Promise.resolve({ data: [] as Message[] }),
+          axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}`)
         ]);
         
-        setContacts(contactsRes.data.filter(c => c.id !== userId));
+        const allContacts = contactsRes.data.filter(c => c.id !== userId);
+        const contactsWithLastMessage = allContacts.map(contact => {
+          const lastMsg = allMessagesRes.data
+            .filter(m => (m.userId === userId && m.contactId === contact.id) || (m.userId === contact.id && m.contactId === userId))
+            .sort((a, b) => b.timestamp - a.timestamp)[0];
+          return { ...contact, lastMessage: lastMsg };
+        }).sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+
+        setContacts(contactsWithLastMessage);
         setMessages(messagesRes.data.map(msg => ({
           ...msg,
           isMine: msg.userId === userId
@@ -125,7 +136,7 @@ const App: React.FC = () => {
     };
 
     fetchData();
-    const interval = setInterval(() => selectedChatId && fetchData(), 5000);
+    const interval = setInterval(() => fetchData(), 5000);
     return () => clearInterval(interval);
   }, [userId, selectedChatId]);
 
@@ -192,6 +203,11 @@ const App: React.FC = () => {
 
   const sendMessage = () => {
     if (!input.trim() || !userId || !selectedChatId || !wsRef.current) return;
+    if (wsRef.current.readyState !== WebSocket.OPEN) {
+      console.error('WebSocket is not open');
+      alert('Connection lost. Please refresh the page.');
+      return;
+    }
     
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -209,9 +225,6 @@ const App: React.FC = () => {
     setInput('');
     
     wsRef.current.send(JSON.stringify(newMessage));
-    axios.post('http://192.168.31.185:4000/messages', newMessage).catch(err => {
-      console.error('Failed to persist message:', err);
-    });
   };
 
   const handleContactSelect = (contact: Contact) => {
@@ -233,6 +246,15 @@ const App: React.FC = () => {
 
   const handleUpdate = () => {
     window.location.reload();
+  };
+
+  const updateContactsWithLastMessage = (newMessage: Message) => {
+    setContacts(prev => prev.map(contact => {
+      if (contact.id === newMessage.contactId || contact.id === newMessage.userId) {
+        return { ...contact, lastMessage: newMessage };
+      }
+      return contact;
+    }).sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
@@ -265,7 +287,18 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'relative' }}>
+    <div 
+      className={`d-flex flex-column ${themeClass}`} 
+      style={{ 
+        height: '100vh', 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        overflow: 'hidden'
+      }}
+    >
       <style>
         {`
           @keyframes slideIn {
@@ -284,16 +317,60 @@ const App: React.FC = () => {
           .input-placeholder-dark::placeholder {
             color: #b0b0b0;
           }
+          .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid ${isDarkTheme ? '#444' : '#eee'};
+            cursor: pointer;
+            width: 100%;
+          }
+          .chat-item:hover {
+            background: ${isDarkTheme ? '#444' : '#f8f9fa'};
+          }
+          .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: ${isDarkTheme ? '#6c757d' : '#e9ecef'};
+            color: ${isDarkTheme ? '#fff' : '#212529'};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+          }
+          .scroll-container {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: ${isDarkTheme ? '#6c757d #212529' : '#dee2e6 #fff'};
+          }
+          .scroll-container::-webkit-scrollbar {
+            width: 8px;
+          }
+          .scroll-container::-webkit-scrollbar-track {
+            background: ${isDarkTheme ? '#212529' : '#fff'};
+          }
+          .scroll-container::-webkit-scrollbar-thumb {
+            background: ${isDarkTheme ? '#6c757d' : '#dee2e6'};
+            border-radius: 4px;
+          }
+          .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: ${isDarkTheme ? '#868e96' : '#adb5bd'};
+          }
         `}
       </style>
+
+      {/* Header */}
       <div 
         className="p-2" 
         style={{ 
-          position: 'sticky', 
-          top: 0, 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
           background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
           zIndex: 20,
-          height: "90px"
+          height: selectedChatId ? "90px" : "50px"
         }}
       >
         <div className="d-flex justify-content-between align-items-center">
@@ -344,7 +421,14 @@ const App: React.FC = () => {
           </div>
         </div>
         {selectedChatId && (
-          <div className="p-2 d-flex justify-content-center align-items-center mt-1">
+          <div className="p-2 d-flex align-items-center mt-1">
+            <button 
+              className="btn btn-sm btn-outline-secondary me-2" 
+              onClick={() => setSelectedChatId(null)}
+              style={{ border: 'none', background: 'transparent' }}
+            >
+              <FaArrowLeft />
+            </button>
             <div 
               className="rounded-circle me-2 d-flex align-items-center justify-content-center"
               style={{ 
@@ -361,11 +445,12 @@ const App: React.FC = () => {
         )}
       </div>
 
+      {/* Search */}
       {isSearchOpen && (
         <div
           style={{
             position: 'fixed',
-            top: 40,
+            top: selectedChatId ? 90 : 50,
             left: 0,
             right: 0,
             background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)',
@@ -382,7 +467,7 @@ const App: React.FC = () => {
               placeholder="Search users..."
             />
           </div>
-          <div style={{ overflowY: 'auto', maxHeight: selectedChatId ? 'calc(100vh - 160px)' : 'calc(100vh - 60px)' }}>
+          <div style={{ overflowY: 'auto', maxHeight: selectedChatId ? 'calc(100vh - 150px)' : 'calc(100vh - 90px)' }}>
             {searchResults.map(result => (
               <div
                 key={result.id}
@@ -397,19 +482,31 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* Main content */}
       <div 
         ref={chatRef}
-        className="flex-grow-1 p-3"
+        className="flex-grow-1"
         style={{ 
-          overflowY: 'auto',
-          filter: isSearchOpen && selectedChatId ? 'blur(5px)' : 'none',
-          transition: 'filter 0.3s',
-          display: 'flex',
-          flexDirection: 'column',
+          position: 'absolute',
+          top: selectedChatId ? 90 : 50,
+          bottom: selectedChatId ? 60 : 0,
+          left: 0,
+          right: 0,
+          overflow: 'hidden',
         }}
       >
         {selectedChatId ? (
-          <>
+          <div 
+            className="p-3 scroll-container"
+            style={{ 
+              height: 'calc(100% - 60px)',
+              overflowY: 'auto',
+              filter: isSearchOpen ? 'blur(5px)' : 'none',
+              transition: 'filter 0.3s',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <div style={{ flexGrow: 1 }} />
             {messages.length > 0 ? (
               <>
@@ -448,25 +545,60 @@ const App: React.FC = () => {
               </div>
             )}
             <div ref={anchorRef} style={{ height: '1px' }} />
-          </>
+          </div>
         ) : (
-          <div className="h-100 d-flex justify-content-center align-items-center text-muted">
-            Select a chat
+          <div 
+            className="scroll-container" 
+            style={{ 
+              height: '100%',
+              overflowY: 'auto' 
+            }}
+          >
+            {contacts.map((contact) => (
+              <div
+                key={contact.id}
+                className="chat-item"
+                onClick={() => handleContactSelect(contact)}
+                style={{ width: '100%' }}
+              >
+                <div className="avatar">
+                  {contact.email.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div className="fw-bold">{contact.email}</div>
+                  {contact.lastMessage && (
+                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                      {contact.lastMessage.text.length > 20 ? `${contact.lastMessage.text.substring(0, 20)}...` : contact.lastMessage.text}
+                      <span style={{ marginLeft: '10px', fontSize: '0.7rem' }}>
+                        {new Date(contact.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
+      {/* Input panel - Fixed positioning at the bottom */}
       {selectedChatId && (
         <div 
           className="p-2" 
           style={{ 
-            position: 'sticky', 
+            position: 'fixed',  
             bottom: 0, 
+            left: 0,
+            right: 0,
             background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
-            zIndex: 10 
+            zIndex: 10,
+            height: '49px',
+            display: 'flex',
+            alignItems: 'center',
+            borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee'
           }}
         >
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center w-100 px-2">
             <input
               type="text"
               className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light input-placeholder-dark' : ''}`}

@@ -3,6 +3,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const url = require('url');
 
 const app = express();
 const server = http.createServer(app);
@@ -45,8 +46,16 @@ db.serialize(() => {
 // WebSocket логіка
 const clients = new Map();
 
-wss.on('connection', (ws) => {
-  console.log('New WebSocket connection established');
+wss.on('connection', (ws, req) => {
+  const params = url.parse(req.url, true).query;
+  const userId = params.userId;
+  if (!userId) {
+    ws.close(4000, 'Missing userId');
+    return;
+  }
+
+  clients.set(userId, ws);
+  console.log(`New WebSocket connection established for user: ${userId}`);
 
   ws.on('message', (message) => {
     const msg = JSON.parse(message);
@@ -61,25 +70,27 @@ wss.on('connection', (ws) => {
           console.error('Failed to save WebSocket message to DB:', err);
         } else {
           console.log(`WebSocket message saved to DB: ${msg.id}`);
-          broadcastMessage(msg); // Розсилка повідомлення всім клієнтам
+          sendToParticipants(msg); // Відправка повідомлення тільки учасникам чату
         }
       }
     );
   });
 
   ws.on('close', () => {
-    console.log('WebSocket connection closed');
-    clients.forEach((value, key) => {
-      if (value === ws) {
-        clients.delete(key);
-      }
-    });
+    console.log(`WebSocket connection closed for user: ${userId}`);
+    clients.delete(userId);
+  });
+
+  ws.on('error', (err) => {
+    console.error(`WebSocket error for user ${userId}:`, err);
   });
 });
 
-const broadcastMessage = (message) => {
-  clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
+const sendToParticipants = (message) => {
+  const participants = [message.userId, message.contactId];
+  participants.forEach((id) => {
+    const client = clients.get(id);
+    if (client && client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify(message));
     }
   });
@@ -169,24 +180,6 @@ app.get('/messages', (req, res) => {
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Database error' });
       res.json(rows);
-    }
-  );
-});
-
-app.post('/messages', (req, res) => {
-  const { id, userId, contactId, text, timestamp } = req.body;
-  db.run(
-    'INSERT INTO messages (id, userId, contactId, text, timestamp) VALUES (?, ?, ?, ?, ?)',
-    [id, userId, contactId, text, timestamp],
-    (err) => {
-      if (err) {
-        console.error(`Failed to save HTTP message to DB: ${id}`, err);
-        return res.status(500).json({ error: 'Failed to send message' });
-      }
-      console.log(`HTTP message saved to DB: From ${userId} to ${contactId} (ID: ${id})`);
-      const message = { id, userId, contactId, text, timestamp };
-      broadcastMessage(message);
-      res.json({ success: true });
     }
   );
 });
