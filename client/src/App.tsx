@@ -292,14 +292,15 @@ const App: React.FC = () => {
           position: 'sticky', 
           top: 0, 
           background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
-          zIndex: 20 
+          zIndex: 20,
+          height: "90px"
         }}
       >
         <div className="d-flex justify-content-between align-items-center">
           <div style={{ position: 'relative' }}>
-            <h4 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               MSNGR ({userEmail})
-            </h4>
+            </h5>
             {isMenuOpen && (
               <div
                 style={{
@@ -343,12 +344,12 @@ const App: React.FC = () => {
           </div>
         </div>
         {selectedChatId && (
-          <div className="p-2 d-flex align-items-center mt-2">
+          <div className="p-2 d-flex justify-content-center align-items-center mt-1">
             <div 
               className="rounded-circle me-2 d-flex align-items-center justify-content-center"
               style={{ 
-                width: '32px', 
-                height: '32px', 
+                width: '25px', 
+                height: '25px', 
                 background: isDarkTheme ? '#6c757d' : '#e9ecef',
                 color: isDarkTheme ? '#fff' : '#212529'
               }}

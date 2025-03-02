@@ -1,0 +1,216 @@
+Server running on http://192.168.31.185:4000
+Connected to SQLite database
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+User logged in: hello (ID: 1740687912977)
+Updated keys for user ID: 1740687912977
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+User logged in: hello (ID: 1740687912977)
+Updated keys for user ID: 1740687912977
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+Received WebSocket message: From 1740687912977 to 7 (ID: 1740916858020)
+WebSocket message saved to DB: 1740916858020
+Failed to save HTTP message to DB: 1740916858020 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: messages.id
+--> in Statement#run([ '1740916858020', '1740687912977', '7', 'Hello', 1740916858020 ], [Function (anonymous)])
+    at Database.<anonymous> (/home/john/vscode_projects/messenger/server/node_modules/sqlite3/lib/sqlite3.js:76:19)
+    at Database.<anonymous> (/home/john/vscode_projects/messenger/server/node_modules/sqlite3/lib/sqlite3.js:20:19)
+    at /home/john/vscode_projects/messenger/server/index.js:178:6
+    at Layer.handle [as handle_request] (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/layer.js:95:5)
+    at /home/john/vscode_projects/messenger/server/node_modules/express/lib/router/index.js:284:15 {
+  errno: 19,
+  code: 'SQLITE_CONSTRAINT',
+  __augmented: true
+}
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+Received WebSocket message: From 1740687912977 to 1740700769529 (ID: 1740916999943)
+WebSocket message saved to DB: 1740916999943
+Failed to save HTTP message to DB: 1740916999943 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: messages.id
+--> in Statement#run([
+  '1740916999943',
+  '1740687912977',
+  '1740700769529',
+  'Hello',
+  1740916999944
+], [Function (anonymous)])
+    at Database.<anonymous> (/home/john/vscode_projects/messenger/server/node_modules/sqlite3/lib/sqlite3.js:76:19)
+    at Database.<anonymous> (/home/john/vscode_projects/messenger/server/node_modules/sqlite3/lib/sqlite3.js:20:19)
+    at /home/john/vscode_projects/messenger/server/index.js:178:6
+    at Layer.handle [as handle_request] (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/layer.js:95:5)
+    at /home/john/vscode_projects/messenger/server/node_modules/express/lib/router/index.js:284:15 {
+  errno: 19,
+  code: 'SQLITE_CONSTRAINT',
+  __augmented: true
+}
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+New WebSocket connection established
+WebSocket connection closed
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+Received WebSocket message: From 1740687912977 to 1740786143680 (ID: 1740917260361)
+WebSocket message saved to DB: 1740917260361
+Failed to save HTTP message to DB: 1740917260361 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: messages.id
+--> in Statement#run([
+  '1740917260361',
+  '1740687912977',
+  '1740786143680',
+  'Hello',
+  1740917260361
+], [Function (anonymous)])
+    at Database.<anonymous> (/home/john/vscode_projects/messenger/server/node_modules/sqlite3/lib/sqlite3.js:76:19)
+    at Database.<anonymous> (/home/john/vscode_projects/messenger/server/node_modules/sqlite3/lib/sqlite3.js:20:19)
+    at /home/john/vscode_projects/messenger/server/index.js:178:6
+    at Layer.handle [as handle_request] (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/john/vscode_projects/messenger/server/node_modules/express/lib/router/layer.js:95:5)
+    at /home/john/vscode_projects/messenger/server/node_modules/express/lib/router/index.js:284:15 {
+  errno: 19,
+  code: 'SQLITE_CONSTRAINT',
+  __augmented: true
+}
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
+New WebSocket connection established
+WebSocket connection closed
