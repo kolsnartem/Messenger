@@ -109,23 +109,14 @@ const App: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const [contactsRes, messagesRes, allMessagesRes] = await Promise.all([
-          axios.get<Contact[]>('http://192.168.31.185:4000/users'),
+        const [chatsRes, messagesRes] = await Promise.all([
+          axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } }),
           selectedChatId 
             ? axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`)
             : Promise.resolve({ data: [] as Message[] }),
-          axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}`)
         ]);
-        
-        const allContacts = contactsRes.data.filter(c => c.id !== userId);
-        const contactsWithLastMessage = allContacts.map(contact => {
-          const lastMsg = allMessagesRes.data
-            .filter(m => (m.userId === userId && m.contactId === contact.id) || (m.userId === contact.id && m.contactId === userId))
-            .sort((a, b) => b.timestamp - a.timestamp)[0];
-          return { ...contact, lastMessage: lastMsg };
-        }).sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
 
-        setContacts(contactsWithLastMessage);
+        setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
         setMessages(messagesRes.data.map(msg => ({
           ...msg,
           isMine: msg.userId === userId
@@ -225,6 +216,7 @@ const App: React.FC = () => {
     setInput('');
     
     wsRef.current.send(JSON.stringify(newMessage));
+    updateContactsWithLastMessage(newMessage); // Оновлюємо список чатів при відправці
   };
 
   const handleContactSelect = (contact: Contact) => {
@@ -249,12 +241,29 @@ const App: React.FC = () => {
   };
 
   const updateContactsWithLastMessage = (newMessage: Message) => {
-    setContacts(prev => prev.map(contact => {
-      if (contact.id === newMessage.contactId || contact.id === newMessage.userId) {
-        return { ...contact, lastMessage: newMessage };
+    setContacts(prev => {
+      const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
+      const existingContact = prev.find(c => c.id === contactId);
+
+      if (existingContact) {
+        return prev
+          .map(contact =>
+            contact.id === contactId ? { ...contact, lastMessage: newMessage } : contact
+          )
+          .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+      } else {
+        axios.get(`http://192.168.31.185:4000/users`).then(res => {
+          const newContact = res.data.find((c: Contact) => c.id === contactId);
+          if (newContact) {
+            setContacts(prev => [
+              ...prev,
+              { ...newContact, lastMessage: newMessage }
+            ].sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
+          }
+        });
+        return prev;
       }
-      return contact;
-    }).sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
+    });
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
@@ -554,34 +563,40 @@ const App: React.FC = () => {
               overflowY: 'auto' 
             }}
           >
-            {contacts.map((contact) => (
-              <div
-                key={contact.id}
-                className="chat-item"
-                onClick={() => handleContactSelect(contact)}
-                style={{ width: '100%' }}
-              >
-                <div className="avatar">
-                  {contact.email.charAt(0).toUpperCase()}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div className="fw-bold">{contact.email}</div>
-                  {contact.lastMessage && (
-                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
-                      {contact.lastMessage.text.length > 20 ? `${contact.lastMessage.text.substring(0, 20)}...` : contact.lastMessage.text}
-                      <span style={{ marginLeft: '10px', fontSize: '0.7rem' }}>
-                        {new Date(contact.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                  )}
-                </div>
+            {contacts.length === 0 ? (
+              <div className="text-muted text-center p-3">
+                No chats yet. Use the search to start a conversation!
               </div>
-            ))}
+            ) : (
+              contacts.map((contact) => (
+                <div
+                  key={contact.id}
+                  className="chat-item"
+                  onClick={() => handleContactSelect(contact)}
+                  style={{ width: '100%' }}
+                >
+                  <div className="avatar">
+                    {contact.email.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div className="fw-bold">{contact.email}</div>
+                    {contact.lastMessage && (
+                      <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                        {contact.lastMessage.text.length > 20 ? `${contact.lastMessage.text.substring(0, 20)}...` : contact.lastMessage.text}
+                        <span style={{ marginLeft: '10px', fontSize: '0.7rem' }}>
+                          {new Date(contact.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
 
-      {/* Input panel - Fixed positioning at the bottom */}
+      {/* Input panel */}
       {selectedChatId && (
         <div 
           className="p-2" 

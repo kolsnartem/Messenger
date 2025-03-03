@@ -184,6 +184,62 @@ app.get('/messages', (req, res) => {
   );
 });
 
+// Новий ендпоінт для отримання списку чатів
+app.get('/chats', (req, res) => {
+  const { userId } = req.query;
+
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  db.all(
+    `
+      SELECT DISTINCT u.id, u.email, u.publicKey 
+      FROM users u
+      INNER JOIN messages m 
+      ON (u.id = m.userId OR u.id = m.contactId)
+      WHERE (m.userId = ? OR m.contactId = ?) AND u.id != ?
+    `,
+    [userId, userId, userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Error fetching chats:', err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      const contacts = rows.map(row => ({
+        id: row.id.toString(),
+        email: row.email,
+        publicKey: row.publicKey,
+      }));
+
+      Promise.all(
+        contacts.map(contact =>
+          new Promise((resolve) => {
+            db.get(
+              `
+                SELECT id, userId, contactId, text, timestamp 
+                FROM messages 
+                WHERE (userId = ? AND contactId = ?) OR (userId = ? AND contactId = ?) 
+                ORDER BY timestamp DESC LIMIT 1
+              `,
+              [userId, contact.id, contact.id, userId],
+              (err, msg) => {
+                if (err) {
+                  console.error('Error fetching last message:', err);
+                  resolve({ ...contact, lastMessage: null });
+                } else {
+                  resolve({ ...contact, lastMessage: msg || null });
+                }
+              }
+            );
+          })
+        )
+      ).then(results => {
+        res.json(results.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
+      });
+    }
+  );
+});
+
 // Закриття бази даних при завершенні роботи
 process.on('SIGINT', () => {
   db.close((err) => {
