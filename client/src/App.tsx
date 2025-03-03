@@ -286,7 +286,7 @@ const App: React.FC = () => {
           )
           .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       } else {
-        return prev; // Не додаємо новий контакт автоматично через WebSocket
+        return prev;
       }
     });
   };
@@ -351,6 +351,9 @@ const App: React.FC = () => {
           .input-placeholder-dark::placeholder {
             color: #b0b0b0;
           }
+          .search-placeholder-dark::placeholder {
+            color: #b0b0b0;
+          }
           .chat-item {
             display: flex;
             align-items: center;
@@ -393,6 +396,10 @@ const App: React.FC = () => {
           }
           .unread-text {
             font-weight: bold;
+          }
+          .chat-timestamp {
+            color: ${isDarkTheme ? '#b0b0b0' : '#6c757d'};
+            font-size: 0.7rem;
           }
         `}
       </style>
@@ -498,7 +505,7 @@ const App: React.FC = () => {
           <div className="container p-2">
             <input
               type="text"
-              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
+              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light search-placeholder-dark' : ''}`}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search users..."
@@ -611,10 +618,15 @@ const App: React.FC = () => {
                   <div style={{ flex: 1 }}>
                     <div className={`fw-bold ${hasUnread ? 'unread-text' : ''}`}>{contact.email}</div>
                     {contact.lastMessage && (
-                      <div className={`text-muted ${hasUnread ? 'unread-text' : ''}`} style={{ fontSize: '0.9rem' }}>
+                      <div className={`${hasUnread ? 'unread-text' : ''}`} style={{ fontSize: '0.9rem' }}>
                         {contact.lastMessage.text.length > 20 ? `${contact.lastMessage.text.substring(0, 20)}...` : contact.lastMessage.text}
-                        <span style={{ marginLeft: '10px', fontSize: '0.7rem' }}>
-                          {new Date(contact.lastMessage.timestamp).toLocaleDateString()}
+                        <span className="chat-timestamp" style={{ marginLeft: '10px' }}>
+                          {new Date(contact.lastMessage.timestamp).toLocaleString([], { 
+                            day: '2-digit', 
+                            month: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
                         </span>
                       </div>
                     )}
