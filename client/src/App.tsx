@@ -40,6 +40,14 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
   const velocity = useRef(0);
   const isScrolling = useRef(false);
   const animationFrame = useRef<number | null>(null);
+  const scrollPosition = useRef(0);
+
+  // Зберігаємо позицію скролінгу перед вибором чату
+  useEffect(() => {
+    if (chatListRef.current && !selectedChatId) {
+      chatListRef.current.scrollTop = scrollPosition.current;
+    }
+  }, [selectedChatId]);
 
   // Обробка початку дотику
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -59,26 +67,27 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
     const touchCurrentY = e.touches[0].clientY;
     const deltaY = lastTouchY.current - touchCurrentY;
     
-    if (Math.abs(deltaY) > 2) {
+    if (Math.abs(deltaY) > 1) { // Зменшено поріг для чутливості
       isScrolling.current = true;
       e.preventDefault();
-      chatListRef.current.scrollTop += deltaY;
-      velocity.current = deltaY * 0.9; // Зберігаємо швидкість для інерції
+      chatListRef.current.scrollTop += deltaY * 1.25; // Збільшено чутливість скролінгу
+      velocity.current = deltaY * 1.5; // Збільшено початкову швидкість для інерції
     }
     
     lastTouchY.current = touchCurrentY;
+    scrollPosition.current = chatListRef.current.scrollTop;
   };
 
   // Інерційний скролінг
   const animateScroll = () => {
-    if (!chatListRef.current || Math.abs(velocity.current) < 0.1) return;
+    if (!chatListRef.current || Math.abs(velocity.current) < 0.5) return;
 
     chatListRef.current.scrollTop += velocity.current;
-    velocity.current *= 0.95; // Зменшуємо швидкість для плавного гальмування
+    velocity.current *= 0.97; // Зменшено тертя для більш тривалої інерції
     
-    // Обмежуємо скролінг в межах контейнера
     const maxScroll = chatListRef.current.scrollHeight - chatListRef.current.clientHeight;
     chatListRef.current.scrollTop = Math.max(0, Math.min(chatListRef.current.scrollTop, maxScroll));
+    scrollPosition.current = chatListRef.current.scrollTop;
 
     animationFrame.current = requestAnimationFrame(animateScroll);
   };
@@ -87,7 +96,7 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
   const handleTouchEnd = (e: React.TouchEvent, contact: Contact) => {
     if (!isScrolling.current) {
       onSelectChat(contact);
-    } else if (Math.abs(velocity.current) > 1) {
+    } else if (Math.abs(velocity.current) > 2) { // Зменшено поріг для запуску інерції
       animationFrame.current = requestAnimationFrame(animateScroll);
     }
     touchStartY.current = null;
@@ -106,7 +115,7 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
         overscrollBehavior: 'contain',
         position: 'relative',
         touchAction: 'none',
-        paddingBottom: '100px', // Збільшений відступ для видимості останнього чату
+        paddingBottom: '100px',
       }}
     >
       {contacts.map((contact) => {
