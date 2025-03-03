@@ -15,6 +15,7 @@ interface Message {
   contactId: string;
   text: string;
   timestamp: number;
+  isRead?: number; // 0 - непрочитано, 1 - прочитано
   isMine?: boolean;
 }
 
@@ -22,7 +23,7 @@ interface Contact {
   id: string;
   email: string;
   publicKey: string;
-  lastMessage?: Message;
+  lastMessage: Message | null;
 }
 
 const App: React.FC = () => {
@@ -87,7 +88,13 @@ const App: React.FC = () => {
     wsRef.current = new WebSocket(`ws://192.168.31.185:4000?userId=${userId}`);
     wsRef.current.onopen = () => console.log('WebSocket connected');
     wsRef.current.onmessage = (event) => {
-      const msg: Message = JSON.parse(event.data);
+      const msg = JSON.parse(event.data);
+      if (msg.type === 'read') {
+        setMessages(prev =>
+          prev.map(m => (m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0 ? { ...m, isRead: 1 } : m))
+        );
+        return;
+      }
       if ((msg.userId === userId && msg.contactId === selectedChatId) || 
           (msg.contactId === userId && msg.userId === selectedChatId)) {
         setMessages(prev => {
@@ -121,6 +128,11 @@ const App: React.FC = () => {
           ...msg,
           isMine: msg.userId === userId
         })).sort((a, b) => a.timestamp - b.timestamp));
+
+        // Якщо відкрито чат, позначаємо повідомлення як прочитані
+        if (selectedChatId) {
+          axios.post('http://192.168.31.185:4000/mark-as-read', { userId, contactId: selectedChatId });
+        }
       } catch (err) {
         console.error('Fetch data error:', err);
       }
@@ -206,6 +218,7 @@ const App: React.FC = () => {
       contactId: selectedChatId,
       text: input.trim(),
       timestamp: Date.now(),
+      isRead: 0, // Нове повідомлення за замовчуванням непрочитане
       isMine: true,
     };
 
@@ -216,7 +229,7 @@ const App: React.FC = () => {
     setInput('');
     
     wsRef.current.send(JSON.stringify(newMessage));
-    updateContactsWithLastMessage(newMessage); // Оновлюємо список чатів при відправці
+    updateContactsWithLastMessage(newMessage);
   };
 
   const handleContactSelect = (contact: Contact) => {
@@ -224,6 +237,19 @@ const App: React.FC = () => {
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
+    
+    // Додаємо контакт до списку, якщо його там немає
+    setContacts(prev => {
+      if (!prev.some(c => c.id === contact.id)) {
+        return [...prev, { ...contact, lastMessage: null } as Contact].sort(
+          (a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)
+        );
+      }
+      return prev;
+    });
+
+    // Позначаємо повідомлення як прочитані при відкритті чату
+    axios.post('http://192.168.31.185:4000/mark-as-read', { userId, contactId: contact.id });
   };
 
   const handleLogout = () => {
@@ -246,28 +272,35 @@ const App: React.FC = () => {
       const existingContact = prev.find(c => c.id === contactId);
 
       if (existingContact) {
+        // Оновлюємо існуючий контакт із новим останнім повідомленням
         return prev
           .map(contact =>
-            contact.id === contactId ? { ...contact, lastMessage: newMessage } : contact
+            contact.id === contactId 
+              ? { ...contact, lastMessage: newMessage } 
+              : contact
           )
           .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       } else {
-        axios.get(`http://192.168.31.185:4000/users`).then(res => {
-          const newContact = res.data.find((c: Contact) => c.id === contactId);
-          if (newContact) {
-            setContacts(prev => [
-              ...prev,
-              { ...newContact, lastMessage: newMessage }
-            ].sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
-          }
-        });
-        return prev;
+        // Додаємо новий контакт лише якщо його ще немає
+        const updatedContacts = [...prev];
+        if (!updatedContacts.some(c => c.id === contactId)) {
+          axios.get<Contact[]>(`http://192.168.31.185:4000/users`).then(res => {
+            const newContact = res.data.find((c: Contact) => c.id === contactId);
+            if (newContact && !updatedContacts.some(c => c.id === newContact.id)) {
+              setContacts(prev => [
+                ...prev,
+                { ...newContact, lastMessage: newMessage } as Contact
+              ].sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
+            }
+          });
+        }
+        return updatedContacts;
       }
     });
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
-  const selectedContact = contacts.find(c => c.id === selectedChatId) || null;
+  const selectedContact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId) || null;
 
   if (isLoading) return null;
 
@@ -542,6 +575,11 @@ const App: React.FC = () => {
                       <div>{msg.text}</div>
                       <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
                         {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {msg.isMine && (
+                          <span style={{ marginLeft: '5px' }}>
+                            {msg.isRead === 1 ? '✓✓' : '✓'}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -563,12 +601,11 @@ const App: React.FC = () => {
               overflowY: 'auto' 
             }}
           >
-            {contacts.length === 0 ? (
-              <div className="text-muted text-center p-3">
-                No chats yet. Use the search to start a conversation!
-              </div>
-            ) : (
-              contacts.map((contact) => (
+            {contacts.map((contact) => {
+              const hasUnread = messages.some(
+                m => m.contactId === userId && m.userId === contact.id && m.isRead === 0
+              );
+              return (
                 <div
                   key={contact.id}
                   className="chat-item"
@@ -584,19 +621,30 @@ const App: React.FC = () => {
                       <div className="text-muted" style={{ fontSize: '0.9rem' }}>
                         {contact.lastMessage.text.length > 20 ? `${contact.lastMessage.text.substring(0, 20)}...` : contact.lastMessage.text}
                         <span style={{ marginLeft: '10px', fontSize: '0.7rem' }}>
-                          {new Date(contact.lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(contact.lastMessage.timestamp).toLocaleDateString()} {/* Додаємо дату */}
                         </span>
                       </div>
                     )}
                   </div>
+                  {hasUnread && (
+                    <div
+                      style={{
+                        width: '10px',
+                        height: '10px',
+                        backgroundColor: '#007bff',
+                        borderRadius: '50%',
+                        marginLeft: '10px',
+                      }}
+                    />
+                  )}
                 </div>
-              ))
-            )}
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Input panel */}
+      {/* Input panel - Fixed positioning at the bottom */}
       {selectedChatId && (
         <div 
           className="p-2" 

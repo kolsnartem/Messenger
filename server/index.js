@@ -38,9 +38,17 @@ db.serialize(() => {
       userId TEXT NOT NULL,
       contactId TEXT NOT NULL,
       text TEXT NOT NULL,
-      timestamp INTEGER NOT NULL
+      timestamp INTEGER NOT NULL,
+      isRead INTEGER DEFAULT 0
     )
   `);
+
+  // Додаємо колонку isRead, якщо її ще немає
+  db.run(`ALTER TABLE messages ADD COLUMN isRead INTEGER DEFAULT 0`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding isRead column:', err);
+    }
+  });
 });
 
 // WebSocket логіка
@@ -59,18 +67,21 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', (message) => {
     const msg = JSON.parse(message);
+    if (msg.type === 'read') {
+      sendToParticipants(msg);
+      return;
+    }
     console.log(`Received WebSocket message: From ${msg.userId} to ${msg.contactId} (ID: ${msg.id})`);
 
-    // Збереження повідомлення в базу даних
     db.run(
-      'INSERT INTO messages (id, userId, contactId, text, timestamp) VALUES (?, ?, ?, ?, ?)',
-      [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp],
+      'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead) VALUES (?, ?, ?, ?, ?, ?)',
+      [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0],
       (err) => {
         if (err) {
           console.error('Failed to save WebSocket message to DB:', err);
         } else {
           console.log(`WebSocket message saved to DB: ${msg.id}`);
-          sendToParticipants(msg); // Відправка повідомлення тільки учасникам чату
+          sendToParticipants(msg);
         }
       }
     );
@@ -87,7 +98,7 @@ wss.on('connection', (ws, req) => {
 });
 
 const sendToParticipants = (message) => {
-  const participants = [message.userId, message.contactId];
+  const participants = message.type === 'read' ? [message.contactId] : [message.userId, message.contactId];
   participants.forEach((id) => {
     const client = clients.get(id);
     if (client && client.readyState === WebSocket.OPEN) {
@@ -169,22 +180,6 @@ app.get('/search', (req, res) => {
   );
 });
 
-app.get('/messages', (req, res) => {
-  const { userId, contactId } = req.query;
-  db.all(
-    `SELECT id, userId, contactId, text, timestamp 
-     FROM messages 
-     WHERE (userId = ? AND contactId = ?) OR (userId = ? AND contactId = ?) 
-     ORDER BY timestamp`,
-    [userId, contactId, contactId, userId],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
-      res.json(rows);
-    }
-  );
-});
-
-// Новий ендпоінт для отримання списку чатів
 app.get('/chats', (req, res) => {
   const { userId } = req.query;
 
@@ -216,7 +211,7 @@ app.get('/chats', (req, res) => {
           new Promise((resolve) => {
             db.get(
               `
-                SELECT id, userId, contactId, text, timestamp 
+                SELECT id, userId, contactId, text, timestamp, isRead 
                 FROM messages 
                 WHERE (userId = ? AND contactId = ?) OR (userId = ? AND contactId = ?) 
                 ORDER BY timestamp DESC LIMIT 1
@@ -236,6 +231,38 @@ app.get('/chats', (req, res) => {
       ).then(results => {
         res.json(results.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
       });
+    }
+  );
+});
+
+app.get('/messages', (req, res) => {
+  const { userId, contactId } = req.query;
+  db.all(
+    `SELECT id, userId, contactId, text, timestamp, isRead 
+     FROM messages 
+     WHERE (userId = ? AND contactId = ?) OR (userId = ? AND contactId = ?) 
+     ORDER BY timestamp`,
+    [userId, contactId, contactId, userId],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.json(rows);
+    }
+  );
+});
+
+app.post('/mark-as-read', (req, res) => {
+  const { userId, contactId } = req.body;
+  db.run(
+    `UPDATE messages SET isRead = 1 WHERE contactId = ? AND userId = ? AND isRead = 0`,
+    [userId, contactId],
+    (err) => {
+      if (err) {
+        console.error('Error marking messages as read:', err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+      const readUpdate = { type: 'read', userId, contactId };
+      sendToParticipants(readUpdate);
+      res.json({ success: true });
     }
   );
 });
