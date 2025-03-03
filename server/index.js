@@ -43,7 +43,6 @@ db.serialize(() => {
     )
   `);
 
-  // Додаємо колонку isRead, якщо її ще немає
   db.run(`ALTER TABLE messages ADD COLUMN isRead INTEGER DEFAULT 0`, (err) => {
     if (err && !err.message.includes('duplicate column')) {
       console.error('Error adding isRead column:', err);
@@ -159,7 +158,7 @@ app.get('/users', (req, res) => {
     res.json(rows.map(row => ({
       id: row.id.toString(),
       email: row.email,
-      publicKey: row.publicKey
+      publicKey: row.publicKey,
     })));
   });
 });
@@ -174,7 +173,7 @@ app.get('/search', (req, res) => {
       res.json(rows.map(row => ({
         id: row.id.toString(),
         email: row.email,
-        publicKey: row.publicKey
+        publicKey: row.publicKey,
       })));
     }
   );

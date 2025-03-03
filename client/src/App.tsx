@@ -93,6 +93,14 @@ const App: React.FC = () => {
         setMessages(prev =>
           prev.map(m => (m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0 ? { ...m, isRead: 1 } : m))
         );
+        setContacts(prev =>
+          prev.map(c => ({
+            ...c,
+            lastMessage: c.lastMessage && c.lastMessage.contactId === msg.userId && c.lastMessage.isRead === 0
+              ? { ...c.lastMessage, isRead: 1 }
+              : c.lastMessage,
+          }))
+        );
         return;
       }
       if ((msg.userId === userId && msg.contactId === selectedChatId) || 
@@ -126,10 +134,9 @@ const App: React.FC = () => {
         setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
         setMessages(messagesRes.data.map(msg => ({
           ...msg,
-          isMine: msg.userId === userId
+          isMine: msg.userId === userId,
         })).sort((a, b) => a.timestamp - b.timestamp));
 
-        // Якщо відкрито чат, позначаємо повідомлення як прочитані
         if (selectedChatId) {
           axios.post('http://192.168.31.185:4000/mark-as-read', { userId, contactId: selectedChatId });
         }
@@ -139,7 +146,7 @@ const App: React.FC = () => {
     };
 
     fetchData();
-    const interval = setInterval(() => fetchData(), 5000);
+    const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, [userId, selectedChatId]);
 
@@ -169,7 +176,7 @@ const App: React.FC = () => {
     const keyPair = await signal.KeyHelper.generateIdentityKeyPair();
     localStorage.setItem('signalKeyPair', JSON.stringify({
       publicKey: Buffer.from(keyPair.pubKey).toString('base64'),
-      privateKey: Buffer.from(keyPair.privKey).toString('base64')
+      privateKey: Buffer.from(keyPair.privKey).toString('base64'),
     }));
     return keyPair;
   };
@@ -218,7 +225,7 @@ const App: React.FC = () => {
       contactId: selectedChatId,
       text: input.trim(),
       timestamp: Date.now(),
-      isRead: 0, // Нове повідомлення за замовчуванням непрочитане
+      isRead: 0,
       isMine: true,
     };
 
@@ -238,17 +245,16 @@ const App: React.FC = () => {
     setSearchQuery('');
     setSearchResults([]);
     
-    // Додаємо контакт до списку, якщо його там немає
     setContacts(prev => {
-      if (!prev.some(c => c.id === contact.id)) {
-        return [...prev, { ...contact, lastMessage: null } as Contact].sort(
+      const contactExists = prev.some(c => c.id === contact.id);
+      if (!contactExists) {
+        return [...prev, { ...contact, lastMessage: null }].sort(
           (a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)
         );
       }
       return prev;
     });
 
-    // Позначаємо повідомлення як прочитані при відкритті чату
     axios.post('http://192.168.31.185:4000/mark-as-read', { userId, contactId: contact.id });
   };
 
@@ -272,29 +278,15 @@ const App: React.FC = () => {
       const existingContact = prev.find(c => c.id === contactId);
 
       if (existingContact) {
-        // Оновлюємо існуючий контакт із новим останнім повідомленням
         return prev
-          .map(contact =>
-            contact.id === contactId 
-              ? { ...contact, lastMessage: newMessage } 
-              : contact
+          .map(c =>
+            c.id === contactId
+              ? { ...c, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }
+              : c
           )
           .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       } else {
-        // Додаємо новий контакт лише якщо його ще немає
-        const updatedContacts = [...prev];
-        if (!updatedContacts.some(c => c.id === contactId)) {
-          axios.get<Contact[]>(`http://192.168.31.185:4000/users`).then(res => {
-            const newContact = res.data.find((c: Contact) => c.id === contactId);
-            if (newContact && !updatedContacts.some(c => c.id === newContact.id)) {
-              setContacts(prev => [
-                ...prev,
-                { ...newContact, lastMessage: newMessage } as Contact
-              ].sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
-            }
-          });
-        }
-        return updatedContacts;
+        return prev; // Не додаємо новий контакт автоматично через WebSocket
       }
     });
   };
@@ -338,7 +330,7 @@ const App: React.FC = () => {
         left: 0,
         right: 0,
         bottom: 0,
-        overflow: 'hidden'
+        overflow: 'hidden',
       }}
     >
       <style>
@@ -399,6 +391,9 @@ const App: React.FC = () => {
           .scroll-container::-webkit-scrollbar-thumb:hover {
             background: ${isDarkTheme ? '#868e96' : '#adb5bd'};
           }
+          .unread-text {
+            font-weight: bold;
+          }
         `}
       </style>
 
@@ -412,7 +407,7 @@ const App: React.FC = () => {
           right: 0,
           background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
           zIndex: 20,
-          height: selectedChatId ? "90px" : "50px"
+          height: selectedChatId ? "90px" : "50px",
         }}
       >
         <div className="d-flex justify-content-between align-items-center">
@@ -477,7 +472,7 @@ const App: React.FC = () => {
                 width: '25px', 
                 height: '25px', 
                 background: isDarkTheme ? '#6c757d' : '#e9ecef',
-                color: isDarkTheme ? '#fff' : '#212529'
+                color: isDarkTheme ? '#fff' : '#212529',
               }}
             >
               {selectedContact?.email.charAt(0).toUpperCase() || '?'}
@@ -569,7 +564,7 @@ const App: React.FC = () => {
                         maxWidth: '75%',
                         position: 'relative',
                         borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                        wordBreak: 'break-word'
+                        wordBreak: 'break-word',
                       }}
                     >
                       <div>{msg.text}</div>
@@ -598,13 +593,11 @@ const App: React.FC = () => {
             className="scroll-container" 
             style={{ 
               height: '100%',
-              overflowY: 'auto' 
+              overflowY: 'auto',
             }}
           >
             {contacts.map((contact) => {
-              const hasUnread = messages.some(
-                m => m.contactId === userId && m.userId === contact.id && m.isRead === 0
-              );
+              const hasUnread = contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id;
               return (
                 <div
                   key={contact.id}
@@ -616,12 +609,12 @@ const App: React.FC = () => {
                     {contact.email.charAt(0).toUpperCase()}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div className="fw-bold">{contact.email}</div>
+                    <div className={`fw-bold ${hasUnread ? 'unread-text' : ''}`}>{contact.email}</div>
                     {contact.lastMessage && (
-                      <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                      <div className={`text-muted ${hasUnread ? 'unread-text' : ''}`} style={{ fontSize: '0.9rem' }}>
                         {contact.lastMessage.text.length > 20 ? `${contact.lastMessage.text.substring(0, 20)}...` : contact.lastMessage.text}
                         <span style={{ marginLeft: '10px', fontSize: '0.7rem' }}>
-                          {new Date(contact.lastMessage.timestamp).toLocaleDateString()} {/* Додаємо дату */}
+                          {new Date(contact.lastMessage.timestamp).toLocaleDateString()}
                         </span>
                       </div>
                     )}
@@ -644,7 +637,7 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* Input panel - Fixed positioning at the bottom */}
+      {/* Input panel */}
       {selectedChatId && (
         <div 
           className="p-2" 
@@ -658,7 +651,7 @@ const App: React.FC = () => {
             height: '49px',
             display: 'flex',
             alignItems: 'center',
-            borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee'
+            borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee',
           }}
         >
           <div className="d-flex align-items-center w-100 px-2">
