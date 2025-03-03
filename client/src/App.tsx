@@ -15,7 +15,7 @@ interface Message {
   contactId: string;
   text: string;
   timestamp: number;
-  isRead?: number; // 0 - непрочитано, 1 - прочитано
+  isRead?: number;
   isMine?: boolean;
 }
 
@@ -25,6 +25,152 @@ interface Contact {
   publicKey: string;
   lastMessage: Message | null;
 }
+
+interface ChatListProps {
+  contacts: Contact[];
+  selectedChatId: string | null;
+  isDarkTheme: boolean;
+  onSelectChat: (contact: Contact) => void;
+}
+
+const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkTheme, onSelectChat }) => {
+  const chatListRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef<number | null>(null);
+  const lastTouchY = useRef<number | null>(null);
+  const velocity = useRef(0);
+  const isScrolling = useRef(false);
+  const animationFrame = useRef<number | null>(null);
+
+  // Обробка початку дотику
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    lastTouchY.current = touchStartY.current;
+    velocity.current = 0;
+    isScrolling.current = false;
+    if (animationFrame.current) {
+      cancelAnimationFrame(animationFrame.current);
+    }
+  };
+
+  // Обробка руху пальця
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!chatListRef.current || touchStartY.current === null || lastTouchY.current === null) return;
+
+    const touchCurrentY = e.touches[0].clientY;
+    const deltaY = lastTouchY.current - touchCurrentY;
+    
+    if (Math.abs(deltaY) > 2) {
+      isScrolling.current = true;
+      e.preventDefault();
+      chatListRef.current.scrollTop += deltaY;
+      velocity.current = deltaY * 0.9; // Зберігаємо швидкість для інерції
+    }
+    
+    lastTouchY.current = touchCurrentY;
+  };
+
+  // Інерційний скролінг
+  const animateScroll = () => {
+    if (!chatListRef.current || Math.abs(velocity.current) < 0.1) return;
+
+    chatListRef.current.scrollTop += velocity.current;
+    velocity.current *= 0.95; // Зменшуємо швидкість для плавного гальмування
+    
+    // Обмежуємо скролінг в межах контейнера
+    const maxScroll = chatListRef.current.scrollHeight - chatListRef.current.clientHeight;
+    chatListRef.current.scrollTop = Math.max(0, Math.min(chatListRef.current.scrollTop, maxScroll));
+
+    animationFrame.current = requestAnimationFrame(animateScroll);
+  };
+
+  // Обробка завершення дотику
+  const handleTouchEnd = (e: React.TouchEvent, contact: Contact) => {
+    if (!isScrolling.current) {
+      onSelectChat(contact);
+    } else if (Math.abs(velocity.current) > 1) {
+      animationFrame.current = requestAnimationFrame(animateScroll);
+    }
+    touchStartY.current = null;
+    lastTouchY.current = null;
+    isScrolling.current = false;
+  };
+
+  return (
+    <div 
+      ref={chatListRef}
+      className="scroll-container"
+      style={{ 
+        height: '100%',
+        overflowY: 'scroll',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        position: 'relative',
+        touchAction: 'none',
+        paddingBottom: '100px', // Збільшений відступ для видимості останнього чату
+      }}
+    >
+      {contacts.map((contact) => {
+        const hasUnread = contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id;
+        const isSelected = selectedChatId === contact.id;
+        
+        return (
+          <div
+            key={contact.id}
+            className="chat-item"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={(e) => handleTouchEnd(e, contact)}
+            onClick={(e) => {
+              if (!('ontouchstart' in window)) {
+                onSelectChat(contact);
+              }
+            }}
+            style={{ 
+              background: isSelected ? (isDarkTheme ? '#444' : '#f0f0f0') : 'transparent',
+              width: '100%',
+              userSelect: 'none',
+            }}
+          >
+            <div className="avatar">
+              {contact.email.charAt(0).toUpperCase()}
+            </div>
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              <div className={`fw-bold ${hasUnread ? 'unread-text' : ''}`}>
+                {contact.email}
+              </div>
+              {contact.lastMessage && (
+                <div className={`${hasUnread ? 'unread-text' : ''}`} style={{ fontSize: '0.9rem' }}>
+                  {contact.lastMessage.text.length > 20 
+                    ? `${contact.lastMessage.text.substring(0, 20)}...` 
+                    : contact.lastMessage.text}
+                  <span className="chat-timestamp" style={{ marginLeft: '10px' }}>
+                    {new Date(contact.lastMessage.timestamp).toLocaleString([], { 
+                      day: '2-digit', 
+                      month: '2-digit', 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </span>
+                </div>
+              )}
+            </div>
+            {hasUnread && (
+              <div
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  backgroundColor: '#007bff',
+                  borderRadius: '50%',
+                  marginLeft: '10px',
+                }}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(() => localStorage.getItem('userId'));
@@ -360,7 +506,6 @@ const App: React.FC = () => {
             padding: 10px;
             border-bottom: 1px solid ${isDarkTheme ? '#444' : '#eee'};
             cursor: pointer;
-            width: 100%;
           }
           .chat-item:hover {
             background: ${isDarkTheme ? '#444' : '#f8f9fa'};
@@ -596,56 +741,12 @@ const App: React.FC = () => {
             <div ref={anchorRef} style={{ height: '1px' }} />
           </div>
         ) : (
-          <div 
-            className="scroll-container" 
-            style={{ 
-              height: '100%',
-              overflowY: 'auto',
-            }}
-          >
-            {contacts.map((contact) => {
-              const hasUnread = contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id;
-              return (
-                <div
-                  key={contact.id}
-                  className="chat-item"
-                  onClick={() => handleContactSelect(contact)}
-                  style={{ width: '100%' }}
-                >
-                  <div className="avatar">
-                    {contact.email.charAt(0).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div className={`fw-bold ${hasUnread ? 'unread-text' : ''}`}>{contact.email}</div>
-                    {contact.lastMessage && (
-                      <div className={`${hasUnread ? 'unread-text' : ''}`} style={{ fontSize: '0.9rem' }}>
-                        {contact.lastMessage.text.length > 20 ? `${contact.lastMessage.text.substring(0, 20)}...` : contact.lastMessage.text}
-                        <span className="chat-timestamp" style={{ marginLeft: '10px' }}>
-                          {new Date(contact.lastMessage.timestamp).toLocaleString([], { 
-                            day: '2-digit', 
-                            month: '2-digit', 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  {hasUnread && (
-                    <div
-                      style={{
-                        width: '10px',
-                        height: '10px',
-                        backgroundColor: '#007bff',
-                        borderRadius: '50%',
-                        marginLeft: '10px',
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <ChatList 
+            contacts={contacts}
+            selectedChatId={selectedChatId}
+            isDarkTheme={isDarkTheme}
+            onSelectChat={handleContactSelect}
+          />
         )}
       </div>
 
