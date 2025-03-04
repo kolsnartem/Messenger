@@ -1,190 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Contact, Message } from './types';
+import ChatList from './components/ChatList';
+import { fetchChats, fetchMessages, markAsRead } from './services/api';
+import webSocketService from './services/websocket';
+import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
-import * as signal from '@privacyresearch/libsignal-protocol-typescript';
-import * as CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
 
-interface IdentityKeyPair {
-  pubKey: ArrayBuffer;
-  privKey: ArrayBuffer;
-}
-
-interface Message {
-  id: string;
-  userId: string;
-  contactId: string;
-  text: string;
-  timestamp: number;
-  isRead?: number;
-  isMine?: boolean;
-}
-
-interface Contact {
-  id: string;
-  email: string;
-  publicKey: string;
-  lastMessage: Message | null;
-}
-
-interface ChatListProps {
-  contacts: Contact[];
-  selectedChatId: string | null;
-  isDarkTheme: boolean;
-  onSelectChat: (contact: Contact) => void;
-}
-
-const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkTheme, onSelectChat }) => {
-  const chatListRef = useRef<HTMLDivElement>(null);
-  const touchStartY = useRef<number | null>(null);
-  const lastTouchY = useRef<number | null>(null);
-  const velocity = useRef(0);
-  const isScrolling = useRef(false);
-  const animationFrame = useRef<number | null>(null);
-  const scrollPosition = useRef(0);
-
-  // Зберігаємо позицію скролінгу перед вибором чату
-  useEffect(() => {
-    if (chatListRef.current && !selectedChatId) {
-      chatListRef.current.scrollTop = scrollPosition.current;
-    }
-  }, [selectedChatId]);
-
-  // Обробка початку дотику
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-    lastTouchY.current = touchStartY.current;
-    velocity.current = 0;
-    isScrolling.current = false;
-    if (animationFrame.current) {
-      cancelAnimationFrame(animationFrame.current);
-    }
-  };
-
-  // Обробка руху пальця
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!chatListRef.current || touchStartY.current === null || lastTouchY.current === null) return;
-
-    const touchCurrentY = e.touches[0].clientY;
-    const deltaY = lastTouchY.current - touchCurrentY;
-    
-    if (Math.abs(deltaY) > 1) { // Зменшено поріг для чутливості
-      isScrolling.current = true;
-      e.preventDefault();
-      chatListRef.current.scrollTop += deltaY * 1.25; // Збільшено чутливість скролінгу
-      velocity.current = deltaY * 1.5; // Збільшено початкову швидкість для інерції
-    }
-    
-    lastTouchY.current = touchCurrentY;
-    scrollPosition.current = chatListRef.current.scrollTop;
-  };
-
-  // Інерційний скролінг
-  const animateScroll = () => {
-    if (!chatListRef.current || Math.abs(velocity.current) < 0.5) return;
-
-    chatListRef.current.scrollTop += velocity.current;
-    velocity.current *= 0.97; // Зменшено тертя для більш тривалої інерції
-    
-    const maxScroll = chatListRef.current.scrollHeight - chatListRef.current.clientHeight;
-    chatListRef.current.scrollTop = Math.max(0, Math.min(chatListRef.current.scrollTop, maxScroll));
-    scrollPosition.current = chatListRef.current.scrollTop;
-
-    animationFrame.current = requestAnimationFrame(animateScroll);
-  };
-
-  // Обробка завершення дотику
-  const handleTouchEnd = (e: React.TouchEvent, contact: Contact) => {
-    if (!isScrolling.current) {
-      onSelectChat(contact);
-    } else if (Math.abs(velocity.current) > 2) { // Зменшено поріг для запуску інерції
-      animationFrame.current = requestAnimationFrame(animateScroll);
-    }
-    touchStartY.current = null;
-    lastTouchY.current = null;
-    isScrolling.current = false;
-  };
-
-  return (
-    <div 
-      ref={chatListRef}
-      className="scroll-container"
-      style={{ 
-        height: '100%',
-        overflowY: 'scroll',
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehavior: 'contain',
-        position: 'relative',
-        touchAction: 'none',
-        paddingBottom: '100px',
-      }}
-    >
-      {contacts.map((contact) => {
-        const hasUnread = contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id;
-        const isSelected = selectedChatId === contact.id;
-        
-        return (
-          <div
-            key={contact.id}
-            className="chat-item"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={(e) => handleTouchEnd(e, contact)}
-            onClick={(e) => {
-              if (!('ontouchstart' in window)) {
-                onSelectChat(contact);
-              }
-            }}
-            style={{ 
-              background: isSelected ? (isDarkTheme ? '#444' : '#f0f0f0') : 'transparent',
-              width: '100%',
-              userSelect: 'none',
-            }}
-          >
-            <div className="avatar">
-              {contact.email.charAt(0).toUpperCase()}
-            </div>
-            <div style={{ flex: 1, overflow: 'hidden' }}>
-              <div className={`fw-bold ${hasUnread ? 'unread-text' : ''}`}>
-                {contact.email}
-              </div>
-              {contact.lastMessage && (
-                <div className={`${hasUnread ? 'unread-text' : ''}`} style={{ fontSize: '0.9rem' }}>
-                  {contact.lastMessage.text.length > 20 
-                    ? `${contact.lastMessage.text.substring(0, 20)}...` 
-                    : contact.lastMessage.text}
-                  <span className="chat-timestamp" style={{ marginLeft: '10px' }}>
-                    {new Date(contact.lastMessage.timestamp).toLocaleString([], { 
-                      day: '2-digit', 
-                      month: '2-digit', 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
-                  </span>
-                </div>
-              )}
-            </div>
-            {hasUnread && (
-              <div
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  backgroundColor: '#007bff',
-                  borderRadius: '50%',
-                  marginLeft: '10px',
-                }}
-              />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
 const App: React.FC = () => {
-  const [userId, setUserId] = useState<string | null>(() => localStorage.getItem('userId'));
+  const { userId, identityKeyPair, setUserId, setIdentityKeyPair, generateKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem('userEmail'));
-  const [identityKeyPair, setIdentityKeyPair] = useState<IdentityKeyPair | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(() => localStorage.getItem('selectedChatId'));
@@ -196,55 +22,64 @@ const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<WebSocket | null>(null);
   const isInitialMount = useRef(true);
   const prevMessageCount = useRef(0);
 
-  useEffect(() => {
-    const init = async () => {
-      const storedKeyPair = localStorage.getItem('signalKeyPair');
-      if (storedKeyPair) {
-        const { publicKey, privateKey } = JSON.parse(storedKeyPair);
-        setIdentityKeyPair({
-          pubKey: Buffer.from(publicKey, 'base64'),
-          privKey: Buffer.from(privateKey, 'base64'),
-        });
+  const updateContactsWithLastMessage = useCallback((newMessage: Message) => {
+    setContacts(prev => {
+      const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
+      const existingContact = prev.find(c => c.id === contactId);
+
+      if (existingContact) {
+        return prev
+          .map(c =>
+            c.id === contactId
+              ? { ...c, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }
+              : c
+          )
+          .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       }
-      setIsLoading(false);
-    };
-    init();
-  }, []);
-
-  useEffect(() => {
-    if (!userId || !selectedChatId || !chatRef.current) return;
-
-    const scrollToPosition = () => {
-      if (messages.length === 0 && anchorRef.current) {
-        anchorRef.current.scrollIntoView({ behavior: 'auto' });
-      } else if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: isInitialMount.current ? 'auto' : 'smooth' });
-      }
-    };
-
-    scrollToPosition();
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    }
-    prevMessageCount.current = messages.length;
-  }, [messages, selectedChatId, userId]);
+      return prev;
+    });
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) return;
 
-    wsRef.current = new WebSocket(`ws://192.168.31.185:4000?userId=${userId}`);
-    wsRef.current.onopen = () => console.log('WebSocket connected');
-    wsRef.current.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      if (msg.type === 'read') {
+    const fetchData = async () => {
+      try {
+        const [chatsRes, messagesRes] = await Promise.all([
+          fetchChats(userId),
+          selectedChatId ? fetchMessages(userId, selectedChatId) : Promise.resolve({ data: [] as Message[] }),
+        ]);
+
+        setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
+        setMessages(messagesRes.data.map(msg => ({
+          ...msg,
+          isMine: msg.userId === userId,
+        })).sort((a, b) => a.timestamp - b.timestamp));
+
+        if (selectedChatId) {
+          markAsRead(userId, selectedChatId);
+        }
+      } catch (err) {
+        const error = err as AxiosError<{ error?: string }>;
+        console.error('Fetch data error:', error.message);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, [userId, selectedChatId, updateContactsWithLastMessage]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    webSocketService.connect(userId, (msg: Message | { type: string, userId: string, contactId: string }) => {
+      if ('type' in msg && msg.type === 'read') {
         setMessages(prev =>
           prev.map(m => (m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0 ? { ...m, isRead: 1 } : m))
         );
@@ -258,52 +93,20 @@ const App: React.FC = () => {
         );
         return;
       }
-      if ((msg.userId === userId && msg.contactId === selectedChatId) || 
-          (msg.contactId === userId && msg.userId === selectedChatId)) {
+      if (('userId' in msg && 'contactId' in msg) && 
+          ((msg.userId === userId && msg.contactId === selectedChatId) || 
+           (msg.contactId === userId && msg.userId === selectedChatId))) {
         setMessages(prev => {
-          if (prev.some(m => m.id === msg.id)) return prev;
-          const newMsg = { ...msg, isMine: msg.userId === userId };
+          if (prev.some(m => m.id === (msg as Message).id)) return prev;
+          const newMsg = { ...msg, isMine: (msg as Message).userId === userId } as Message;
           return [...prev, newMsg].sort((a, b) => a.timestamp - b.timestamp);
         });
       }
-      updateContactsWithLastMessage(msg);
-    };
-    wsRef.current.onerror = (err) => console.error('WebSocket error:', err);
-    wsRef.current.onclose = () => console.log('WebSocket closed');
+      updateContactsWithLastMessage(msg as Message);
+    });
 
-    return () => { wsRef.current?.close(); };
-  }, [userId, selectedChatId]);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    const fetchData = async () => {
-      try {
-        const [chatsRes, messagesRes] = await Promise.all([
-          axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } }),
-          selectedChatId 
-            ? axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${selectedChatId}`)
-            : Promise.resolve({ data: [] as Message[] }),
-        ]);
-
-        setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
-        setMessages(messagesRes.data.map(msg => ({
-          ...msg,
-          isMine: msg.userId === userId,
-        })).sort((a, b) => a.timestamp - b.timestamp));
-
-        if (selectedChatId) {
-          axios.post('http://192.168.31.185:4000/mark-as-read', { userId, contactId: selectedChatId });
-        }
-      } catch (err) {
-        console.error('Fetch data error:', err);
-      }
-    };
-
-    fetchData();
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
-  }, [userId, selectedChatId]);
+    return () => webSocketService.disconnect();
+  }, [userId, selectedChatId, updateContactsWithLastMessage]);
 
   useEffect(() => {
     if (!searchQuery || !userId) {
@@ -312,8 +115,12 @@ const App: React.FC = () => {
     }
     
     const search = async () => {
-      const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
-      setSearchResults(res.data.filter(c => c.id !== userId));
+      try {
+        const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
+        setSearchResults(res.data.filter(c => c.id !== userId));
+      } catch (err) {
+        console.error('Search error:', err);
+      }
     };
     search();
   }, [searchQuery, userId]);
@@ -327,14 +134,15 @@ const App: React.FC = () => {
     }
   }, [selectedChatId]);
 
-  const generateKeyPair = async (): Promise<IdentityKeyPair> => {
-    const keyPair = await signal.KeyHelper.generateIdentityKeyPair();
-    localStorage.setItem('signalKeyPair', JSON.stringify({
-      publicKey: Buffer.from(keyPair.pubKey).toString('base64'),
-      privateKey: Buffer.from(keyPair.privKey).toString('base64'),
-    }));
-    return keyPair;
-  };
+  useEffect(() => {
+    if (chatRef.current && messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: isInitialMount.current ? 'auto' : 'smooth' });
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+      }
+      prevMessageCount.current = messages.length;
+    }
+  }, [messages]);
 
   const handleAuth = async (isLogin: boolean) => {
     if (!email || !password) return alert('Fill in all fields');
@@ -367,12 +175,7 @@ const App: React.FC = () => {
   };
 
   const sendMessage = () => {
-    if (!input.trim() || !userId || !selectedChatId || !wsRef.current) return;
-    if (wsRef.current.readyState !== WebSocket.OPEN) {
-      console.error('WebSocket is not open');
-      alert('Connection lost. Please refresh the page.');
-      return;
-    }
+    if (!input.trim() || !userId || !selectedChatId) return;
     
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -390,7 +193,7 @@ const App: React.FC = () => {
     });
     setInput('');
     
-    wsRef.current.send(JSON.stringify(newMessage));
+    webSocketService.send(newMessage);
     updateContactsWithLastMessage(newMessage);
   };
 
@@ -410,7 +213,9 @@ const App: React.FC = () => {
       return prev;
     });
 
-    axios.post('http://192.168.31.185:4000/mark-as-read', { userId, contactId: contact.id });
+    if (userId) {
+      markAsRead(userId, contact.id);
+    }
   };
 
   const handleLogout = () => {
@@ -421,35 +226,15 @@ const App: React.FC = () => {
     setSelectedChatId(null);
     setMessages([]);
     setContacts([]);
+    webSocketService.disconnect();
   };
 
   const handleUpdate = () => {
     window.location.reload();
   };
 
-  const updateContactsWithLastMessage = (newMessage: Message) => {
-    setContacts(prev => {
-      const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
-      const existingContact = prev.find(c => c.id === contactId);
-
-      if (existingContact) {
-        return prev
-          .map(c =>
-            c.id === contactId
-              ? { ...c, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }
-              : c
-          )
-          .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
-      } else {
-        return prev;
-      }
-    });
-  };
-
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
   const selectedContact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId) || null;
-
-  if (isLoading) return null;
 
   if (!userId || !identityKeyPair) {
     return (
@@ -747,7 +532,6 @@ const App: React.FC = () => {
                 No messages yet. Start your conversation!
               </div>
             )}
-            <div ref={anchorRef} style={{ height: '1px' }} />
           </div>
         ) : (
           <ChatList 

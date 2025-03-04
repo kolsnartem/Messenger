@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es6", // Оновлено з es5 для сучасніших браузерів
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "skipLibCheck": false, // Вимкнено для суворішої перевірки типів
+    "skipLibCheck": false,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true, // Залишаємо лише один раз
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
@@ -17,11 +17,15 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "react-icons/*": ["node_modules/react-icons/*/index.d.ts"]
+      "*": ["src/*", "node_modules/*"],
+      "hooks/*": ["src/hooks/*"],
+      "types": ["src/types.ts"],
+      "components/*": ["src/components/*"],
+      "services/*": ["src/services/*"]
     },
     "jsxImportSource": "react",
-    "types": ["react", "react-dom", "react-icons"] // Додано для явного вказання типів
+    "types": ["react", "react-dom", "react-icons"]
   },
-  "include": ["src/**/*", "types/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }

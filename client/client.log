@@ -6,9 +6,9 @@ Applying Webpack configuration...
 Updated source-map-loader rule with exclude: [ /node_modules\/@signalapp\/libsignal-client/ ]
 Webpack configuration applied successfully.
 Dev server middlewares set up.
-(node:106851) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:2436) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:106851) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:2436) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -25,3 +25,1520 @@ webpack compiled successfully
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
 No issues found.
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Compiling...
+ERROR in src/types.ts
+TS1208: 'types.ts' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+Compiled successfully!
+webpack compiled successfully
+No issues found.
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx
+TS1208: 'ChatList.tsx' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/services/api.ts
+TS1208: 'api.ts' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+ERROR in src/services/websocket.ts
+TS1208: 'websocket.ts' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/components/hooks/useAuth.ts
+TS1208: 'useAuth.ts' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: Expression expected (35:2)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token (35:2)
+
+  33 |   return (
+  34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+> 35 |   );
+     |   ^
+  36 | };
+  37 |
+  38 | export default App;
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11376:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.parseReturnStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12786:28)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12437:21)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+    at TypeScriptParserMixin.parseStatementListItem (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12386:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12960:61)
+    at TypeScriptParserMixin.parseBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12953:10)
+    at TypeScriptParserMixin.parseBlock (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12941:10)
+    at TypeScriptParserMixin.parseFunctionBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11783:24)
+    at TypeScriptParserMixin.parseArrowExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11758:10)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11371:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseVar (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:13028:91)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12874:10)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9314:31)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12489:23)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 35:2:  Parsing error: Expression expected
+
+webpack compiled with 2 errors
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import * as CryptoJS from 'crypto-js';
+    8 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+    9 |
+
+ERROR in src/App.tsx:35:3
+TS1109: Expression expected.
+    33 |   return (
+    34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+  > 35 |   );
+       |   ^
+    36 | };
+    37 |
+    38 | export default App;
+
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: Expression expected (35:2)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token (35:2)
+
+  33 |   return (
+  34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+> 35 |   );
+     |   ^
+  36 | };
+  37 |
+  38 | export default App;
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11376:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.parseReturnStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12786:28)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12437:21)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+    at TypeScriptParserMixin.parseStatementListItem (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12386:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12960:61)
+    at TypeScriptParserMixin.parseBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12953:10)
+    at TypeScriptParserMixin.parseBlock (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12941:10)
+    at TypeScriptParserMixin.parseFunctionBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11783:24)
+    at TypeScriptParserMixin.parseArrowExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11758:10)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11371:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseVar (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:13028:91)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12874:10)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9314:31)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12489:23)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 35:2:  Parsing error: Expression expected
+
+webpack compiled with 2 errors
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import * as CryptoJS from 'crypto-js';
+    8 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+    9 |
+
+ERROR in src/App.tsx:35:3
+TS1109: Expression expected.
+    33 |   return (
+    34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+  > 35 |   );
+       |   ^
+    36 | };
+    37 |
+    38 | export default App;
+
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: Expression expected (35:2)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token (35:2)
+
+  33 |   return (
+  34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+> 35 |   );
+     |   ^
+  36 | };
+  37 |
+  38 | export default App;
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11376:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.parseReturnStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12786:28)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12437:21)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+    at TypeScriptParserMixin.parseStatementListItem (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12386:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12960:61)
+    at TypeScriptParserMixin.parseBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12953:10)
+    at TypeScriptParserMixin.parseBlock (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12941:10)
+    at TypeScriptParserMixin.parseFunctionBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11783:24)
+    at TypeScriptParserMixin.parseArrowExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11758:10)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11371:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseVar (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:13028:91)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12874:10)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9314:31)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12489:23)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 35:2:  Parsing error: Expression expected
+
+webpack compiled with 2 errors
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import * as CryptoJS from 'crypto-js';
+    8 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+    9 |
+
+ERROR in src/App.tsx:35:3
+TS1109: Expression expected.
+    33 |   return (
+    34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+  > 35 |   );
+       |   ^
+    36 | };
+    37 |
+    38 | export default App;
+
+ERROR in src/components/ChatList.tsx:50:7
+TS2322: Type 'void[]' is not assignable to type 'ReactNode'.
+  Type 'void[]' is not assignable to type 'Iterable<ReactNode>'.
+    The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+      Type 'IteratorResult<void, any>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+        Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+          Type 'IteratorYieldResult<void>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+            Type 'void' is not assignable to type 'ReactNode'.
+    48 |       }}
+    49 |     >
+  > 50 |       {contacts.map((contact) => {
+       |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 51 |         // ... (рендер як у вашому коді)
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 52 |       })}
+       | ^^^^^^^^^^
+    53 |     </div>
+    54 |   );
+    55 | };
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: Expression expected (35:2)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token (35:2)
+
+  33 |   return (
+  34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+> 35 |   );
+     |   ^
+  36 | };
+  37 |
+  38 | export default App;
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11376:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.parseReturnStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12786:28)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12437:21)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+    at TypeScriptParserMixin.parseStatementListItem (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12386:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12960:61)
+    at TypeScriptParserMixin.parseBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12953:10)
+    at TypeScriptParserMixin.parseBlock (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12941:10)
+    at TypeScriptParserMixin.parseFunctionBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11783:24)
+    at TypeScriptParserMixin.parseArrowExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11758:10)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11371:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseVar (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:13028:91)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12874:10)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9314:31)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12489:23)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 35:2:  Parsing error: Expression expected
+
+webpack compiled with 2 errors
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import * as CryptoJS from 'crypto-js';
+    8 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+    9 |
+
+ERROR in src/App.tsx:35:3
+TS1109: Expression expected.
+    33 |   return (
+    34 |     // JSX як у вашому коді, але з використанням компонентів та хуків
+  > 35 |   );
+       |   ^
+    36 | };
+    37 |
+    38 | export default App;
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: Expression expected (248:2)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token (248:2)
+
+  246 |   return (
+  247 |     // JSX як у вашому оригінальному коді, але з коректними імпортами та типами
+> 248 |   );
+      |   ^
+  249 | };
+  250 |
+  251 | export default App;
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11376:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.parseReturnStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12786:28)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12437:21)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+    at TypeScriptParserMixin.parseStatementListItem (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12386:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12960:61)
+    at TypeScriptParserMixin.parseBlockBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12953:10)
+    at TypeScriptParserMixin.parseBlock (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12941:10)
+    at TypeScriptParserMixin.parseFunctionBody (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11783:24)
+    at TypeScriptParserMixin.parseArrowExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11758:10)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11371:12)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseVar (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:13028:91)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12874:10)
+    at TypeScriptParserMixin.parseVarStatement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9314:31)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12489:23)
+    at TypeScriptParserMixin.parseStatementContent (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12406:17)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 248:2:  Parsing error: Expression expected
+
+webpack compiled with 2 errors
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import * as CryptoJS from 'crypto-js';
+    8 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+    9 |
+
+ERROR in src/App.tsx:98:25
+TS2304: Cannot find name 'axios'.
+     96 |     
+     97 |     const search = async () => {
+  >  98 |       const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
+        |                         ^^^^^
+     99 |       setSearchResults(res.data.filter(c => c.id !== userId));
+    100 |     };
+    101 |     search();
+
+ERROR in src/App.tsx:99:40
+TS7006: Parameter 'c' implicitly has an 'any' type.
+     97 |     const search = async () => {
+     98 |       const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
+  >  99 |       setSearchResults(res.data.filter(c => c.id !== userId));
+        |                                        ^
+    100 |     };
+    101 |     search();
+    102 |   }, [searchQuery, userId]);
+
+ERROR in src/App.tsx:122:25
+TS2304: Cannot find name 'axios'.
+    120 |       const publicKey = Buffer.from(keys.pubKey).toString('base64');
+    121 |       
+  > 122 |       const res = await axios.post<{ id: string; publicKey?: string }>(
+        |                         ^^^^^
+    123 |         `http://192.168.31.185:4000${endpoint}`, 
+    124 |         { email, password: hashedPassword, ...(isLogin ? {} : { publicKey }) }
+    125 |       );
+
+ERROR in src/App.tsx:128:15
+TS2304: Cannot find name 'axios'.
+    126 |
+    127 |       if (isLogin && !identityKeyPair) {
+  > 128 |         await axios.put('http://192.168.31.185:4000/update-keys', { userId: res.data.id, publicKey });
+        |               ^^^^^
+    129 |       }
+    130 |
+    131 |       localStorage.setItem('userId', res.data.id);
+
+ERROR in src/App.tsx:135:7
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    133 |       setUserId(res.data.id);
+    134 |       setUserEmail(email);
+  > 135 |       setIdentityKeyPair(keys);
+        |       ^^^^^^^^^^^^^^^^^^
+    136 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    137 |     } catch (err) {
+    138 |       const error = err as AxiosError<{ error?: string }>;
+
+ERROR in src/App.tsx:138:28
+TS2304: Cannot find name 'AxiosError'.
+    136 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    137 |     } catch (err) {
+  > 138 |       const error = err as AxiosError<{ error?: string }>;
+        |                            ^^^^^^^^^^
+    139 |       alert(`Error: ${error.response?.data?.error || error.message}`);
+    140 |     }
+    141 |   };
+
+ERROR in src/App.tsx:189:5
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    187 |     setUserId(null);
+    188 |     setUserEmail(null);
+  > 189 |     setIdentityKeyPair(null);
+        |     ^^^^^^^^^^^^^^^^^^
+    190 |     setSelectedChatId(null);
+    191 |     setMessages([]);
+    192 |     setContacts([]);
+
+ERROR in src/App.tsx:248:3
+TS1109: Expression expected.
+    246 |   return (
+    247 |     // JSX як у вашому оригінальному коді, але з коректними імпортами та типами
+  > 248 |   );
+        |   ^
+    249 | };
+    250 |
+    251 | export default App;
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+WARNING in [eslint] 
+src/App.tsx
+  Line 91:6:  React Hook useEffect has a missing dependency: 'updateContactsWithLastMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/services/api.ts
+  Line 1:17:  'AxiosError' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/services/websocket.ts
+  Line 25:3:  Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+ERROR in ./src/App.tsx 9:0-42
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+
+webpack compiled with 1 error and 1 warning
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import axios, { AxiosError } from 'axios'; // Імпорт axios і AxiosError
+    8 | import * as CryptoJS from 'crypto-js';
+    9 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+
+ERROR in src/App.tsx:141:7
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    139 |       setUserId(res.data.id);
+    140 |       setUserEmail(email);
+  > 141 |       setIdentityKeyPair(keys);
+        |       ^^^^^^^^^^^^^^^^^^
+    142 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    143 |     } catch (err) {
+    144 |       const error = err as AxiosError<{ error?: string }>;
+
+ERROR in src/App.tsx:195:5
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    193 |     setUserId(null);
+    194 |     setUserEmail(null);
+  > 195 |     setIdentityKeyPair(null);
+        |     ^^^^^^^^^^^^^^^^^^
+    196 |     setSelectedChatId(null);
+    197 |     setMessages([]);
+    198 |     setContacts([]);
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+WARNING in [eslint] 
+src/App.tsx
+  Line 91:6:  React Hook useEffect has a missing dependency: 'updateContactsWithLastMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/services/api.ts
+  Line 1:17:  'AxiosError' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/services/websocket.ts
+  Line 25:3:  Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+ERROR in ./src/App.tsx 9:0-42
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+
+webpack compiled with 1 error and 1 warning
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import axios, { AxiosError } from 'axios'; // Імпорт axios і AxiosError
+    8 | import * as CryptoJS from 'crypto-js';
+    9 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+
+ERROR in src/App.tsx:141:7
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    139 |       setUserId(res.data.id);
+    140 |       setUserEmail(email);
+  > 141 |       setIdentityKeyPair(keys);
+        |       ^^^^^^^^^^^^^^^^^^
+    142 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    143 |     } catch (err) {
+    144 |       const error = err as AxiosError<{ error?: string }>;
+
+ERROR in src/App.tsx:195:5
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    193 |     setUserId(null);
+    194 |     setUserEmail(null);
+  > 195 |     setIdentityKeyPair(null);
+        |     ^^^^^^^^^^^^^^^^^^
+    196 |     setSelectedChatId(null);
+    197 |     setMessages([]);
+    198 |     setContacts([]);
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+WARNING in [eslint] 
+src/App.tsx
+  Line 91:6:  React Hook useEffect has a missing dependency: 'updateContactsWithLastMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/services/api.ts
+  Line 1:17:  'AxiosError' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/services/websocket.ts
+  Line 25:3:  Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+ERROR in ./src/App.tsx 9:0-42
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+
+webpack compiled with 1 error and 1 warning
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import axios, { AxiosError } from 'axios'; // Імпорт axios і AxiosError
+    8 | import * as CryptoJS from 'crypto-js';
+    9 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+
+ERROR in src/App.tsx:141:7
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    139 |       setUserId(res.data.id);
+    140 |       setUserEmail(email);
+  > 141 |       setIdentityKeyPair(keys);
+        |       ^^^^^^^^^^^^^^^^^^
+    142 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    143 |     } catch (err) {
+    144 |       const error = err as AxiosError<{ error?: string }>;
+
+ERROR in src/App.tsx:195:5
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    193 |     setUserId(null);
+    194 |     setUserEmail(null);
+  > 195 |     setIdentityKeyPair(null);
+        |     ^^^^^^^^^^^^^^^^^^
+    196 |     setSelectedChatId(null);
+    197 |     setMessages([]);
+    198 |     setContacts([]);
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+WARNING in [eslint] 
+src/App.tsx
+  Line 91:6:  React Hook useEffect has a missing dependency: 'updateContactsWithLastMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/services/api.ts
+  Line 1:17:  'AxiosError' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/services/websocket.ts
+  Line 25:3:  Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+ERROR in ./src/App.tsx 9:0-42
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+
+webpack compiled with 1 error and 1 warning
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import axios, { AxiosError } from 'axios'; // Імпорт axios і AxiosError
+    8 | import * as CryptoJS from 'crypto-js';
+    9 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+
+ERROR in src/App.tsx:141:7
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    139 |       setUserId(res.data.id);
+    140 |       setUserEmail(email);
+  > 141 |       setIdentityKeyPair(keys);
+        |       ^^^^^^^^^^^^^^^^^^
+    142 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    143 |     } catch (err) {
+    144 |       const error = err as AxiosError<{ error?: string }>;
+
+ERROR in src/App.tsx:195:5
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    193 |     setUserId(null);
+    194 |     setUserEmail(null);
+  > 195 |     setIdentityKeyPair(null);
+        |     ^^^^^^^^^^^^^^^^^^
+    196 |     setSelectedChatId(null);
+    197 |     setMessages([]);
+    198 |     setContacts([]);
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+ERROR in src/services/api.ts:4:20
+TS2304: Cannot find name 'Contact'.
+    2 |
+    3 | export const fetchChats = async (userId: string) => {
+  > 4 |   return axios.get<Contact[]>('http://192.168.31.185:4000/chats', { params: { userId } });
+      |                    ^^^^^^^
+    5 | };
+    6 |
+    7 | export const fetchMessages = async (userId: string, contactId: string) => {
+
+ERROR in src/services/api.ts:8:20
+TS2304: Cannot find name 'Message'.
+     6 |
+     7 | export const fetchMessages = async (userId: string, contactId: string) => {
+  >  8 |   return axios.get<Message[]>(`http://192.168.31.185:4000/messages?userId=${userId}&contactId=${contactId}`);
+       |                    ^^^^^^^
+     9 | };
+    10 |
+    11 | export const markAsRead = async (userId: string, contactId: string) => {
+
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+WARNING in [eslint] 
+src/App.tsx
+  Line 91:6:  React Hook useEffect has a missing dependency: 'updateContactsWithLastMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/services/api.ts
+  Line 1:17:  'AxiosError' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/services/websocket.ts
+  Line 25:3:  Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+ERROR in ./src/App.tsx 9:0-42
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+
+webpack compiled with 1 error and 1 warning
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import axios, { AxiosError } from 'axios'; // Імпорт axios і AxiosError
+    8 | import * as CryptoJS from 'crypto-js';
+    9 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+
+ERROR in src/App.tsx:141:7
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    139 |       setUserId(res.data.id);
+    140 |       setUserEmail(email);
+  > 141 |       setIdentityKeyPair(keys);
+        |       ^^^^^^^^^^^^^^^^^^
+    142 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    143 |     } catch (err) {
+    144 |       const error = err as AxiosError<{ error?: string }>;
+
+ERROR in src/App.tsx:195:5
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    193 |     setUserId(null);
+    194 |     setUserEmail(null);
+  > 195 |     setIdentityKeyPair(null);
+        |     ^^^^^^^^^^^^^^^^^^
+    196 |     setSelectedChatId(null);
+    197 |     setMessages([]);
+    198 |     setContacts([]);
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+WARNING in [eslint] 
+src/App.tsx
+  Line 91:6:  React Hook useEffect has a missing dependency: 'updateContactsWithLastMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/services/api.ts
+  Line 1:17:  'AxiosError' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/services/websocket.ts
+  Line 27:1:  Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+ERROR in ./src/App.tsx 9:0-42
+Module not found: Error: Can't resolve './hooks/useAuth' in '/home/john/vscode_projects/messenger/client/src'
+
+webpack compiled with 1 error and 1 warning
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:6:25
+TS2307: Cannot find module './hooks/useAuth' or its corresponding type declarations.
+    4 | import { fetchChats, fetchMessages, markAsRead } from './services/api';
+    5 | import WebSocketService from './services/websocket';
+  > 6 | import { useAuth } from './hooks/useAuth';
+      |                         ^^^^^^^^^^^^^^^^^
+    7 | import axios, { AxiosError } from 'axios'; // Імпорт axios і AxiosError
+    8 | import * as CryptoJS from 'crypto-js';
+    9 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
+
+ERROR in src/App.tsx:65:15
+TS2339: Property 'type' does not exist on type 'Message | { type: string; userId: string; contactId: string; }'.
+  Property 'type' does not exist on type 'Message'.
+    63 |
+    64 |     WebSocketService.connect(userId, (msg) => {
+  > 65 |       if (msg.type === 'read') {
+       |               ^^^^
+    66 |         setMessages(prev =>
+    67 |           prev.map(m => (m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0 ? { ...m, isRead: 1 } : m))
+    68 |         );
+
+ERROR in src/App.tsx:82:43
+TS2339: Property 'id' does not exist on type 'Message | { type: string; userId: string; contactId: string; }'.
+  Property 'id' does not exist on type '{ type: string; userId: string; contactId: string; }'.
+    80 |           (msg.contactId === userId && msg.userId === selectedChatId)) {
+    81 |         setMessages(prev => {
+  > 82 |           if (prev.some(m => m.id === msg.id)) return prev;
+       |                                           ^^
+    83 |           const newMsg = { ...msg, isMine: msg.userId === userId } as Message;
+    84 |           return [...prev, newMsg].sort((a, b) => a.timestamp - b.timestamp);
+    85 |         });
+
+ERROR in src/App.tsx:141:7
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    139 |       setUserId(res.data.id);
+    140 |       setUserEmail(email);
+  > 141 |       setIdentityKeyPair(keys);
+        |       ^^^^^^^^^^^^^^^^^^
+    142 |       alert(isLogin ? 'Login successful!' : 'Registration successful!');
+    143 |     } catch (err) {
+    144 |       const error = err as AxiosError<{ error?: string }>;
+
+ERROR in src/App.tsx:195:5
+TS2552: Cannot find name 'setIdentityKeyPair'. Did you mean 'identityKeyPair'?
+    193 |     setUserId(null);
+    194 |     setUserEmail(null);
+  > 195 |     setIdentityKeyPair(null);
+        |     ^^^^^^^^^^^^^^^^^^
+    196 |     setSelectedChatId(null);
+    197 |     setMessages([]);
+    198 |     setContacts([]);
+
+ERROR in src/components/hooks/useAuth.ts:4:33
+TS2307: Cannot find module '../types' or its corresponding type declarations.
+    2 | import * as signal from '@privacyresearch/libsignal-protocol-typescript';
+    3 | import * as CryptoJS from 'crypto-js';
+  > 4 | import { IdentityKeyPair } from '../types';
+      |                                 ^^^^^^^^^^
+    5 |
+    6 | export const useAuth = () => {
+    7 |   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
+

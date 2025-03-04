@@ -1,90 +1,188 @@
 Server running on http://192.168.31.185:4000
 Connected to SQLite database
-User logged in: Brad (ID: 1740786143713)
-Updated keys for user ID: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-User logged in: Kira (ID: 1740786143712)
-Updated keys for user ID: 1740786143712
+User registered: Obama💯 (ID: 1740786143730)
+New WebSocket connection established for user: 1740786143730
+User registered: Michael (ID: 1740786143731)
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+Received WebSocket message: From 1740786143731 to 1740786143730 (ID: 1741046212892)
+WebSocket message saved to DB: 1741046212892
+Received WebSocket message: From 1740786143731 to 1740786143730 (ID: 1741046221506)
+WebSocket message saved to DB: 1741046221506
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+Received WebSocket message: From 1740786143730 to 1740786143731 (ID: 1741046227404)
+WebSocket message saved to DB: 1741046227404
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+Received WebSocket message: From 1740786143730 to 1740786143731 (ID: 1741046235044)
+WebSocket message saved to DB: 1741046235044
+WebSocket connection closed for user: 1740786143730
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
 New WebSocket connection established for user: 1740786143712
 WebSocket connection closed for user: 1740786143712
 New WebSocket connection established for user: 1740786143712
-Received WebSocket message: From 1740786143712 to 1740786143713 (ID: 1740930789330)
-WebSocket message saved to DB: 1740930789330
-New WebSocket connection established for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
+New WebSocket connection established for user: 1740786143712
+New WebSocket connection established for user: 1740786143712
 WebSocket connection closed for user: 1740786143712
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-User logged in: Brad (ID: 1740786143713)
-Updated keys for user ID: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-Received WebSocket message: From 1740786143713 to 1740786143712 (ID: 1740945236037)
-WebSocket message saved to DB: 1740945236037
-WebSocket connection closed for user: 1740786143713
-User logged in: Brad (ID: 1740786143713)
-Updated keys for user ID: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-Received WebSocket message: From 1740786143713 to 1740786143712 (ID: 1740945328222)
-WebSocket message saved to DB: 1740945328222
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-Received WebSocket message: From 1740786143713 to 6 (ID: 1740946290510)
-WebSocket message saved to DB: 1740946290510
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-WebSocket connection closed for user: 1740786143713
-New WebSocket connection established for user: 1740786143713
-Received WebSocket message: From 1740786143713 to 1740786143712 (ID: 1740946959879)
-WebSocket message saved to DB: 1740946959879
-WebSocket connection closed for user: 1740786143713
+WebSocket connection closed for user: 1740786143712
+New WebSocket connection established for user: 1740786143712
+WebSocket connection closed for user: 1740786143712
+New WebSocket connection established for user: 1740786143712
+Received WebSocket message: From 1740786143712 to 1740786143730 (ID: 1741046676652)
+WebSocket message saved to DB: 1741046676652
+WebSocket connection closed for user: 1740786143712
+WebSocket connection closed for user: 1740786143712
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+Received WebSocket message: From 1740786143730 to 1740786143731 (ID: 1741047736407)
+WebSocket message saved to DB: 1741047736407
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+New WebSocket connection established for user: 1740786143712
+New WebSocket connection established for user: 1740786143712
+WebSocket connection closed for user: 1740786143712
+Received WebSocket message: From 1740786143712 to 1740786143730 (ID: 1741047760327)
+WebSocket message saved to DB: 1741047760327
+WebSocket connection closed for user: 1740786143712
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740687912977
+WebSocket connection closed for user: 1740687912977
+New WebSocket connection established for user: 1740687912977
+WebSocket connection closed for user: 1740687912977
+New WebSocket connection established for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+Received WebSocket message: From undefined to undefined (ID: undefined)
+Failed to save WebSocket message to DB: [Error: SQLITE_CONSTRAINT: NOT NULL constraint failed: messages.text] {
+  errno: 19,
+  code: 'SQLITE_CONSTRAINT'
+}
+Received WebSocket message: From undefined to undefined (ID: undefined)
+Failed to save WebSocket message to DB: [Error: SQLITE_CONSTRAINT: NOT NULL constraint failed: messages.text] {
+  errno: 19,
+  code: 'SQLITE_CONSTRAINT'
+}
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+New WebSocket connection established for user: 1740786143730
+WebSocket connection closed for user: 1740786143730
+User logged in: hello (ID: 1740687912977)
+Updated keys for user ID: 1740687912977
+New WebSocket connection established for user: 1740687912977
+WebSocket connection closed for user: 1740687912977
+New WebSocket connection established for user: 1740687912977
+Received WebSocket message: From 1740687912977 to 1740786143680 (ID: 1741080098164)
+WebSocket message saved to DB: 1741080098164
+WebSocket connection closed for user: 1740687912977
+New WebSocket connection established for user: 1740687912977
+New WebSocket connection established for user: 1740687912977
+WebSocket connection closed for user: 1740687912977
+WebSocket connection closed for user: 1740687912977
+New WebSocket connection established for user: 1740687912977
+WebSocket connection closed for user: 1740687912977
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
+New WebSocket connection established for user: 1740786143731
+WebSocket connection closed for user: 1740786143731
