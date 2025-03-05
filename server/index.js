@@ -12,7 +12,6 @@ const wss = new WebSocket.Server({ server });
 app.use(cors());
 app.use(express.json());
 
-// Ініціалізація бази даних SQLite
 const db = new sqlite3.Database('./messenger.db', (err) => {
   if (err) {
     console.error('SQLite connection error:', err);
@@ -21,14 +20,13 @@ const db = new sqlite3.Database('./messenger.db', (err) => {
   console.log('Connected to SQLite database');
 });
 
-// Створення таблиць
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
-      publicKey TEXT NOT NULL
+      publicKey TEXT
     )
   `);
 
@@ -42,15 +40,8 @@ db.serialize(() => {
       isRead INTEGER DEFAULT 0
     )
   `);
-
-  db.run(`ALTER TABLE messages ADD COLUMN isRead INTEGER DEFAULT 0`, (err) => {
-    if (err && !err.message.includes('duplicate column')) {
-      console.error('Error adding isRead column:', err);
-    }
-  });
 });
 
-// WebSocket логіка
 const clients = new Map();
 
 wss.on('connection', (ws, req) => {
@@ -70,24 +61,35 @@ wss.on('connection', (ws, req) => {
       sendToParticipants(msg);
       return;
     }
-    console.log(`Received WebSocket message: From ${msg.userId} to ${msg.contactId} (ID: ${msg.id})`);
+    console.log(`Received WebSocket message: From ${msg.userId} to ${msg.contactId} (ID: ${msg.id}, Text: ${msg.text})`);
 
-    db.run(
-      'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead) VALUES (?, ?, ?, ?, ?, ?)',
-      [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0],
-      (err) => {
-        if (err) {
-          console.error('Failed to save WebSocket message to DB:', err);
-        } else {
-          console.log(`WebSocket message saved to DB: ${msg.id}`);
-          sendToParticipants(msg);
-        }
+    db.get('SELECT id FROM messages WHERE id = ?', [msg.id], (err, row) => {
+      if (err) {
+        console.error('Error checking message existence:', err);
+        return;
       }
-    );
+      if (row) {
+        console.log(`Message ${msg.id} already exists, skipping`);
+        return;
+      }
+
+      db.run(
+        'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead) VALUES (?, ?, ?, ?, ?, ?)',
+        [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0],
+        (err) => {
+          if (err) {
+            console.error('Failed to save WebSocket message to DB:', err);
+          } else {
+            console.log(`WebSocket message saved to DB: ${msg.id}, Text: ${msg.text}`);
+            sendToParticipants(msg);
+          }
+        }
+      );
+    });
   });
 
-  ws.on('close', () => {
-    console.log(`WebSocket connection closed for user: ${userId}`);
+  ws.on('close', (code, reason) => {
+    console.log(`WebSocket connection closed for user: ${userId} (Code: ${code}, Reason: ${reason || 'unknown'})`);
     clients.delete(userId);
   });
 
@@ -101,21 +103,21 @@ const sendToParticipants = (message) => {
   participants.forEach((id) => {
     const client = clients.get(id);
     if (client && client.readyState === WebSocket.OPEN) {
+      console.log(`Sending message to user ${id}:`, message);
       client.send(JSON.stringify(message));
     }
   });
 };
 
-// API ендпоінти
 app.post('/register', (req, res) => {
-  const { email, password, publicKey } = req.body;
+  const { email, password } = req.body;
   db.get('SELECT email FROM users WHERE email = ?', [email], (err, row) => {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (row) return res.status(400).json({ error: 'User already exists' });
 
     db.run(
-      'INSERT INTO users (email, password, publicKey) VALUES (?, ?, ?)',
-      [email, password, publicKey],
+      'INSERT INTO users (email, password) VALUES (?, ?)',
+      [email, password],
       function(err) {
         if (err) return res.status(500).json({ error: 'Registration failed' });
         console.log(`User registered: ${email} (ID: ${this.lastID})`);
@@ -146,7 +148,7 @@ app.put('/update-keys', (req, res) => {
     [publicKey, userId],
     (err) => {
       if (err) return res.status(500).json({ error: 'Update failed' });
-      console.log(`Updated keys for user ID: ${userId}`);
+      console.log(`Updated keys for user ID: ${userId}, PublicKey: ${publicKey}`);
       res.json({ success: true });
     }
   );
@@ -173,7 +175,7 @@ app.get('/search', (req, res) => {
       res.json(rows.map(row => ({
         id: row.id.toString(),
         email: row.email,
-        publicKey: row.publicKey,
+        publicKey: row.publicKey || '', // Гарантуємо, що publicKey завжди є, навіть якщо порожній
       })));
     }
   );
@@ -202,7 +204,7 @@ app.get('/chats', (req, res) => {
       const contacts = rows.map(row => ({
         id: row.id.toString(),
         email: row.email,
-        publicKey: row.publicKey,
+        publicKey: row.publicKey || '', // Гарантуємо, що publicKey завжди є
       }));
 
       Promise.all(
@@ -243,7 +245,11 @@ app.get('/messages', (req, res) => {
      ORDER BY timestamp`,
     [userId, contactId, contactId, userId],
     (err, rows) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
+      if (err) {
+        console.error('Error fetching messages:', err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+      console.log(`Fetched messages for user ${userId} and contact ${contactId}:`, rows);
       res.json(rows);
     }
   );
@@ -266,7 +272,6 @@ app.post('/mark-as-read', (req, res) => {
   );
 });
 
-// Закриття бази даних при завершенні роботи
 process.on('SIGINT', () => {
   db.close((err) => {
     if (err) console.error('Error closing database:', err);
@@ -275,7 +280,6 @@ process.on('SIGINT', () => {
   });
 });
 
-// Запуск сервера
 const PORT = 4000;
 server.listen(PORT, '192.168.31.185', () => {
   console.log(`Server running on http://192.168.31.185:${PORT}`);

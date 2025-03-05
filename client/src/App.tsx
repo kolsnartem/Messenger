@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Contact, Message } from './types';
+import { Contact, Message, TweetNaClKeyPair } from './types';
 import ChatList from './components/ChatList';
 import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import webSocketService from './services/websocket';
 import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import CryptoJS from 'crypto-js';
+import * as nacl from 'tweetnacl';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
 
+type ErrorWithMessage = { message: string };
+
 const App: React.FC = () => {
-  const { userId, identityKeyPair, setUserId, setIdentityKeyPair, generateKeyPair } = useAuth();
+  const { userId, setUserId, setIdentityKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem('userEmail'));
   const [messages, setMessages] = useState<Message[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -22,16 +25,15 @@ const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [tweetNaclKeyPair, setTweetNaclKeyPair] = useState<TweetNaClKeyPair | null>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
-  const prevMessageCount = useRef(0);
 
   const updateContactsWithLastMessage = useCallback((newMessage: Message) => {
     setContacts(prev => {
       const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
       const existingContact = prev.find(c => c.id === contactId);
-
       if (existingContact) {
         return prev
           .map(c =>
@@ -41,47 +43,167 @@ const App: React.FC = () => {
           )
           .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       }
-      return prev;
+      // Якщо контакту немає, додаємо його з публічним ключем
+      const newContact = searchResults.find(c => c.id === contactId) || { id: contactId, email: '', publicKey: '' };
+      return [...prev, { ...newContact, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }]
+        .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
     });
-  }, [userId]);
+  }, [userId, searchResults]);
+
+  const cleanBase64 = (base64Str: string): string => {
+    return base64Str.replace(/[^A-Za-z0-9+/=]/g, '').replace(/=+$/, '');
+  };
+
+  const fixPublicKey = (key: Uint8Array): Uint8Array => {
+    if (key.length === 33) {
+      console.warn('Public key has 33 bytes, trimming to 32 bytes');
+      return key.slice(1);
+    }
+    if (key.length !== 32) {
+      console.error(`Invalid public key size: expected 32 bytes, got ${key.length} bytes`);
+      return key; // Повертаємо як є, щоб уникнути помилки
+    }
+    return key;
+  };
+
+  const encryptMessage = (text: string, contactPublicKey: string): string => {
+    if (!tweetNaclKeyPair) throw new Error('TweetNaCl key pair not initialized');
+    const cleanedPublicKey = cleanBase64(contactPublicKey || '');
+    if (!cleanedPublicKey) {
+      console.error('No public key available for encryption');
+      return text; // Повертаємо нешифрований текст, якщо ключ недоступний
+    }
+    let theirPublicKeyBuffer;
+    try {
+      theirPublicKeyBuffer = Buffer.from(cleanedPublicKey, 'base64');
+    } catch (error) {
+      console.error(`Invalid Base64 public key: ${(error as Error).message}`);
+      return text; // Повертаємо нешифрований текст у разі помилки
+    }
+    const theirPublicKey = fixPublicKey(new Uint8Array(theirPublicKeyBuffer));
+    const nonce = nacl.randomBytes(nacl.box.nonceLength);
+    const encrypted = nacl.box(
+      new TextEncoder().encode(text),
+      nonce,
+      theirPublicKey,
+      tweetNaclKeyPair.secretKey
+    );
+    if (!encrypted) {
+      console.error('Encryption failed');
+      return text;
+    }
+    return `base64:${Buffer.from(new Uint8Array([...nonce, ...encrypted])).toString('base64')}`;
+  };
+
+  const decryptMessage = (encryptedText: string, senderId: string): string => {
+    if (!tweetNaclKeyPair) {
+      console.warn('TweetNaCl key pair not initialized yet, returning encrypted text');
+      return encryptedText;
+    }
+    if (!encryptedText.startsWith('base64:')) return encryptedText;
+    const base64Data = encryptedText.slice(7);
+    const data = Buffer.from(base64Data, 'base64');
+    const nonce = data.subarray(0, nacl.box.nonceLength);
+    const cipher = data.subarray(nacl.box.nonceLength);
+
+    const senderPublicKey = cleanBase64(contacts.find(c => c.id === senderId)?.publicKey || 
+      searchResults.find(c => c.id === senderId)?.publicKey || '');
+    if (!senderPublicKey) {
+      console.error(`No public key found for sender ${senderId}`);
+      return encryptedText;
+    }
+    let theirPublicKeyBuffer;
+    try {
+      theirPublicKeyBuffer = Buffer.from(senderPublicKey, 'base64');
+    } catch (error) {
+      console.error(`Invalid Base64 public key for sender ${senderId}: ${(error as Error).message}`);
+      return encryptedText;
+    }
+    const theirPublicKey = fixPublicKey(new Uint8Array(theirPublicKeyBuffer));
+    const decrypted = nacl.box.open(cipher, nonce, theirPublicKey, tweetNaclKeyPair.secretKey);
+    if (!decrypted) {
+      console.error(`Decryption failed for message from ${senderId}`);
+      return encryptedText;
+    }
+    return new TextDecoder().decode(decrypted);
+  };
+
+  const initTweetNacl = (): TweetNaClKeyPair => {
+    const storedKeyPair = localStorage.getItem('tweetnaclKeyPair');
+    if (storedKeyPair) {
+      const parsed = JSON.parse(storedKeyPair);
+      const publicKey = new Uint8Array(parsed.publicKey);
+      const secretKey = new Uint8Array(parsed.secretKey);
+      if (publicKey.length !== 32 || secretKey.length !== 32) {
+        console.error('Invalid stored TweetNaCl key pair, generating new one');
+        const newKeyPair = nacl.box.keyPair();
+        localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
+          publicKey: Array.from(newKeyPair.publicKey),
+          secretKey: Array.from(newKeyPair.secretKey),
+        }));
+        return newKeyPair;
+      }
+      return { publicKey, secretKey };
+    } else {
+      const newKeyPair = nacl.box.keyPair();
+      localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
+        publicKey: Array.from(newKeyPair.publicKey),
+        secretKey: Array.from(newKeyPair.secretKey),
+      }));
+      return newKeyPair;
+    }
+  };
 
   useEffect(() => {
     if (!userId) return;
 
+    let keyPair: TweetNaClKeyPair;
+    try {
+      keyPair = initTweetNacl();
+      setTweetNaclKeyPair(keyPair);
+    } catch (error) {
+      console.error('Error initializing TweetNaCl keys:', error);
+      alert('Failed to initialize encryption keys: ' + (error as Error).message);
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        const [chatsRes, messagesRes] = await Promise.all([
-          fetchChats(userId),
-          selectedChatId ? fetchMessages(userId, selectedChatId) : Promise.resolve({ data: [] as Message[] }),
-        ]);
-
+        const chatsRes = await fetchChats(userId);
         setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
-        setMessages(messagesRes.data.map(msg => ({
-          ...msg,
-          isMine: msg.userId === userId,
-        })).sort((a, b) => a.timestamp - b.timestamp));
 
         if (selectedChatId) {
-          markAsRead(userId, selectedChatId);
+          const messagesRes = await fetchMessages(userId, selectedChatId);
+          const decryptedMessages = messagesRes.data.map(msg => ({
+            ...msg,
+            isMine: msg.userId === userId,
+            text: msg.text.startsWith('base64:') ? decryptMessage(msg.text, msg.userId) : msg.text,
+          })).sort((a, b) => a.timestamp - b.timestamp);
+          setMessages(decryptedMessages);
+          await markAsRead(userId, selectedChatId);
         }
       } catch (err) {
-        const error = err as AxiosError<{ error?: string }>;
-        console.error('Fetch data error:', error.message);
+        console.error('Fetch data error:', (err as AxiosError).message);
       }
     };
 
     fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-  }, [userId, selectedChatId, updateContactsWithLastMessage]);
+  }, [userId, selectedChatId]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !tweetNaclKeyPair) return;
 
-    webSocketService.connect(userId, (msg: Message | { type: string, userId: string, contactId: string }) => {
+    webSocketService.connect(userId, (msg: Message | { type: string; userId: string; contactId: string }) => {
+      console.log('Received WebSocket message:', msg);
       if ('type' in msg && msg.type === 'read') {
         setMessages(prev =>
-          prev.map(m => (m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0 ? { ...m, isRead: 1 } : m))
+          prev.map(m => 
+            m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0 
+              ? { ...m, isRead: 1 } 
+              : m
+          )
         );
         setContacts(prev =>
           prev.map(c => ({
@@ -93,20 +215,22 @@ const App: React.FC = () => {
         );
         return;
       }
-      if (('userId' in msg && 'contactId' in msg) && 
-          ((msg.userId === userId && msg.contactId === selectedChatId) || 
-           (msg.contactId === userId && msg.userId === selectedChatId))) {
+
+      const newMsg = msg as Message;
+      const decryptedText = newMsg.text.startsWith('base64:') ? decryptMessage(newMsg.text, newMsg.userId) : newMsg.text;
+      if ((newMsg.userId === userId && newMsg.contactId === selectedChatId) || 
+          (newMsg.contactId === userId && newMsg.userId === selectedChatId)) {
         setMessages(prev => {
-          if (prev.some(m => m.id === (msg as Message).id)) return prev;
-          const newMsg = { ...msg, isMine: (msg as Message).userId === userId } as Message;
-          return [...prev, newMsg].sort((a, b) => a.timestamp - b.timestamp);
+          if (prev.some(m => m.id === newMsg.id)) return prev;
+          return [...prev, { ...newMsg, isMine: newMsg.userId === userId, text: decryptedText }]
+            .sort((a, b) => a.timestamp - b.timestamp);
         });
       }
-      updateContactsWithLastMessage(msg as Message);
+      updateContactsWithLastMessage({ ...newMsg, text: decryptedText });
     });
 
     return () => webSocketService.disconnect();
-  }, [userId, selectedChatId, updateContactsWithLastMessage]);
+  }, [userId, selectedChatId, tweetNaclKeyPair, updateContactsWithLastMessage]);
 
   useEffect(() => {
     if (!searchQuery || !userId) {
@@ -119,7 +243,7 @@ const App: React.FC = () => {
         const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
         setSearchResults(res.data.filter(c => c.id !== userId));
       } catch (err) {
-        console.error('Search error:', err);
+        console.error('Search error:', (err as AxiosError).message);
       }
     };
     search();
@@ -137,10 +261,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (chatRef.current && messages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: isInitialMount.current ? 'auto' : 'smooth' });
-      if (isInitialMount.current) {
-        isInitialMount.current = false;
-      }
-      prevMessageCount.current = messages.length;
+      isInitialMount.current = false;
     }
   }, [messages]);
 
@@ -150,59 +271,79 @@ const App: React.FC = () => {
     
     try {
       const endpoint = isLogin ? '/login' : '/register';
-      const keys = isLogin ? identityKeyPair || await generateKeyPair() : await generateKeyPair();
-      const publicKey = Buffer.from(keys.pubKey).toString('base64');
-      
       const res = await axios.post<{ id: string; publicKey?: string }>(
         `http://192.168.31.185:4000${endpoint}`, 
-        { email, password: hashedPassword, ...(isLogin ? {} : { publicKey }) }
+        { email, password: hashedPassword }
       );
 
-      if (isLogin && !identityKeyPair) {
+      if (!isLogin) {
+        const newKeyPair = nacl.box.keyPair();
+        const publicKey = Buffer.from(newKeyPair.publicKey).toString('base64');
         await axios.put('http://192.168.31.185:4000/update-keys', { userId: res.data.id, publicKey });
+        setTweetNaclKeyPair(newKeyPair);
+        localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
+          publicKey: Array.from(newKeyPair.publicKey),
+          secretKey: Array.from(newKeyPair.secretKey),
+        }));
       }
 
       localStorage.setItem('userId', res.data.id);
       localStorage.setItem('userEmail', email);
       setUserId(res.data.id);
       setUserEmail(email);
-      setIdentityKeyPair(keys);
       alert(isLogin ? 'Login successful!' : 'Registration successful!');
     } catch (err) {
-      const error = err as AxiosError<{ error?: string }>;
-      alert(`Error: ${error.response?.data?.error || error.message}`);
+      console.error('Auth error:', err);
+      alert(`Error: ${(err as AxiosError).response?.data?.error || (err as AxiosError).message || 'Unknown error'}`);
     }
   };
 
-  const sendMessage = () => {
-    if (!input.trim() || !userId || !selectedChatId) return;
+  const sendMessage = async () => {
+    if (!input.trim() || !userId || !selectedChatId || !tweetNaclKeyPair) return;
     
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      userId,
-      contactId: selectedChatId,
-      text: input.trim(),
-      timestamp: Date.now(),
-      isRead: 0,
-      isMine: true,
-    };
+    const contact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId);
+    if (!contact) {
+      console.error(`No contact found for ID: ${selectedChatId}`);
+      alert('Cannot send message: Contact not found.');
+      return;
+    }
 
-    setMessages(prev => {
-      if (prev.some(m => m.id === newMessage.id)) return prev;
-      return [...prev, newMessage].sort((a, b) => a.timestamp - b.timestamp);
-    });
-    setInput('');
-    
-    webSocketService.send(newMessage);
-    updateContactsWithLastMessage(newMessage);
+    try {
+      const encryptedText = encryptMessage(input.trim(), contact.publicKey || '');
+      if (!encryptedText.startsWith('base64:')) {
+        console.error('Encryption failed, sending unencrypted text');
+      }
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        userId,
+        contactId: selectedChatId,
+        text: encryptedText,
+        timestamp: Date.now(),
+        isRead: 0,
+        isMine: true,
+      };
+
+      await webSocketService.send(newMessage);
+      const decryptedText = newMessage.text.startsWith('base64:') ? decryptMessage(newMessage.text, userId) : newMessage.text;
+      setMessages(prev => {
+        if (prev.some(m => m.id === newMessage.id)) return prev;
+        return [...prev, { ...newMessage, text: decryptedText }].sort((a, b) => a.timestamp - b.timestamp);
+      });
+      setInput('');
+      updateContactsWithLastMessage({ ...newMessage, text: decryptedText });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message: ' + (error as Error).message);
+    }
   };
 
-  const handleContactSelect = (contact: Contact) => {
+  const handleContactSelect = async (contact: Contact) => {
     setSelectedChatId(contact.id);
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
     
+    // Оновлюємо контакти, додаючи нового, якщо його ще немає
     setContacts(prev => {
       const contactExists = prev.some(c => c.id === contact.id);
       if (!contactExists) {
@@ -213,8 +354,19 @@ const App: React.FC = () => {
       return prev;
     });
 
-    if (userId) {
-      markAsRead(userId, contact.id);
+    if (userId && tweetNaclKeyPair) {
+      try {
+        const messagesRes = await fetchMessages(userId, contact.id);
+        const decryptedMessages = messagesRes.data.map(msg => ({
+          ...msg,
+          isMine: msg.userId === userId,
+          text: msg.text.startsWith('base64:') ? decryptMessage(msg.text, msg.userId) : msg.text,
+        })).sort((a, b) => a.timestamp - b.timestamp);
+        setMessages(decryptedMessages);
+        await markAsRead(userId, contact.id);
+      } catch (err) {
+        console.error('Error fetching messages on contact select:', err);
+      }
     }
   };
 
@@ -226,6 +378,7 @@ const App: React.FC = () => {
     setSelectedChatId(null);
     setMessages([]);
     setContacts([]);
+    setTweetNaclKeyPair(null);
     webSocketService.disconnect();
   };
 
@@ -236,7 +389,7 @@ const App: React.FC = () => {
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
   const selectedContact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId) || null;
 
-  if (!userId || !identityKeyPair) {
+  if (!userId) {
     return (
       <div className={`container vh-100 d-flex flex-column justify-content-center ${themeClass} p-3`}>
         <h3 className="text-center mb-4">My Messenger</h3>
@@ -276,24 +429,12 @@ const App: React.FC = () => {
       <style>
         {`
           @keyframes slideIn {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
           }
-          .message-enter {
-            animation: slideIn 0.3s ease-out forwards;
-          }
-          .input-placeholder-dark::placeholder {
-            color: #b0b0b0;
-          }
-          .search-placeholder-dark::placeholder {
-            color: #b0b0b0;
-          }
+          .message-enter { animation: slideIn 0.3s ease-out forwards; }
+          .input-placeholder-dark::placeholder { color: #b0b0b0; }
+          .search-placeholder-dark::placeholder { color: #b0b0b0; }
           .chat-item {
             display: flex;
             align-items: center;
@@ -301,9 +442,7 @@ const App: React.FC = () => {
             border-bottom: 1px solid ${isDarkTheme ? '#444' : '#eee'};
             cursor: pointer;
           }
-          .chat-item:hover {
-            background: ${isDarkTheme ? '#444' : '#f8f9fa'};
-          }
+          .chat-item:hover { background: ${isDarkTheme ? '#444' : '#f8f9fa'}; }
           .avatar {
             width: 40px;
             height: 40px;
@@ -320,12 +459,8 @@ const App: React.FC = () => {
             scrollbar-width: thin;
             scrollbar-color: ${isDarkTheme ? '#6c757d #212529' : '#dee2e6 #fff'};
           }
-          .scroll-container::-webkit-scrollbar {
-            width: 8px;
-          }
-          .scroll-container::-webkit-scrollbar-track {
-            background: ${isDarkTheme ? '#212529' : '#fff'};
-          }
+          .scroll-container::-webkit-scrollbar { width: 8px; }
+          .scroll-container::-webkit-scrollbar-track { background: ${isDarkTheme ? '#212529' : '#fff'}; }
           .scroll-container::-webkit-scrollbar-thumb {
             background: ${isDarkTheme ? '#6c757d' : '#dee2e6'};
             border-radius: 4px;
@@ -333,9 +468,7 @@ const App: React.FC = () => {
           .scroll-container::-webkit-scrollbar-thumb:hover {
             background: ${isDarkTheme ? '#868e96' : '#adb5bd'};
           }
-          .unread-text {
-            font-weight: bold;
-          }
+          .unread-text { font-weight: bold; }
           .chat-timestamp {
             color: ${isDarkTheme ? '#b0b0b0' : '#6c757d'};
             font-size: 0.7rem;
@@ -343,7 +476,6 @@ const App: React.FC = () => {
         `}
       </style>
 
-      {/* Header */}
       <div 
         className="p-2" 
         style={{ 
@@ -428,7 +560,6 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* Search */}
       {isSearchOpen && (
         <div
           style={{
@@ -465,7 +596,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Main content */}
       <div 
         ref={chatRef}
         className="flex-grow-1"
@@ -496,9 +626,7 @@ const App: React.FC = () => {
                 {messages.map((msg, index) => (
                   <div 
                     key={msg.id} 
-                    className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 ${
-                      index >= prevMessageCount.current && !isInitialMount.current ? 'message-enter' : ''
-                    }`}
+                    className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}
                   >
                     <div 
                       className={`p-2 rounded-3 ${
@@ -543,7 +671,6 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* Input panel */}
       {selectedChatId && (
         <div 
           className="p-2" 
@@ -574,7 +701,7 @@ const App: React.FC = () => {
               className="btn btn-primary ms-2 d-flex align-items-center justify-content-center" 
               onClick={sendMessage}
               style={{ borderRadius: '20px', minWidth: '60px', height: '38px' }}
-              disabled={!input.trim()}
+              disabled={!input.trim() || !tweetNaclKeyPair}
             >
               Send
             </button>
