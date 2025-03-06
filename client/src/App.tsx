@@ -9,7 +9,6 @@ import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
 
-// Тип для помилок від API
 interface ApiErrorResponse {
   error?: string;
 }
@@ -130,6 +129,8 @@ const getSentMessage = (messageId: string, chatId: string): string | null => {
   return storedMessages[messageId] || null;
 };
 
+const publicKeysCache = new Map<string, string>();
+
 const App: React.FC = () => {
   const { userId, setUserId, setIdentityKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem('userEmail'));
@@ -167,7 +168,7 @@ const App: React.FC = () => {
         id: contactId, 
         email: '', 
         publicKey: '',
-        lastMessage: null // Додано lastMessage
+        lastMessage: null
       };
       return [...prev, { ...newContact, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }]
         .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
@@ -175,10 +176,14 @@ const App: React.FC = () => {
   }, [userId, searchResults]);
 
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
+    if (publicKeysCache.has(senderId)) {
+      return publicKeysCache.get(senderId)!;
+    }
+
     let senderPublicKey = cleanBase64(
       contacts.find(c => c.id === senderId)?.publicKey ||
       searchResults.find(c => c.id === senderId)?.publicKey ||
-      ''
+      localStorage.getItem(`publicKey_${senderId}`) || ''
     );
 
     if (!senderPublicKey) {
@@ -188,6 +193,8 @@ const App: React.FC = () => {
         const key = cleanBase64(res.data.publicKey || '');
         if (key && key.length === 44) {
           senderPublicKey = key;
+          publicKeysCache.set(senderId, senderPublicKey);
+          localStorage.setItem(`publicKey_${senderId}`, senderPublicKey);
           setContacts(prev => {
             const exists = prev.some(c => c.id === senderId);
             if (!exists) {
@@ -195,7 +202,7 @@ const App: React.FC = () => {
                 id: senderId, 
                 email: res.data.email || '', 
                 publicKey: key,
-                lastMessage: null // Додано lastMessage
+                lastMessage: null
               }];
             }
             return prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c);
@@ -215,6 +222,7 @@ const App: React.FC = () => {
         throw new Error(error.message);
       }
     }
+    publicKeysCache.set(senderId, senderPublicKey);
     return senderPublicKey;
   };
 
@@ -267,6 +275,26 @@ const App: React.FC = () => {
     }
   };
 
+  const retryDecryption = async (messageId: string) => {
+    const messageIndex = messages.findIndex(msg => msg.id === messageId);
+    if (messageIndex === -1 || !messages[messageIndex].encryptedText) return;
+
+    try {
+      const decryptedText = await decryptMessage(
+        messages[messageIndex].encryptedText!,
+        messages[messageIndex].userId
+      );
+      const updatedMessages = [...messages];
+      updatedMessages[messageIndex] = {
+        ...updatedMessages[messageIndex],
+        text: decryptedText
+      };
+      setMessages(updatedMessages);
+    } catch (error) {
+      console.error('Retry decryption failed:', error);
+    }
+  };
+
   const handleIncomingMessage = async (message: Message) => {
     try {
       const storedText = message.userId === userId ? getSentMessage(message.id, selectedChatId || '') : null;
@@ -287,7 +315,7 @@ const App: React.FC = () => {
       };
       logEncryptionEvent('Incoming message processing failed', encryptionError);
       setMessages(prev => {
-        const updatedMessage = { ...message, text: '[Decryption Failed]', isMine: message.userId === userId };
+        const updatedMessage = { ...message, text: '[Decryption Failed]', isMine: message.userId === userId, encryptedText: message.text };
         if (prev.some(m => m.id === message.id)) return prev;
         return [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
       });
@@ -372,59 +400,97 @@ const App: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (!userId) return;
-
-    const initializeKeys = async () => {
-      if (!tweetNaclKeyPair && !isKeysLoaded) {
-        try {
-          const keyPair = initializeTweetNaclKeys();
-          setTweetNaclKeyPair(keyPair);
-          setIsKeysLoaded(true);
-          logEncryptionEvent('Keys initialized on mount');
-        } catch (error) {
-          console.error('Key initialization error:', error);
-          alert('Failed to initialize encryption keys: ' + (error as Error).message);
-        }
+  const initializeKeys = async () => {
+    try {
+      const savedKeyPair = localStorage.getItem('tweetnaclKeyPair');
+      if (savedKeyPair) {
+        const parsedKeyPair = JSON.parse(savedKeyPair);
+        setTweetNaclKeyPair({
+          publicKey: new Uint8Array(Object.values(parsedKeyPair.publicKey)),
+          secretKey: new Uint8Array(Object.values(parsedKeyPair.secretKey))
+        });
+        setIsKeysLoaded(true);
+        logEncryptionEvent('Keys loaded from storage');
+        return;
       }
-    };
 
-    initializeKeys();
-  }, [userId, tweetNaclKeyPair, isKeysLoaded]);
+      const newKeyPair = nacl.box.keyPair();
+      setTweetNaclKeyPair(newKeyPair);
+      localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
+        publicKey: Array.from(newKeyPair.publicKey),
+        secretKey: Array.from(newKeyPair.secretKey)
+      }));
+      setIsKeysLoaded(true);
+      logEncryptionEvent('New keys generated and stored');
+    } catch (error) {
+      console.error('Error initializing keys:', error);
+      alert('Failed to initialize encryption keys: ' + (error as Error).message);
+    }
+  };
 
-  useEffect(() => {
-    if (!userId || !tweetNaclKeyPair || !isKeysLoaded) return;
+  const fetchData = async () => {
+    try {
+      const chatsRes = await fetchChats(userId!);
+      const sortedChats = chatsRes.data.sort((a, b) => 
+        (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)
+      );
 
-    const fetchData = async () => {
-      try {
-        const chatsRes = await fetchChats(userId);
-        setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
+      const chatsWithDecryptedLastMessages = await Promise.all(
+        sortedChats.map(async (chat) => {
+          if (chat.lastMessage && chat.lastMessage.text.startsWith('base64:')) {
+            try {
+              chat.lastMessage.text = await decryptMessage(
+                chat.lastMessage.text,
+                chat.lastMessage.userId
+              );
+            } catch (error) {
+              chat.lastMessage.text = 'Encrypted message';
+            }
+          }
+          return chat;
+        })
+      );
+      setContacts(chatsWithDecryptedLastMessages);
 
-        if (selectedChatId) {
-          const messagesRes = await fetchMessages(userId, selectedChatId);
-          const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => {
+      if (selectedChatId) {
+        const messagesRes = await fetchMessages(userId!, selectedChatId);
+        const decryptedMessages = await Promise.all(
+          messagesRes.data.map(async (msg) => {
             const storedText = msg.userId === userId ? getSentMessage(msg.id, selectedChatId) : null;
             try {
-              const text = storedText || (msg.text.startsWith('base64:') 
+              const text = storedText || (msg.text.startsWith('base64:')
                 ? await decryptMessage(msg.text, msg.userId)
                 : msg.text);
               return { ...msg, isMine: msg.userId === userId, text };
             } catch (error) {
               logEncryptionEvent('Decryption failed for message', { msgId: msg.id, error });
-              return { ...msg, isMine: msg.userId === userId, text: '[Decryption Failed]' };
+              return { ...msg, isMine: msg.userId === userId, text: '[Decryption Failed]', encryptedText: msg.text };
             }
-          }));
-          setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
-          await markAsRead(userId, selectedChatId);
-        }
-      } catch (err) {
-        console.error('Fetch data error:', (err as AxiosError).message);
+          })
+        );
+        setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
+        await markAsRead(userId!, selectedChatId);
       }
-    };
+    } catch (err) {
+      console.error('Fetch data error:', (err as AxiosError).message);
+    }
+  };
 
-    fetchData();
-    const interval = setInterval(() => fetchData(), 5000);
-    return () => clearInterval(interval);
+  useEffect(() => {
+    if (!userId) return;
+
+    if (!tweetNaclKeyPair) {
+      initializeKeys().then(() => {
+        fetchData();
+      });
+      return;
+    }
+
+    if (isKeysLoaded) {
+      fetchData();
+      const interval = setInterval(() => fetchData(), 5000);
+      return () => clearInterval(interval);
+    }
   }, [userId, selectedChatId, tweetNaclKeyPair, isKeysLoaded]);
 
   useEffect(() => {
@@ -560,7 +626,7 @@ const App: React.FC = () => {
             return { ...msg, isMine: msg.userId === userId, text };
           } catch (error) {
             logEncryptionEvent('Decryption failed on contact select', { msgId: msg.id, error });
-            return { ...msg, isMine: msg.userId === userId, text: '[Decryption Failed]' };
+            return { ...msg, isMine: msg.userId === userId, text: '[Decryption Failed]', encryptedText: msg.text };
           }
         }));
         setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
@@ -843,7 +909,22 @@ const App: React.FC = () => {
                         wordBreak: 'break-word',
                       }}
                     >
-                      <div>{msg.text}</div>
+                      <div>
+                        {msg.text === '[Decryption Failed]' ? (
+                          <>
+                            {msg.text} 
+                            <button 
+                              className="btn btn-sm btn-link p-0 ms-2" 
+                              onClick={() => retryDecryption(msg.id)}
+                              style={{ color: isDarkTheme ? '#fff' : '#007bff' }}
+                            >
+                              Retry
+                            </button>
+                          </>
+                        ) : (
+                          msg.text
+                        )}
+                      </div>
                       <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
                         {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         {msg.isMine && (
