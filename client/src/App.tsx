@@ -43,7 +43,6 @@ const App: React.FC = () => {
           )
           .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       }
-      // Якщо контакту немає, додаємо його з публічним ключем
       const newContact = searchResults.find(c => c.id === contactId) || { id: contactId, email: '', publicKey: '' };
       return [...prev, { ...newContact, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }]
         .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
@@ -55,13 +54,19 @@ const App: React.FC = () => {
   };
 
   const fixPublicKey = (key: Uint8Array): Uint8Array => {
+    console.log('Raw public key bytes:', Array.from(key), 'Length:', key.length);
     if (key.length === 33) {
-      console.warn('Public key has 33 bytes, trimming to 32 bytes');
-      return key.slice(1);
+      if (key[0] === 0x00 || key[0] === 0x01) { // Перевірка на типовий префікс
+        console.warn('Public key has 33 bytes, trimming prefix byte:', key[0]);
+        return key.slice(1);
+      } else {
+        console.error('Unexpected prefix in public key, cannot trim safely');
+        throw new Error('Invalid public key format');
+      }
     }
     if (key.length !== 32) {
       console.error(`Invalid public key size: expected 32 bytes, got ${key.length} bytes`);
-      return key; // Повертаємо як є, щоб уникнути помилки
+      throw new Error('Invalid public key size');
     }
     return key;
   };
@@ -76,6 +81,7 @@ const App: React.FC = () => {
     let theirPublicKeyBuffer;
     try {
       theirPublicKeyBuffer = Buffer.from(cleanedPublicKey, 'base64');
+      console.log('Contact public key (Base64):', cleanedPublicKey, 'Decoded length:', theirPublicKeyBuffer.length);
     } catch (error) {
       console.error(`Invalid Base64 public key: ${(error as Error).message}`);
       return text; // Повертаємо нешифрований текст у разі помилки
@@ -95,57 +101,123 @@ const App: React.FC = () => {
     return `base64:${Buffer.from(new Uint8Array([...nonce, ...encrypted])).toString('base64')}`;
   };
 
-  const decryptMessage = (encryptedText: string, senderId: string): string => {
-    if (!tweetNaclKeyPair) {
-      console.warn('TweetNaCl key pair not initialized yet, returning encrypted text');
-      return encryptedText;
-    }
-    if (!encryptedText.startsWith('base64:')) return encryptedText;
-    const base64Data = encryptedText.slice(7);
-    const data = Buffer.from(base64Data, 'base64');
-    const nonce = data.subarray(0, nacl.box.nonceLength);
-    const cipher = data.subarray(nacl.box.nonceLength);
+  const decryptMessage = async (encryptedText: string, senderId: string): Promise<string> => {
+    console.log(`Decrypting message from ${senderId}, tweetNaclKeyPair:`, tweetNaclKeyPair ? 'Initialized' : 'Not initialized', 
+      'contacts:', contacts, 'searchResults:', searchResults);
 
-    const senderPublicKey = cleanBase64(contacts.find(c => c.id === senderId)?.publicKey || 
-      searchResults.find(c => c.id === senderId)?.publicKey || '');
-    if (!senderPublicKey) {
-      console.error(`No public key found for sender ${senderId}`);
-      return encryptedText;
-    }
-    let theirPublicKeyBuffer;
+    const ensureKeysInitialized = async (retries = 5, delay = 1000): Promise<TweetNaClKeyPair> => {
+      for (let i = 0; i < retries; i++) {
+        if (tweetNaclKeyPair) return tweetNaclKeyPair;
+        console.warn(`TweetNaCl key pair not initialized yet, retry ${i + 1}/${retries}...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+      throw new Error('Failed to initialize TweetNaCl keys after retries');
+    };
+
     try {
-      theirPublicKeyBuffer = Buffer.from(senderPublicKey, 'base64');
+      const keys = await ensureKeysInitialized();
+      if (!encryptedText.startsWith('base64:')) return encryptedText;
+
+      const base64Data = encryptedText.slice(7);
+      const data = Buffer.from(base64Data, 'base64');
+      const nonce = data.subarray(0, nacl.box.nonceLength);
+      const cipher = data.subarray(nacl.box.nonceLength);
+
+      const senderPublicKey = cleanBase64(contacts.find(c => c.id === senderId)?.publicKey || 
+        searchResults.find(c => c.id === senderId)?.publicKey || '');
+      if (!senderPublicKey) {
+        console.error(`No public key found for sender ${senderId}, checking database...`);
+        const fetchPublicKey = async () => {
+          try {
+            const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${senderId}`);
+            const key = res.data.publicKey || '';
+            console.log(`Fetched public key for ${senderId}:`, key, 'Length:', key.length);
+            if (key && key.length === 44) {
+              setContacts(prev => prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c));
+              setSearchResults(prev => prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c));
+              return key;
+            }
+          } catch (err) {
+            console.error('Failed to fetch public key:', err);
+          }
+          return '';
+        };
+        const key = await fetchPublicKey();
+        if (!key) {
+          return '[Decryption Error: No public key]';
+        }
+        let theirPublicKeyBuffer;
+        try {
+          theirPublicKeyBuffer = Buffer.from(key, 'base64');
+          console.log(`Retry decrypting with fetched key, length:`, theirPublicKeyBuffer.length);
+          const theirPublicKey = fixPublicKey(new Uint8Array(theirPublicKeyBuffer));
+          const decrypted = nacl.box.open(cipher, nonce, theirPublicKey, keys.secretKey);
+          if (decrypted) {
+            return new TextDecoder().decode(decrypted);
+          }
+        } catch (error) {
+          console.error('Retry decryption failed:', error);
+          return '[Decryption Error: Failed to decrypt with fetched key]';
+        }
+      }
+
+      let theirPublicKeyBuffer;
+      try {
+        theirPublicKeyBuffer = Buffer.from(senderPublicKey, 'base64');
+        console.log(`Sender ${senderId} public key (Base64):`, senderPublicKey, 'Decoded length:', theirPublicKeyBuffer.length);
+      } catch (error) {
+        console.error(`Invalid Base64 public key for sender ${senderId}: ${(error as Error).message}`);
+        return '[Decryption Error: Invalid public key format]';
+      }
+
+      const theirPublicKey = fixPublicKey(new Uint8Array(theirPublicKeyBuffer));
+      const decrypted = nacl.box.open(cipher, nonce, theirPublicKey, keys.secretKey);
+      if (!decrypted) {
+        console.error(`Decryption failed for message from ${senderId}`);
+        return '[Decryption Error: Failed to decrypt]';
+      }
+      return new TextDecoder().decode(decrypted);
     } catch (error) {
-      console.error(`Invalid Base64 public key for sender ${senderId}: ${(error as Error).message}`);
-      return encryptedText;
+      console.error('Decryption error:', error);
+      return '[Decryption Error: Keys not initialized]';
     }
-    const theirPublicKey = fixPublicKey(new Uint8Array(theirPublicKeyBuffer));
-    const decrypted = nacl.box.open(cipher, nonce, theirPublicKey, tweetNaclKeyPair.secretKey);
-    if (!decrypted) {
-      console.error(`Decryption failed for message from ${senderId}`);
-      return encryptedText;
-    }
-    return new TextDecoder().decode(decrypted);
   };
 
   const initTweetNacl = (): TweetNaClKeyPair => {
     const storedKeyPair = localStorage.getItem('tweetnaclKeyPair');
     if (storedKeyPair) {
-      const parsed = JSON.parse(storedKeyPair);
-      const publicKey = new Uint8Array(parsed.publicKey);
-      const secretKey = new Uint8Array(parsed.secretKey);
-      if (publicKey.length !== 32 || secretKey.length !== 32) {
-        console.error('Invalid stored TweetNaCl key pair, generating new one');
+      try {
+        const parsed = JSON.parse(storedKeyPair);
+        const publicKey = new Uint8Array(parsed.publicKey);
+        const secretKey = new Uint8Array(parsed.secretKey);
+        if (publicKey.length !== 32 || secretKey.length !== 32) {
+          console.error('Invalid stored TweetNaCl key pair, generating new one');
+          const newKeyPair = nacl.box.keyPair();
+          const publicKeyBase64 = Buffer.from(newKeyPair.publicKey).toString('base64');
+          console.log('Generated public key (Base64):', publicKeyBase64, 'Length:', publicKeyBase64.length);
+          localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
+            publicKey: Array.from(newKeyPair.publicKey),
+            secretKey: Array.from(newKeyPair.secretKey),
+          }));
+          return newKeyPair;
+        }
+        console.log('Loaded stored TweetNaCl keys, publicKey length:', publicKey.length);
+        return { publicKey, secretKey };
+      } catch (error) {
+        console.error('Error parsing stored key pair:', error);
         const newKeyPair = nacl.box.keyPair();
+        const publicKeyBase64 = Buffer.from(newKeyPair.publicKey).toString('base64');
+        console.log('Generated new public key (Base64):', publicKeyBase64, 'Length:', publicKeyBase64.length);
         localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
           publicKey: Array.from(newKeyPair.publicKey),
           secretKey: Array.from(newKeyPair.secretKey),
         }));
         return newKeyPair;
       }
-      return { publicKey, secretKey };
     } else {
       const newKeyPair = nacl.box.keyPair();
+      const publicKeyBase64 = Buffer.from(newKeyPair.publicKey).toString('base64');
+      console.log('Generated public key (Base64):', publicKeyBase64, 'Length:', publicKeyBase64.length);
       localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
         publicKey: Array.from(newKeyPair.publicKey),
         secretKey: Array.from(newKeyPair.secretKey),
@@ -157,29 +229,36 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!userId) return;
 
-    let keyPair: TweetNaClKeyPair;
-    try {
-      keyPair = initTweetNacl();
-      setTweetNaclKeyPair(keyPair);
-    } catch (error) {
-      console.error('Error initializing TweetNaCl keys:', error);
-      alert('Failed to initialize encryption keys: ' + (error as Error).message);
-      return;
-    }
+    const initializeKeysAndFetchData = async () => {
+      let keyPair: TweetNaClKeyPair;
+      try {
+        keyPair = initTweetNacl();
+        console.log('TweetNaCl keys initialized:', keyPair.publicKey.length, keyPair.secretKey.length);
+        setTweetNaclKeyPair(keyPair);
+      } catch (error) {
+        console.error('Error initializing TweetNaCl keys:', error);
+        alert('Failed to initialize encryption keys: ' + (error as Error).message);
+        return;
+      }
 
-    const fetchData = async () => {
+      // Дочекайся, поки ключі будуть встановлені в стейт
+      while (!tweetNaclKeyPair) {
+        await new Promise(resolve => setTimeout(resolve, 100)); // Коротка затримка
+      }
+
       try {
         const chatsRes = await fetchChats(userId);
+        chatsRes.data.forEach(contact => console.log(`Chat contact ${contact.id} publicKey:`, contact.publicKey, 'Length:', contact.publicKey.length));
         setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
 
         if (selectedChatId) {
           const messagesRes = await fetchMessages(userId, selectedChatId);
-          const decryptedMessages = messagesRes.data.map(msg => ({
+          const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => ({
             ...msg,
             isMine: msg.userId === userId,
-            text: msg.text.startsWith('base64:') ? decryptMessage(msg.text, msg.userId) : msg.text,
-          })).sort((a, b) => a.timestamp - b.timestamp);
-          setMessages(decryptedMessages);
+            text: msg.text.startsWith('base64:') ? await decryptMessage(msg.text, msg.userId) : msg.text,
+          })));
+          setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
           await markAsRead(userId, selectedChatId);
         }
       } catch (err) {
@@ -187,16 +266,16 @@ const App: React.FC = () => {
       }
     };
 
-    fetchData();
-    const interval = setInterval(fetchData, 5000);
+    initializeKeysAndFetchData();
+    const interval = setInterval(() => initializeKeysAndFetchData(), 5000);
     return () => clearInterval(interval);
   }, [userId, selectedChatId]);
 
   useEffect(() => {
     if (!userId || !tweetNaclKeyPair) return;
 
-    webSocketService.connect(userId, (msg: Message | { type: string; userId: string; contactId: string }) => {
-      console.log('Received WebSocket message:', msg);
+    webSocketService.connect(userId, async (msg: Message | { type: string; userId: string; contactId: string }) => {
+      console.log('Received WebSocket message:', msg, 'tweetNaclKeyPair:', tweetNaclKeyPair ? 'Initialized' : 'Not initialized');
       if ('type' in msg && msg.type === 'read') {
         setMessages(prev =>
           prev.map(m => 
@@ -217,7 +296,7 @@ const App: React.FC = () => {
       }
 
       const newMsg = msg as Message;
-      const decryptedText = newMsg.text.startsWith('base64:') ? decryptMessage(newMsg.text, newMsg.userId) : newMsg.text;
+      const decryptedText = newMsg.text.startsWith('base64:') ? await decryptMessage(newMsg.text, newMsg.userId) : newMsg.text;
       if ((newMsg.userId === userId && newMsg.contactId === selectedChatId) || 
           (newMsg.contactId === userId && newMsg.userId === selectedChatId)) {
         setMessages(prev => {
@@ -241,6 +320,7 @@ const App: React.FC = () => {
     const search = async () => {
       try {
         const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
+        res.data.forEach(contact => console.log('Search result:', contact.id, 'publicKey:', contact.publicKey, 'Length:', contact.publicKey.length));
         setSearchResults(res.data.filter(c => c.id !== userId));
       } catch (err) {
         console.error('Search error:', (err as AxiosError).message);
@@ -279,6 +359,7 @@ const App: React.FC = () => {
       if (!isLogin) {
         const newKeyPair = nacl.box.keyPair();
         const publicKey = Buffer.from(newKeyPair.publicKey).toString('base64');
+        console.log('Generated public key for registration (Base64):', publicKey, 'Length:', publicKey.length);
         await axios.put('http://192.168.31.185:4000/update-keys', { userId: res.data.id, publicKey });
         setTweetNaclKeyPair(newKeyPair);
         localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
@@ -303,13 +384,33 @@ const App: React.FC = () => {
     
     const contact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId);
     if (!contact) {
-      console.error(`No contact found for ID: ${selectedChatId}`);
-      alert('Cannot send message: Contact not found.');
-      return;
+      console.error(`No contact found for ID: ${selectedChatId}, attempting to fetch from server...`);
+      try {
+        const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${selectedChatId}`);
+        const fetchedContact = res.data;
+        if (fetchedContact.publicKey && fetchedContact.publicKey.length === 44) {
+          // Додаємо контакт до searchResults або contacts
+          setSearchResults(prev => [...prev, fetchedContact].filter(c => c.id !== userId));
+          const updatedContact = { ...fetchedContact, lastMessage: null };
+          setContacts(prev => [...prev, updatedContact].sort(
+            (a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)
+          ));
+          await sendMessageWithContact(updatedContact);
+          return;
+        } else {
+          alert('Cannot send message: Contact not found or invalid public key.');
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to fetch contact:', err);
+        alert('Cannot send message: Contact not found.');
+        return;
+      }
     }
 
     try {
       const encryptedText = encryptMessage(input.trim(), contact.publicKey || '');
+      console.log('Encrypted message:', encryptedText);
       if (!encryptedText.startsWith('base64:')) {
         console.error('Encryption failed, sending unencrypted text');
       }
@@ -324,7 +425,7 @@ const App: React.FC = () => {
       };
 
       await webSocketService.send(newMessage);
-      const decryptedText = newMessage.text.startsWith('base64:') ? decryptMessage(newMessage.text, userId) : newMessage.text;
+      const decryptedText = await decryptMessage(newMessage.text, userId);
       setMessages(prev => {
         if (prev.some(m => m.id === newMessage.id)) return prev;
         return [...prev, { ...newMessage, text: decryptedText }].sort((a, b) => a.timestamp - b.timestamp);
@@ -337,13 +438,44 @@ const App: React.FC = () => {
     }
   };
 
+  const sendMessageWithContact = async (contact: Contact) => {
+    try {
+      const encryptedText = encryptMessage(input.trim(), contact.publicKey || '');
+      console.log('Encrypted message with fetched contact:', encryptedText);
+      if (!encryptedText.startsWith('base64:')) {
+        console.error('Encryption failed, sending unencrypted text');
+      }
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        userId,
+        contactId: contact.id,
+        text: encryptedText,
+        timestamp: Date.now(),
+        isRead: 0,
+        isMine: true,
+      };
+
+      await webSocketService.send(newMessage);
+      const decryptedText = await decryptMessage(newMessage.text, userId);
+      setMessages(prev => {
+        if (prev.some(m => m.id === newMessage.id)) return prev;
+        return [...prev, { ...newMessage, text: decryptedText }].sort((a, b) => a.timestamp - b.timestamp);
+      });
+      setInput('');
+      updateContactsWithLastMessage({ ...newMessage, text: decryptedText });
+    } catch (error) {
+      console.error('Error sending message with fetched contact:', error);
+      alert('Failed to send message: ' + (error as Error).message);
+    }
+  };
+
   const handleContactSelect = async (contact: Contact) => {
+    console.log('Selecting contact:', contact);
     setSelectedChatId(contact.id);
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
-    
-    // Оновлюємо контакти, додаючи нового, якщо його ще немає
+
     setContacts(prev => {
       const contactExists = prev.some(c => c.id === contact.id);
       if (!contactExists) {
@@ -357,12 +489,12 @@ const App: React.FC = () => {
     if (userId && tweetNaclKeyPair) {
       try {
         const messagesRes = await fetchMessages(userId, contact.id);
-        const decryptedMessages = messagesRes.data.map(msg => ({
+        const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => ({
           ...msg,
           isMine: msg.userId === userId,
-          text: msg.text.startsWith('base64:') ? decryptMessage(msg.text, msg.userId) : msg.text,
-        })).sort((a, b) => a.timestamp - b.timestamp);
-        setMessages(decryptedMessages);
+          text: msg.text.startsWith('base64:') ? await decryptMessage(msg.text, msg.userId) : msg.text,
+        })));
+        setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
         await markAsRead(userId, contact.id);
       } catch (err) {
         console.error('Error fetching messages on contact select:', err);

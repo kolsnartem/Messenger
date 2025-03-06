@@ -143,6 +143,11 @@ app.post('/login', (req, res) => {
 
 app.put('/update-keys', (req, res) => {
   const { userId, publicKey } = req.body;
+  console.log('Received public key (before save):', publicKey, 'Length:', publicKey.length);
+  if (!publicKey || publicKey.length !== 44) {
+    console.error('Invalid public key length or empty, expected 44 characters, got:', publicKey?.length || 0);
+    return res.status(400).json({ error: 'Invalid public key format' });
+  }
   db.run(
     'UPDATE users SET publicKey = ? WHERE id = ?',
     [publicKey, userId],
@@ -155,13 +160,18 @@ app.put('/update-keys', (req, res) => {
 });
 
 app.get('/users', (req, res) => {
-  db.all('SELECT id, email, publicKey FROM users', (err, rows) => {
+  const { id } = req.query;
+  if (!id) return res.status(400).json({ error: 'Missing userId' });
+
+  db.get('SELECT id, email, publicKey FROM users WHERE id = ?', [id], (err, row) => {
     if (err) return res.status(500).json({ error: 'Database error' });
-    res.json(rows.map(row => ({
+    if (!row) return res.status(404).json({ error: 'User not found' });
+    console.log(`Fetched user ${id} publicKey:`, row.publicKey, 'Length:', row.publicKey?.length || 0);
+    res.json({
       id: row.id.toString(),
       email: row.email,
-      publicKey: row.publicKey,
-    })));
+      publicKey: row.publicKey || '',
+    });
   });
 });
 
@@ -172,10 +182,11 @@ app.get('/search', (req, res) => {
     [`%${query}%`],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Search failed' });
+      rows.forEach(row => console.log(`Search result for ${row.email}, publicKey:`, row.publicKey, 'Length:', row.publicKey?.length || 0));
       res.json(rows.map(row => ({
         id: row.id.toString(),
         email: row.email,
-        publicKey: row.publicKey || '', // Гарантуємо, що publicKey завжди є, навіть якщо порожній
+        publicKey: row.publicKey || '', // Гарантуємо, що publicKey завжди є
       })));
     }
   );
