@@ -9,7 +9,10 @@ import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft } from 'react-icons/fa';
 
-type ErrorWithMessage = { message: string };
+// Тип для помилок від API
+interface ApiErrorResponse {
+  error?: string;
+}
 
 interface EncryptionError {
   message: string;
@@ -116,7 +119,6 @@ const encryptMessage = (text: string, contactPublicKey: string, tweetNaclKeyPair
   return result;
 };
 
-// Зберігання plaintext для ваших повідомлень у localStorage
 const storeSentMessage = (messageId: string, text: string, chatId: string) => {
   const storedMessages = JSON.parse(localStorage.getItem(`sentMessages_${chatId}`) || '{}');
   storedMessages[messageId] = text;
@@ -143,6 +145,7 @@ const App: React.FC = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [tweetNaclKeyPair, setTweetNaclKeyPair] = useState<TweetNaClKeyPair | null>(null);
+  const [isKeysLoaded, setIsKeysLoaded] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
@@ -160,11 +163,60 @@ const App: React.FC = () => {
           )
           .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       }
-      const newContact = searchResults.find(c => c.id === contactId) || { id: contactId, email: '', publicKey: '' };
+      const newContact = searchResults.find(c => c.id === contactId) || { 
+        id: contactId, 
+        email: '', 
+        publicKey: '',
+        lastMessage: null // Додано lastMessage
+      };
       return [...prev, { ...newContact, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }]
         .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
     });
   }, [userId, searchResults]);
+
+  const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
+    let senderPublicKey = cleanBase64(
+      contacts.find(c => c.id === senderId)?.publicKey ||
+      searchResults.find(c => c.id === senderId)?.publicKey ||
+      ''
+    );
+
+    if (!senderPublicKey) {
+      logEncryptionEvent(`No public key found locally for sender ${senderId}, fetching from server`);
+      try {
+        const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${senderId}`);
+        const key = cleanBase64(res.data.publicKey || '');
+        if (key && key.length === 44) {
+          senderPublicKey = key;
+          setContacts(prev => {
+            const exists = prev.some(c => c.id === senderId);
+            if (!exists) {
+              return [...prev, { 
+                id: senderId, 
+                email: res.data.email || '', 
+                publicKey: key,
+                lastMessage: null // Додано lastMessage
+              }];
+            }
+            return prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c);
+          });
+          setSearchResults(prev => prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c));
+          logEncryptionEvent(`Fetched and updated public key for ${senderId}`, { key });
+        } else {
+          throw new Error('Invalid public key format from server');
+        }
+      } catch (err) {
+        const error: EncryptionError = {
+          message: 'Failed to fetch sender public key',
+          details: (err as Error).message,
+          timestamp: Date.now()
+        };
+        logEncryptionEvent('Decryption failed', error);
+        throw new Error(error.message);
+      }
+    }
+    return senderPublicKey;
+  };
 
   const decryptMessage = async (encryptedText: string, senderId: string): Promise<string> => {
     if (!encryptedText.startsWith('base64:')) {
@@ -183,35 +235,7 @@ const App: React.FC = () => {
     const nonce = data.subarray(0, nacl.box.nonceLength);
     const cipher = data.subarray(nacl.box.nonceLength);
 
-    let senderPublicKey = cleanBase64(
-      contacts.find(c => c.id === senderId)?.publicKey ||
-      searchResults.find(c => c.id === senderId)?.publicKey ||
-      ''
-    );
-
-    if (!senderPublicKey) {
-      logEncryptionEvent(`No public key found locally for sender ${senderId}, fetching from server`);
-      try {
-        const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${senderId}`);
-        const key = cleanBase64(res.data.publicKey || '');
-        if (key && key.length === 44) {
-          senderPublicKey = key;
-          setContacts(prev => prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c));
-          setSearchResults(prev => prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c));
-          logEncryptionEvent(`Fetched and updated public key for ${senderId}`, { key });
-        } else {
-          throw new Error('Invalid public key format from server');
-        }
-      } catch (err) {
-        const error: EncryptionError = {
-          message: 'Failed to fetch sender public key',
-          details: (err as Error).message,
-          timestamp: Date.now()
-        };
-        logEncryptionEvent('Decryption failed', error);
-        throw new Error(error.message);
-      }
-    }
+    const senderPublicKey = await fetchSenderPublicKey(senderId);
 
     try {
       const theirPublicKeyBuffer = Buffer.from(senderPublicKey, 'base64');
@@ -245,9 +269,8 @@ const App: React.FC = () => {
 
   const handleIncomingMessage = async (message: Message) => {
     try {
-      const decryptedText = message.userId === userId 
-        ? getSentMessage(message.id, selectedChatId || '') || message.text 
-        : await decryptMessage(message.text, message.userId);
+      const storedText = message.userId === userId ? getSentMessage(message.id, selectedChatId || '') : null;
+      const decryptedText = storedText || await decryptMessage(message.text, message.userId);
       const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
 
       setMessages(prev => {
@@ -263,6 +286,11 @@ const App: React.FC = () => {
         timestamp: Date.now()
       };
       logEncryptionEvent('Incoming message processing failed', encryptionError);
+      setMessages(prev => {
+        const updatedMessage = { ...message, text: '[Decryption Failed]', isMine: message.userId === userId };
+        if (prev.some(m => m.id === message.id)) return prev;
+        return [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
+      });
     }
   };
 
@@ -321,7 +349,6 @@ const App: React.FC = () => {
         isMine: true,
       };
 
-      // Зберігаємо plaintext локально
       storeSentMessage(newMessage.id, message, selectedChatId);
 
       const localMessage = { ...newMessage, text: message };
@@ -348,16 +375,27 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!userId) return;
 
-    const initializeKeysAndFetchData = async () => {
-      let keyPair: TweetNaClKeyPair;
-      try {
-        keyPair = initializeTweetNaclKeys();
-        setTweetNaclKeyPair(keyPair);
-      } catch (error) {
-        alert('Failed to initialize encryption keys: ' + (error as Error).message);
-        return;
+    const initializeKeys = async () => {
+      if (!tweetNaclKeyPair && !isKeysLoaded) {
+        try {
+          const keyPair = initializeTweetNaclKeys();
+          setTweetNaclKeyPair(keyPair);
+          setIsKeysLoaded(true);
+          logEncryptionEvent('Keys initialized on mount');
+        } catch (error) {
+          console.error('Key initialization error:', error);
+          alert('Failed to initialize encryption keys: ' + (error as Error).message);
+        }
       }
+    };
 
+    initializeKeys();
+  }, [userId, tweetNaclKeyPair, isKeysLoaded]);
+
+  useEffect(() => {
+    if (!userId || !tweetNaclKeyPair || !isKeysLoaded) return;
+
+    const fetchData = async () => {
       try {
         const chatsRes = await fetchChats(userId);
         setContacts(chatsRes.data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)));
@@ -384,13 +422,13 @@ const App: React.FC = () => {
       }
     };
 
-    initializeKeysAndFetchData();
-    const interval = setInterval(() => initializeKeysAndFetchData(), 5000);
+    fetchData();
+    const interval = setInterval(() => fetchData(), 5000);
     return () => clearInterval(interval);
-  }, [userId, selectedChatId]);
+  }, [userId, selectedChatId, tweetNaclKeyPair, isKeysLoaded]);
 
   useEffect(() => {
-    if (!userId || !tweetNaclKeyPair) return;
+    if (!userId || !tweetNaclKeyPair || !isKeysLoaded) return;
 
     webSocketService.connect(userId, async (msg: Message | { type: string; userId: string; contactId: string }) => {
       if ('type' in msg && msg.type === 'read') {
@@ -423,7 +461,7 @@ const App: React.FC = () => {
     });
 
     return () => webSocketService.disconnect();
-  }, [userId, selectedChatId, tweetNaclKeyPair]);
+  }, [userId, selectedChatId, tweetNaclKeyPair, isKeysLoaded]);
 
   useEffect(() => {
     if (!searchQuery || !userId) {
@@ -474,6 +512,7 @@ const App: React.FC = () => {
         const publicKey = Buffer.from(newKeyPair.publicKey).toString('base64');
         await axios.put('http://192.168.31.185:4000/update-keys', { userId: res.data.id, publicKey });
         setTweetNaclKeyPair(newKeyPair);
+        setIsKeysLoaded(true);
         localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
           publicKey: Array.from(newKeyPair.publicKey),
           secretKey: Array.from(newKeyPair.secretKey),
@@ -487,7 +526,9 @@ const App: React.FC = () => {
       alert(isLogin ? 'Login successful!' : 'Registration successful!');
     } catch (err) {
       console.error('Auth error:', err);
-      alert(`Error: ${(err as AxiosError).response?.data?.error || (err as Error).message || 'Unknown error'}`);
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      const errorMessage = axiosError.response?.data?.error || axiosError.message || 'Unknown error';
+      alert(`Error: ${errorMessage}`);
     }
   };
 
@@ -507,7 +548,7 @@ const App: React.FC = () => {
       return prev;
     });
 
-    if (userId && tweetNaclKeyPair) {
+    if (userId && tweetNaclKeyPair && isKeysLoaded) {
       try {
         const messagesRes = await fetchMessages(userId, contact.id);
         const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => {
@@ -539,6 +580,7 @@ const App: React.FC = () => {
     setMessages([]);
     setContacts([]);
     setTweetNaclKeyPair(null);
+    setIsKeysLoaded(false);
     webSocketService.disconnect();
   };
 
@@ -861,7 +903,7 @@ const App: React.FC = () => {
               className="btn btn-primary ms-2 d-flex align-items-center justify-content-center" 
               onClick={sendMessage}
               style={{ borderRadius: '20px', minWidth: '60px', height: '38px' }}
-              disabled={!input.trim() || !tweetNaclKeyPair}
+              disabled={!input.trim() || !tweetNaclKeyPair || !isKeysLoaded}
             >
               Send
             </button>
