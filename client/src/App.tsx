@@ -151,30 +151,6 @@ const App: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
 
-  const updateContactsWithLastMessage = useCallback((newMessage: Message) => {
-    setContacts(prev => {
-      const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
-      const existingContact = prev.find(c => c.id === contactId);
-      if (existingContact) {
-        return prev
-          .map(c =>
-            c.id === contactId
-              ? { ...c, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }
-              : c
-          )
-          .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
-      }
-      const newContact = searchResults.find(c => c.id === contactId) || { 
-        id: contactId, 
-        email: '', 
-        publicKey: '',
-        lastMessage: null
-      };
-      return [...prev, { ...newContact, lastMessage: { ...newMessage, isMine: newMessage.userId === userId } }]
-        .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
-    });
-  }, [userId, searchResults]);
-
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
     if (publicKeysCache.has(senderId)) {
       return publicKeysCache.get(senderId)!;
@@ -198,9 +174,9 @@ const App: React.FC = () => {
           setContacts(prev => {
             const exists = prev.some(c => c.id === senderId);
             if (!exists) {
-              return [...prev, { 
-                id: senderId, 
-                email: res.data.email || '', 
+              return [...prev, {
+                id: senderId,
+                email: res.data.email || '',
                 publicKey: key,
                 lastMessage: null
               }];
@@ -275,6 +251,23 @@ const App: React.FC = () => {
     }
   };
 
+  // Централізована функція для розшифрування повідомлень
+  const decryptMessageText = async (message: Message): Promise<string> => {
+    if (message.userId === userId) {
+      const storedText = getSentMessage(message.id, message.contactId || selectedChatId || '');
+      if (storedText) {
+        logEncryptionEvent('Retrieved stored text for own message', { messageId: message.id, chatId: message.contactId });
+        return storedText;
+      }
+    }
+
+    if (message.text.startsWith('base64:')) {
+      return await decryptMessage(message.text, message.userId);
+    }
+
+    return message.text;
+  };
+
   const retryDecryption = async (messageId: string) => {
     const messageIndex = messages.findIndex(msg => msg.id === messageId);
     if (messageIndex === -1 || !messages[messageIndex].encryptedText) return;
@@ -295,17 +288,54 @@ const App: React.FC = () => {
     }
   };
 
+  const updateContactsWithLastMessage = useCallback(async (newMessage: Message) => {
+    try {
+      let messageToUpdate = { ...newMessage };
+      messageToUpdate.text = await decryptMessageText(newMessage);
+
+      setContacts(prev => {
+        const contactId = messageToUpdate.userId === userId ? messageToUpdate.contactId : messageToUpdate.userId;
+        const existingContact = prev.find(c => c.id === contactId);
+
+        if (existingContact) {
+          return prev
+            .map(c =>
+              c.id === contactId
+                ? { ...c, lastMessage: { ...messageToUpdate, isMine: messageToUpdate.userId === userId } }
+                : c
+            )
+            .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+        }
+
+        const newContact = searchResults.find(c => c.id === contactId) || {
+          id: contactId,
+          email: '',
+          publicKey: '',
+          lastMessage: null
+        };
+
+        return [...prev, { ...newContact, lastMessage: { ...messageToUpdate, isMine: messageToUpdate.userId === userId } }]
+          .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+      });
+    } catch (error) {
+      logEncryptionEvent('Failed to update contacts with last message', {
+        error: (error as Error).message,
+        messageId: newMessage.id
+      });
+    }
+  }, [userId, searchResults, selectedChatId]);
+
   const handleIncomingMessage = async (message: Message) => {
     try {
-      const storedText = message.userId === userId ? getSentMessage(message.id, selectedChatId || '') : null;
-      const decryptedText = storedText || await decryptMessage(message.text, message.userId);
+      const decryptedText = await decryptMessageText(message);
       const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
 
       setMessages(prev => {
         if (prev.some(m => m.id === message.id)) return prev;
         return [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
       });
-      updateContactsWithLastMessage(updatedMessage);
+
+      await updateContactsWithLastMessage(updatedMessage);
       logEncryptionEvent('Incoming message processed successfully', { messageId: message.id });
     } catch (error) {
       const encryptionError: EncryptionError = {
@@ -366,7 +396,7 @@ const App: React.FC = () => {
     try {
       const message = input.trim();
       const encryptedText = encryptMessage(message, contact.publicKey || '', tweetNaclKeyPair);
-      
+
       const newMessage: Message = {
         id: Date.now().toString(),
         userId,
@@ -387,7 +417,7 @@ const App: React.FC = () => {
         return [...prev, localMessage].sort((a, b) => a.timestamp - b.timestamp);
       });
       setInput('');
-      updateContactsWithLastMessage(localMessage);
+      await updateContactsWithLastMessage(localMessage);
       logEncryptionEvent('Message sent successfully', { messageId: newMessage.id });
     } catch (error) {
       const encryptionError: EncryptionError = {
@@ -431,20 +461,22 @@ const App: React.FC = () => {
   const fetchData = async () => {
     try {
       const chatsRes = await fetchChats(userId!);
-      const sortedChats = chatsRes.data.sort((a, b) => 
+      const sortedChats = chatsRes.data.sort((a, b) =>
         (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)
       );
 
       const chatsWithDecryptedLastMessages = await Promise.all(
         sortedChats.map(async (chat) => {
-          if (chat.lastMessage && chat.lastMessage.text.startsWith('base64:')) {
+          if (chat.lastMessage) {
             try {
-              chat.lastMessage.text = await decryptMessage(
-                chat.lastMessage.text,
-                chat.lastMessage.userId
-              );
+              chat.lastMessage.text = await decryptMessageText(chat.lastMessage);
             } catch (error) {
               chat.lastMessage.text = 'Encrypted message';
+              logEncryptionEvent('Failed to decrypt message in chat list', {
+                error: (error as Error).message,
+                chatId: chat.id,
+                messageId: chat.lastMessage.id
+              });
             }
           }
           return chat;
@@ -456,11 +488,8 @@ const App: React.FC = () => {
         const messagesRes = await fetchMessages(userId!, selectedChatId);
         const decryptedMessages = await Promise.all(
           messagesRes.data.map(async (msg) => {
-            const storedText = msg.userId === userId ? getSentMessage(msg.id, selectedChatId) : null;
             try {
-              const text = storedText || (msg.text.startsWith('base64:')
-                ? await decryptMessage(msg.text, msg.userId)
-                : msg.text);
+              const text = await decryptMessageText(msg);
               return { ...msg, isMine: msg.userId === userId, text };
             } catch (error) {
               logEncryptionEvent('Decryption failed for message', { msgId: msg.id, error });
@@ -499,9 +528,9 @@ const App: React.FC = () => {
     webSocketService.connect(userId, async (msg: Message | { type: string; userId: string; contactId: string }) => {
       if ('type' in msg && msg.type === 'read') {
         setMessages(prev =>
-          prev.map(m => 
-            m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0 
-              ? { ...m, isRead: 1 } 
+          prev.map(m =>
+            m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0
+              ? { ...m, isRead: 1 }
               : m
           )
         );
@@ -520,7 +549,7 @@ const App: React.FC = () => {
       const isMine = newMsg.userId === userId;
       newMsg.isMine = isMine;
 
-      if ((newMsg.userId === selectedChatId && newMsg.contactId === userId) || 
+      if ((newMsg.userId === selectedChatId && newMsg.contactId === userId) ||
           (newMsg.contactId === selectedChatId && newMsg.userId === userId)) {
         await handleIncomingMessage(newMsg);
       }
@@ -534,7 +563,7 @@ const App: React.FC = () => {
       setSearchResults([]);
       return;
     }
-    
+
     const search = async () => {
       try {
         const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
@@ -565,11 +594,11 @@ const App: React.FC = () => {
   const handleAuth = async (isLogin: boolean) => {
     if (!email || !password) return alert('Fill in all fields');
     const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
-    
+
     try {
       const endpoint = isLogin ? '/login' : '/register';
       const res = await axios.post<{ id: string; publicKey?: string }>(
-        `http://192.168.31.185:4000${endpoint}`, 
+        `http://192.168.31.185:4000${endpoint}`,
         { email, password: hashedPassword }
       );
 
@@ -618,11 +647,8 @@ const App: React.FC = () => {
       try {
         const messagesRes = await fetchMessages(userId, contact.id);
         const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => {
-          const storedText = msg.userId === userId ? getSentMessage(msg.id, contact.id) : null;
           try {
-            const text = storedText || (msg.text.startsWith('base64:') 
-              ? await decryptMessage(msg.text, msg.userId)
-              : msg.text);
+            const text = await decryptMessageText(msg);
             return { ...msg, isMine: msg.userId === userId, text };
           } catch (error) {
             logEncryptionEvent('Decryption failed on contact select', { msgId: msg.id, error });
@@ -682,10 +708,10 @@ const App: React.FC = () => {
   }
 
   return (
-    <div 
-      className={`d-flex flex-column ${themeClass}`} 
-      style={{ 
-        height: '100vh', 
+    <div
+      className={`d-flex flex-column ${themeClass}`}
+      style={{
+        height: '100vh',
         position: 'fixed',
         top: 0,
         left: 0,
@@ -744,14 +770,14 @@ const App: React.FC = () => {
         `}
       </style>
 
-      <div 
-        className="p-2" 
-        style={{ 
+      <div
+        className="p-2"
+        style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
-          background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
+          background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)',
           zIndex: 20,
           height: selectedChatId ? "90px" : "50px",
         }}
@@ -805,18 +831,18 @@ const App: React.FC = () => {
         </div>
         {selectedChatId && (
           <div className="p-2 d-flex align-items-center mt-1">
-            <button 
-              className="btn btn-sm btn-outline-secondary me-2" 
+            <button
+              className="btn btn-sm btn-outline-secondary me-2"
               onClick={() => setSelectedChatId(null)}
               style={{ border: 'none', background: 'transparent' }}
             >
               <FaArrowLeft />
             </button>
-            <div 
+            <div
               className="rounded-circle me-2 d-flex align-items-center justify-content-center"
-              style={{ 
-                width: '25px', 
-                height: '25px', 
+              style={{
+                width: '25px',
+                height: '25px',
                 background: isDarkTheme ? '#6c757d' : '#e9ecef',
                 color: isDarkTheme ? '#fff' : '#212529',
               }}
@@ -864,10 +890,10 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div 
+      <div
         ref={chatRef}
         className="flex-grow-1"
-        style={{ 
+        style={{
           position: 'absolute',
           top: selectedChatId ? 90 : 50,
           bottom: selectedChatId ? 60 : 0,
@@ -877,9 +903,9 @@ const App: React.FC = () => {
         }}
       >
         {selectedChatId ? (
-          <div 
+          <div
             className="p-3 scroll-container"
-            style={{ 
+            style={{
               height: 'calc(100% - 60px)',
               overflowY: 'auto',
               filter: isSearchOpen ? 'blur(5px)' : 'none',
@@ -892,17 +918,17 @@ const App: React.FC = () => {
             {messages.length > 0 ? (
               <>
                 {messages.map((msg, index) => (
-                  <div 
-                    key={msg.id} 
+                  <div
+                    key={msg.id}
                     className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}
                   >
-                    <div 
+                    <div
                       className={`p-2 rounded-3 ${
-                        msg.isMine 
-                          ? 'bg-primary text-white' 
+                        msg.isMine
+                          ? 'bg-primary text-white'
                           : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'
                       }`}
-                      style={{ 
+                      style={{
                         maxWidth: '75%',
                         position: 'relative',
                         borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
@@ -912,9 +938,9 @@ const App: React.FC = () => {
                       <div>
                         {msg.text === '[Decryption Failed]' ? (
                           <>
-                            {msg.text} 
-                            <button 
-                              className="btn btn-sm btn-link p-0 ms-2" 
+                            {msg.text}
+                            <button
+                              className="btn btn-sm btn-link p-0 ms-2"
                               onClick={() => retryDecryption(msg.id)}
                               style={{ color: isDarkTheme ? '#fff' : '#007bff' }}
                             >
@@ -945,7 +971,7 @@ const App: React.FC = () => {
             )}
           </div>
         ) : (
-          <ChatList 
+          <ChatList
             contacts={contacts}
             selectedChatId={selectedChatId}
             isDarkTheme={isDarkTheme}
@@ -955,14 +981,14 @@ const App: React.FC = () => {
       </div>
 
       {selectedChatId && (
-        <div 
-          className="p-2" 
-          style={{ 
-            position: 'fixed',  
-            bottom: 0, 
+        <div
+          className="p-2"
+          style={{
+            position: 'fixed',
+            bottom: 0,
             left: 0,
             right: 0,
-            background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
+            background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)',
             zIndex: 10,
             height: '49px',
             display: 'flex',
@@ -980,8 +1006,8 @@ const App: React.FC = () => {
               placeholder="Message..."
               style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }}
             />
-            <button 
-              className="btn btn-primary ms-2 d-flex align-items-center justify-content-center" 
+            <button
+              className="btn btn-primary ms-2 d-flex align-items-center justify-content-center"
               onClick={sendMessage}
               style={{ borderRadius: '20px', minWidth: '60px', height: '38px' }}
               disabled={!input.trim() || !tweetNaclKeyPair || !isKeysLoaded}
