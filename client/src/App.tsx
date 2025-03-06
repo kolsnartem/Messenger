@@ -116,6 +116,18 @@ const encryptMessage = (text: string, contactPublicKey: string, tweetNaclKeyPair
   return result;
 };
 
+// Зберігання plaintext для ваших повідомлень у localStorage
+const storeSentMessage = (messageId: string, text: string, chatId: string) => {
+  const storedMessages = JSON.parse(localStorage.getItem(`sentMessages_${chatId}`) || '{}');
+  storedMessages[messageId] = text;
+  localStorage.setItem(`sentMessages_${chatId}`, JSON.stringify(storedMessages));
+};
+
+const getSentMessage = (messageId: string, chatId: string): string | null => {
+  const storedMessages = JSON.parse(localStorage.getItem(`sentMessages_${chatId}`) || '{}');
+  return storedMessages[messageId] || null;
+};
+
 const App: React.FC = () => {
   const { userId, setUserId, setIdentityKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem('userEmail'));
@@ -232,14 +244,11 @@ const App: React.FC = () => {
   };
 
   const handleIncomingMessage = async (message: Message) => {
-    if (message.isMine) {
-      logEncryptionEvent('Skipping incoming message processing - message is mine', { messageId: message.id });
-      return;
-    }
-
     try {
-      const decryptedText = await decryptMessage(message.text, message.userId);
-      const updatedMessage = { ...message, text: decryptedText };
+      const decryptedText = message.userId === userId 
+        ? getSentMessage(message.id, selectedChatId || '') || message.text 
+        : await decryptMessage(message.text, message.userId);
+      const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
 
       setMessages(prev => {
         if (prev.some(m => m.id === message.id)) return prev;
@@ -312,13 +321,18 @@ const App: React.FC = () => {
         isMine: true,
       };
 
+      // Зберігаємо plaintext локально
+      storeSentMessage(newMessage.id, message, selectedChatId);
+
+      const localMessage = { ...newMessage, text: message };
+
       await webSocketService.send(newMessage);
       setMessages(prev => {
         if (prev.some(m => m.id === newMessage.id)) return prev;
-        return [...prev, { ...newMessage, text: message }].sort((a, b) => a.timestamp - b.timestamp);
+        return [...prev, localMessage].sort((a, b) => a.timestamp - b.timestamp);
       });
       setInput('');
-      updateContactsWithLastMessage({ ...newMessage, text: message });
+      updateContactsWithLastMessage(localMessage);
       logEncryptionEvent('Message sent successfully', { messageId: newMessage.id });
     } catch (error) {
       const encryptionError: EncryptionError = {
@@ -350,11 +364,18 @@ const App: React.FC = () => {
 
         if (selectedChatId) {
           const messagesRes = await fetchMessages(userId, selectedChatId);
-          const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => ({
-            ...msg,
-            isMine: msg.userId === userId,
-            text: msg.text.startsWith('base64:') ? await decryptMessage(msg.text, msg.userId) : msg.text,
-          })));
+          const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => {
+            const storedText = msg.userId === userId ? getSentMessage(msg.id, selectedChatId) : null;
+            try {
+              const text = storedText || (msg.text.startsWith('base64:') 
+                ? await decryptMessage(msg.text, msg.userId)
+                : msg.text);
+              return { ...msg, isMine: msg.userId === userId, text };
+            } catch (error) {
+              logEncryptionEvent('Decryption failed for message', { msgId: msg.id, error });
+              return { ...msg, isMine: msg.userId === userId, text: '[Decryption Failed]' };
+            }
+          }));
           setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
           await markAsRead(userId, selectedChatId);
         }
@@ -395,8 +416,8 @@ const App: React.FC = () => {
       const isMine = newMsg.userId === userId;
       newMsg.isMine = isMine;
 
-      if (!isMine && ((newMsg.userId === selectedChatId && newMsg.contactId === userId) || 
-          (newMsg.contactId === selectedChatId && newMsg.userId === userId))) {
+      if ((newMsg.userId === selectedChatId && newMsg.contactId === userId) || 
+          (newMsg.contactId === selectedChatId && newMsg.userId === userId)) {
         await handleIncomingMessage(newMsg);
       }
     });
@@ -489,11 +510,18 @@ const App: React.FC = () => {
     if (userId && tweetNaclKeyPair) {
       try {
         const messagesRes = await fetchMessages(userId, contact.id);
-        const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => ({
-          ...msg,
-          isMine: msg.userId === userId,
-          text: msg.text.startsWith('base64:') ? await decryptMessage(msg.text, msg.userId) : msg.text,
-        })));
+        const decryptedMessages = await Promise.all(messagesRes.data.map(async msg => {
+          const storedText = msg.userId === userId ? getSentMessage(msg.id, contact.id) : null;
+          try {
+            const text = storedText || (msg.text.startsWith('base64:') 
+              ? await decryptMessage(msg.text, msg.userId)
+              : msg.text);
+            return { ...msg, isMine: msg.userId === userId, text };
+          } catch (error) {
+            logEncryptionEvent('Decryption failed on contact select', { msgId: msg.id, error });
+            return { ...msg, isMine: msg.userId === userId, text: '[Decryption Failed]' };
+          }
+        }));
         setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
         await markAsRead(userId, contact.id);
       } catch (err) {
