@@ -40,6 +40,30 @@ db.serialize(() => {
       isRead INTEGER DEFAULT 0
     )
   `);
+
+  // Перевірка і додавання стовпця isP2P
+  db.all("PRAGMA table_info(messages)", (err, rows) => {
+    if (err) {
+      console.error('Error checking table schema:', err);
+      return;
+    }
+    const hasIsP2P = rows.some(row => row.name === 'isP2P');
+    if (!hasIsP2P) {
+      console.log('Adding isP2P column to messages table');
+      db.run(`
+        ALTER TABLE messages
+        ADD COLUMN isP2P INTEGER DEFAULT 0
+      `, (alterErr) => {
+        if (alterErr) {
+          console.error('Failed to add isP2P column:', alterErr);
+        } else {
+          console.log('Successfully added isP2P column');
+        }
+      });
+    } else {
+      console.log('isP2P column already exists');
+    }
+  });
 });
 
 const clients = new Map();
@@ -56,11 +80,25 @@ wss.on('connection', (ws, req) => {
   console.log(`New WebSocket connection established for user: ${userId}`);
 
   ws.on('message', (message) => {
-    const msg = JSON.parse(message);
+    let msg;
+    try {
+      msg = JSON.parse(message);
+    } catch (error) {
+      console.error('Failed to parse WebSocket message:', error);
+      return;
+    }
+
+    if (msg.isP2P) {
+      console.log(`Handling P2P message from ${msg.userId} to ${msg.contactId}: ${msg.text}`);
+      sendToParticipants(msg);
+      return;
+    }
+
     if (msg.type === 'read') {
       sendToParticipants(msg);
       return;
     }
+
     console.log(`Received WebSocket message: From ${msg.userId} to ${msg.contactId} (ID: ${msg.id}, Text: ${msg.text})`);
 
     db.get('SELECT id FROM messages WHERE id = ?', [msg.id], (err, row) => {
@@ -74,8 +112,8 @@ wss.on('connection', (ws, req) => {
       }
 
       db.run(
-        'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead) VALUES (?, ?, ?, ?, ?, ?)',
-        [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0],
+        'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead, isP2P) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0, msg.isP2P || 0],
         (err) => {
           if (err) {
             console.error('Failed to save WebSocket message to DB:', err);
@@ -109,6 +147,7 @@ const sendToParticipants = (message) => {
   });
 };
 
+// Решта ендпоінтів залишилися без змін
 app.post('/register', (req, res) => {
   const { email, password } = req.body;
   db.get('SELECT email FROM users WHERE email = ?', [email], (err, row) => {
@@ -186,7 +225,7 @@ app.get('/search', (req, res) => {
       res.json(rows.map(row => ({
         id: row.id.toString(),
         email: row.email,
-        publicKey: row.publicKey || '', // Гарантуємо, що publicKey завжди є
+        publicKey: row.publicKey || '',
       })));
     }
   );
@@ -215,7 +254,7 @@ app.get('/chats', (req, res) => {
       const contacts = rows.map(row => ({
         id: row.id.toString(),
         email: row.email,
-        publicKey: row.publicKey || '', // Гарантуємо, що publicKey завжди є
+        publicKey: row.publicKey || '',
       }));
 
       Promise.all(
@@ -250,7 +289,7 @@ app.get('/chats', (req, res) => {
 app.get('/messages', (req, res) => {
   const { userId, contactId } = req.query;
   db.all(
-    `SELECT id, userId, contactId, text, timestamp, isRead 
+    `SELECT id, userId, contactId, text, timestamp, isRead, isP2P 
      FROM messages 
      WHERE (userId = ? AND contactId = ?) OR (userId = ? AND contactId = ?) 
      ORDER BY timestamp`,

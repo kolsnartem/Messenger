@@ -12,18 +12,19 @@ export interface Message {
   id: string;
   userId: string;
   contactId: string;
-  text: string; // Зберігаємо зашифрований текст на сервері
-  encryptedText?: string; // Додаємо поле для шифрованого тексту (не зберігається в базі, лише для передачі)
+  text: string;
+  encryptedText?: string;
   timestamp: number;
   isRead?: number;
   isMine?: boolean;
   type?: string;
+  isP2P?: boolean; // Додано для позначення P2P-повідомлень
 }
 
 export interface Contact {
   id: string;
   email: string;
-  publicKey: string; // Base64 публічний ключ для TweetNaCl
+  publicKey: string;
   lastMessage: Message | null;
 }
 
