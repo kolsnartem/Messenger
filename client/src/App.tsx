@@ -168,6 +168,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (p2pServiceRef.current && tweetNaclKeyPair) {
       p2pServiceRef.current.setTweetNaclKeyPair(tweetNaclKeyPair);
+      p2pServiceRef.current.setEncryptionFunctions(encryptMessage, decryptMessage);
     }
   }, [tweetNaclKeyPair]);
 
@@ -437,20 +438,22 @@ const App: React.FC = () => {
 
     try {
       const message = input.trim();
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        userId,
+        contactId: selectedChatId,
+        text: message,
+        timestamp: Date.now(),
+        isRead: 0,
+        isMine: true,
+        isP2P: isP2PActive,
+      };
+
       if (isP2PActive && p2pServiceRef.current) {
         await p2pServiceRef.current.sendP2PMessage(message);
       } else {
         const encryptedText = encryptMessage(message, contact.publicKey || '', tweetNaclKeyPair);
-        const newMessage: Message = {
-          id: Date.now().toString(),
-          userId,
-          contactId: selectedChatId,
-          text: encryptedText,
-          timestamp: Date.now(),
-          isRead: 0,
-          isMine: true,
-        };
-
+        newMessage.text = encryptedText;
         storeSentMessage(newMessage.id, message, selectedChatId);
         const localMessage = { ...newMessage, text: message };
 
@@ -660,7 +663,7 @@ const App: React.FC = () => {
     setSearchQuery('');
     setSearchResults([]);
     setP2PRequest(null);
-    setIsP2PActive(false); // Скидаємо P2P при зміні чату
+    setIsP2PActive(false);
 
     setContacts(prev => {
       const contactExists = prev.some(c => c.id === contact.id);

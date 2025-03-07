@@ -6,7 +6,7 @@ export class P2PService {
   private dataChannel: RTCDataChannel | null = null;
   private userId: string;
   private contactId: string | null = null;
-  private contactPublicKey: Uint8Array | null = null;
+  private contactPublicKey: string | null = null;
   private onP2PMessage: (message: Message) => void;
   private onP2PStatusChange: (isActive: boolean) => void;
   private tweetNaclKeyPair: TweetNaClKeyPair | null = null;
@@ -37,17 +37,8 @@ export class P2PService {
   }
 
   setContactPublicKey(publicKey: string) {
-    try {
-      const cleanedKey = publicKey.replace(/[^A-Za-z0-9+/=]/g, '');
-      this.contactPublicKey = new Uint8Array(Buffer.from(cleanedKey, 'base64'));
-      if (this.contactPublicKey.length !== 32) {
-        throw new Error(`Invalid contact public key length: expected 32 bytes, got ${this.contactPublicKey.length}`);
-      }
-      console.log('Contact public key set for P2P encryption:', publicKey);
-    } catch (error) {
-      console.error('Failed to set contact public key:', error);
-      this.contactPublicKey = null;
-    }
+    this.contactPublicKey = publicKey;
+    console.log('Contact public key set for P2P encryption:', publicKey);
   }
 
   async initiateP2P(contactId: string) {
@@ -145,25 +136,20 @@ export class P2PService {
     }
   }
 
-  async sendP2PMessage(text: string) {
+  async sendP2PMessage(message: Message) {
     if (!this.dataChannel || this.dataChannel.readyState !== 'open' || !this.tweetNaclKeyPair || !this.contactId || !this.contactPublicKey || !this.encryptMessageFn) {
       throw new Error('P2P connection or encryption setup not ready');
     }
 
-    const encryptedText = this.encryptMessageFn(text, Buffer.from(this.contactPublicKey).toString('base64'), this.tweetNaclKeyPair);
-    const message: Message = {
-      id: Date.now().toString(),
-      userId: this.userId,
-      contactId: this.contactId,
+    const encryptedText = this.encryptMessageFn(message.text, this.contactPublicKey, this.tweetNaclKeyPair);
+    const encryptedMessage: Message = {
+      ...message,
       text: encryptedText,
-      timestamp: Date.now(),
-      isRead: 0,
-      isMine: true,
       isP2P: true,
     };
     
-    this.dataChannel.send(JSON.stringify(message));
-    this.onP2PMessage({ ...message, text }); // Локально показуємо оригінальний текст
+    this.dataChannel.send(JSON.stringify(encryptedMessage));
+    this.onP2PMessage({ ...encryptedMessage, text: message.text }); // Локально показуємо оригінальний текст
   }
 
   disconnectP2P() {
@@ -253,13 +239,14 @@ export class P2PService {
         const message = JSON.parse(event.data) as Message;
         message.isP2P = true;
         if (this.decryptMessageFn) {
-          constpitaux decryptedText = await this.decryptMessageFn(message.text, message.userId);
+          const decryptedText = await this.decryptMessageFn(message.text, message.userId);
           this.onP2PMessage({ ...message, text: decryptedText });
         } else {
           this.onP2PMessage(message);
         }
       } catch (error) {
         console.error('Failed to parse or decrypt P2P message:', error);
+        this.onP2PMessage({ ...message, text: '[Decryption Failed]', encryptedText: message.text });
       }
     };
 
