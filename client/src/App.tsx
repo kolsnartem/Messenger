@@ -408,6 +408,7 @@ const App: React.FC = () => {
       });
 
       await updateContactsWithLastMessage(updatedMessage);
+      console.log('P2P message processed and displayed:', updatedMessage);
     } catch (error) {
       console.error('Failed to handle P2P message:', error);
       setMessages(prev => {
@@ -437,25 +438,35 @@ const App: React.FC = () => {
     }
 
     try {
-      const message = input.trim();
+      const messageText = input.trim();
       const newMessage: Message = {
         id: Date.now().toString(),
         userId,
         contactId: selectedChatId,
-        text: message,
+        text: messageText,
         timestamp: Date.now(),
         isRead: 0,
         isMine: true,
         isP2P: isP2PActive,
       };
 
+      const localMessage = { ...newMessage, text: messageText };
+
       if (isP2PActive && p2pServiceRef.current) {
-        await p2pServiceRef.current.sendP2PMessage(message);
+        console.log("Sending message via P2P:", newMessage);
+        storeSentMessage(newMessage.id, messageText, selectedChatId);
+        await p2pServiceRef.current.sendP2PMessage(newMessage);
+
+        setMessages(prev => {
+          if (prev.some(m => m.id === newMessage.id)) return prev;
+          return [...prev, localMessage].sort((a, b) => a.timestamp - b.timestamp);
+        });
+
+        await updateContactsWithLastMessage(localMessage);
       } else {
-        const encryptedText = encryptMessage(message, contact.publicKey || '', tweetNaclKeyPair);
+        const encryptedText = encryptMessage(messageText, contact.publicKey || '', tweetNaclKeyPair);
         newMessage.text = encryptedText;
-        storeSentMessage(newMessage.id, message, selectedChatId);
-        const localMessage = { ...newMessage, text: message };
+        storeSentMessage(newMessage.id, messageText, selectedChatId);
 
         await webSocketService.send(newMessage);
         setMessages(prev => {
@@ -466,6 +477,7 @@ const App: React.FC = () => {
       }
       setInput('');
     } catch (error) {
+      console.error('Error sending message:', error);
       alert(`Failed to send message: ${(error as Error).message}`);
     }
   };
@@ -528,7 +540,14 @@ const App: React.FC = () => {
             }
           })
         );
-        setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
+
+        // Об'єднуємо серверні повідомлення з локальними P2P-повідомленнями
+        setMessages(prev => {
+          const p2pMessages = prev.filter(msg => msg.isP2P); // Зберігаємо тільки P2P-повідомлення
+          const serverMessages = decryptedMessages.filter(msg => !p2pMessages.some(p => p.id === msg.id)); // Уникаємо дублювання
+          return [...p2pMessages, ...serverMessages].sort((a, b) => a.timestamp - b.timestamp);
+        });
+
         await markAsRead(userId!, selectedChatId);
       }
     } catch (err) {
@@ -686,7 +705,13 @@ const App: React.FC = () => {
             return { ...msg, isMine: msg.userId === userId, text: '[Decryption Failed]', encryptedText: msg.text };
           }
         }));
-        setMessages(decryptedMessages.sort((a, b) => a.timestamp - b.timestamp));
+
+        setMessages(prev => {
+          const p2pMessages = prev.filter(msg => msg.isP2P);
+          const serverMessages = decryptedMessages.filter(msg => !p2pMessages.some(p => p.id === msg.id));
+          return [...p2pMessages, ...serverMessages].sort((a, b) => a.timestamp - b.timestamp);
+        });
+
         await markAsRead(userId, contact.id);
       } catch (err) {
         console.error('Error fetching messages on contact select:', err);
