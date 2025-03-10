@@ -6,8 +6,9 @@ import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock } from 'react-icons/fa';
-import P2PService from './p2p';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo } from 'react-icons/fa';
+import P2PService from './services/p2p';
+import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
 
 interface ApiErrorResponse {
@@ -150,19 +151,40 @@ const App: React.FC = () => {
   const [isKeysLoaded, setIsKeysLoaded] = useState(false);
   const [isP2PActive, setIsP2PActive] = useState(false);
   const [p2pRequest, setP2PRequest] = useState<Message | null>(null);
+  const [callState, setCallState] = useState<CallState>({
+    localStream: null,
+    remoteStream: null,
+    isCalling: false,
+    isVideoEnabled: false,
+  });
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const isInitialMount = useRef(true);
   const p2pServiceRef = useRef<P2PService | null>(null);
+  const videoCallServiceRef = useRef<VideoCallService | null>(null);
   const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    if (localVideoRef.current && callState.localStream) {
+      localVideoRef.current.srcObject = callState.localStream;
+    }
+    if (remoteVideoRef.current && callState.remoteStream) {
+      remoteVideoRef.current.srcObject = callState.remoteStream;
+    }
+  }, [callState.localStream, callState.remoteStream]);
 
   useEffect(() => {
     if (!userId) return;
     socketRef.current = io('https://100.64.221.88:4000', { query: { userId } });
     socketRef.current.on('connect', () => console.log('Socket.IO connected'));
 
+    videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, setCallState);
+
     return () => {
       socketRef.current?.disconnect();
+      videoCallServiceRef.current?.endCall(false);
     };
   }, [userId]);
 
@@ -508,6 +530,26 @@ const App: React.FC = () => {
     }
   };
 
+  const initiateCall = (videoEnabled: boolean) => {
+    if (!selectedChatId || !videoCallServiceRef.current) {
+      alert('Cannot initiate call: No contact selected or service not ready');
+      return;
+    }
+    videoCallServiceRef.current.initiateCall(selectedChatId, videoEnabled);
+  };
+
+  const endCall = () => {
+    if (videoCallServiceRef.current) {
+      videoCallServiceRef.current.endCall(true);
+    }
+  };
+
+  const toggleVideo = () => {
+    if (videoCallServiceRef.current) {
+      videoCallServiceRef.current.toggleVideo(!callState.isVideoEnabled);
+    }
+  };
+
   const initializeKeys = async () => {
     try {
       const savedKeyPair = localStorage.getItem('tweetnaclKeyPair');
@@ -763,6 +805,7 @@ const App: React.FC = () => {
     setTweetNaclKeyPair(null);
     setIsKeysLoaded(false);
     p2pServiceRef.current?.disconnectP2P();
+    videoCallServiceRef.current?.endCall(false);
     socketRef.current?.disconnect();
   };
 
@@ -960,6 +1003,9 @@ const App: React.FC = () => {
             font-size: 0.7rem;
           }
           .p2p-message { background-color: #ff9500 !important; color: white; }
+          .video-container { position: relative; width: 100%; height: 100%; }
+          .video-local { position: absolute; bottom: 10px; right: 10px; width: 150px; height: 100px; border-radius: 8px; }
+          .video-remote { width: 100%; height: 100%; object-fit: cover; }
         `}
       </style>
 
@@ -1023,33 +1069,51 @@ const App: React.FC = () => {
           </div>
         </div>
         {selectedChatId && (
-          <div className="p-2 d-flex align-items-center mt-1">
-            <button
-              className="btn btn-sm btn-outline-secondary me-2"
-              onClick={() => setSelectedChatId(null)}
-              style={{ border: 'none', background: 'transparent' }}
-            >
-              <FaArrowLeft />
-            </button>
-            <div
-              className="rounded-circle me-2 d-flex align-items-center justify-content-center"
-              style={{
-                width: '25px',
-                height: '25px',
-                background: isDarkTheme ? '#6c757d' : '#e9ecef',
-                color: isDarkTheme ? '#fff' : '#212529',
-              }}
-            >
-              {selectedContact?.email.charAt(0).toUpperCase() || '?'}
+          <div className="p-2 d-flex align-items-center mt-1 justify-content-between">
+            <div className="d-flex align-items-center">
+              <button
+                className="btn btn-sm btn-outline-secondary me-2"
+                onClick={() => setSelectedChatId(null)}
+                style={{ border: 'none', background: 'transparent' }}
+              >
+                <FaArrowLeft />
+              </button>
+              <div
+                className="rounded-circle me-2 d-flex align-items-center justify-content-center"
+                style={{
+                  width: '25px',
+                  height: '25px',
+                  background: isDarkTheme ? '#6c757d' : '#e9ecef',
+                  color: isDarkTheme ? '#fff' : '#212529',
+                }}
+              >
+                {selectedContact?.email.charAt(0).toUpperCase() || '?'}
+              </div>
+              <h6 className="m-0 me-2">{selectedContact?.email || 'Loading...'}</h6>
             </div>
-            <h6 className="m-0 me-2">{selectedContact?.email || 'Loading...'}</h6>
-            <button
-              className={`btn btn-sm ${isP2PActive ? 'btn-success' : 'btn-outline-secondary'}`}
-              onClick={toggleP2PMode}
-              disabled={!tweetNaclKeyPair || !selectedChatId}
-            >
-              <FaLock /> {isP2PActive ? 'P2P' : 'P2P'}
-            </button>
+            <div>
+              <button
+                className="btn btn-sm btn-outline-success me-2"
+                onClick={() => initiateCall(false)}
+                disabled={callState.isCalling}
+              >
+                <FaPhone />
+              </button>
+              <button
+                className="btn btn-sm btn-outline-success me-2"
+                onClick={() => initiateCall(true)}
+                disabled={callState.isCalling}
+              >
+                <FaVideo />
+              </button>
+              <button
+                className={`btn btn-sm ${isP2PActive ? 'btn-success' : 'btn-outline-secondary'}`}
+                onClick={toggleP2PMode}
+                disabled={!tweetNaclKeyPair || !selectedChatId}
+              >
+                <FaLock /> {isP2PActive ? 'P2P' : 'P2P'}
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -1102,7 +1166,60 @@ const App: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        {selectedChatId ? (
+        {callState.isCalling && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.9)',
+              zIndex: 50,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div className="video-container" style={{ width: '100%', height: '80%' }}>
+              {callState.remoteStream && (
+                <video
+                  ref={remoteVideoRef}
+                  className="video-remote"
+                  autoPlay
+                  playsInline
+                />
+              )}
+              {callState.localStream && (
+                <video
+                  ref={localVideoRef}
+                  className="video-local"
+                  autoPlay
+                  playsInline
+                  muted
+                />
+              )}
+            </div>
+            <div className="mt-3">
+              <button
+                className="btn btn-danger me-2"
+                onClick={endCall}
+              >
+                End Call
+              </button>
+              {callState.isCalling && (
+                <button
+                  className={`btn btn-${callState.isVideoEnabled ? 'warning' : 'success'}`}
+                  onClick={toggleVideo}
+                >
+                  {callState.isVideoEnabled ? 'Turn Video Off' : 'Turn Video On'}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+        {selectedChatId && !callState.isCalling && (
           <div
             className="p-3 scroll-container"
             style={{
@@ -1179,7 +1296,8 @@ const App: React.FC = () => {
               </div>
             )}
           </div>
-        ) : (
+        )}
+        {!selectedChatId && (
           <ChatList
             contacts={contacts}
             selectedChatId={selectedChatId}
@@ -1189,7 +1307,7 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {selectedChatId && (
+      {selectedChatId && !callState.isCalling && (
         <div
           className="p-2"
           style={{

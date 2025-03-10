@@ -6,17 +6,18 @@ Applying Webpack configuration...
 Updated source-map-loader rule with exclude: [ /node_modules\/@signalapp\/libsignal-client/ ]
 Webpack configuration applied successfully.
 Dev server middlewares set up.
-(node:6041) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:5468) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:6041) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:5468) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:5468) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
 
 You can now view client in the browser.
 
-  Local:            http://localhost:3000
-  On Your Network:  http://192.168.31.185:3000
+  Local:            https://localhost:3000
+  On Your Network:  https://192.168.31.185:3000
 
 Note that the development build is not optimized.
 To create a production build, use npm run build.
@@ -24,40 +25,87 @@ To create a production build, use npm run build.
 webpack compiled successfully
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
-ERROR in src/App.tsx:433:21
-TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
-  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
-    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
-      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-          Types of property 'id' are incompatible.
-            Type 'string | undefined' is not assignable to type 'string'.
-              Type 'undefined' is not assignable to type 'string'.
-    431 |         const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${selectedChatId}`);
-    432 |         contact = res.data;
-  > 433 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
-        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    434 |       } catch (err) {
-    435 |         alert('Cannot send message: Contact not found');
-    436 |         return;
+ERROR in src/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Compiling...
+ERROR in src/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/VideoCallService.tsx
+TS1208: 'VideoCallService.tsx' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/VideoCallService.tsx:38:23
+TS2532: Object is possibly 'undefined'.
+    36 |       remoteStream: this.remoteStream,
+    37 |       isCalling: !!this.peerConnection,
+  > 38 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    39 |     });
+    40 |   }
+    41 |
+
+ERROR in src/services/VideoCallService.tsx:176:23
+TS2532: Object is possibly 'undefined'.
+    174 |       remoteStream: this.remoteStream,
+    175 |       isCalling: !!this.peerConnection,
+  > 176 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+        |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    177 |     };
+    178 |   }
+    179 | }
 
 Compiling...
 Failed to compile.
 
 [eslint] 
 src/App.tsx
-Syntax error: ',' expected (914:23)
+Syntax error: ',' expected (1032:23)
 ERROR in ./src/App.tsx
 Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (1032:23)
 
-  912 |                   display: 'flex',
-  913 |                   flexDirection: 'column',
-> 914 |                   align-items: 'center',
-      |                        ^
-  915 |                 }}
-  916 |               >
-  917 |                 <button
+  1030 |                   display: 'flex',
+  1031 |                   flexDirection: 'column',
+> 1032 |                   align-items: 'center',
+       |                        ^
+  1033 |                 }}
+  1034 |               >
+  1035 |                 <button
     at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
     at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
     at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
@@ -111,244 +159,283 @@ SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected
 
 ERROR in [eslint] 
 src/App.tsx
-  Line 914:23:  Parsing error: ',' expected
+  Line 1032:23:  Parsing error: ',' expected
 
 webpack compiled with 2 errors
-Compiling...
-ERROR in src/App.tsx:174:9
-TS2554: Expected 3 arguments, but got 4.
-    172 |         socketRef.current!,
-    173 |         handleP2PMessage,
-  > 174 |         (active) => setIsP2PActive(active)
-        |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    175 |       );
-    176 |     }
-    177 |   }, [userId]);
+ERROR in src/App.tsx:11:24
+TS2307: Cannot find module './services/p2p' or its corresponding type declarations.
+     9 | import * as nacl from 'tweetnacl';
+    10 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo } from 'react-icons/fa';
+  > 11 | import P2PService from './services/p2p';
+       |                        ^^^^^^^^^^^^^^^^
+    12 | import VideoCallService, { CallState } from './services/VideoCallService';
+    13 | import io, { Socket } from 'socket.io-client';
+    14 |
 
-ERROR in src/App.tsx:174:10
+ERROR in src/App.tsx:187:10
 TS7006: Parameter 'active' implicitly has an 'any' type.
-    172 |         socketRef.current!,
-    173 |         handleP2PMessage,
-  > 174 |         (active) => setIsP2PActive(active)
+    185 |         socketRef.current,
+    186 |         handleP2PMessage,
+  > 187 |         (active) => {
         |          ^^^^^^
-    175 |       );
-    176 |     }
-    177 |   }, [userId]);
+    188 |           console.log('P2P status changed:', active);
+    189 |           setIsP2PActive(active);
+    190 |         }
 
-ERROR in src/App.tsx:444:21
-TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
-  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
-    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
-      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-          Types of property 'id' are incompatible.
-            Type 'string | undefined' is not assignable to type 'string'.
-              Type 'undefined' is not assignable to type 'string'.
-    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
-    443 |         contact = res.data;
-  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
-        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    445 |       } catch (err) {
-    446 |         alert('Cannot send message: Contact not found');
-    447 |         return;
-
-ERROR in src/App.tsx:903:17
+ERROR in src/App.tsx:1021:17
 TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                 ^^^^^
-    904 |                   position: 'fixed',
-    905 |                   top: 55,
-    906 |                   left: 10,
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                 ^^^^^
+    1022 |                   position: 'fixed',
+    1023 |                   top: '55px',
+    1024 |                   left: '10px',
 
-ERROR in src/App.tsx:903:24
+ERROR in src/App.tsx:1021:24
 TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                        ^
-  > 904 |                   position: 'fixed',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 905 |                   top: 55,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 906 |                   left: 10,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 908 |                   border: '1px solid #ccc',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 909 |                   borderRadius: '4px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 910 |                   zIndex: 1000,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 911 |                   padding: '5px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 912 |                   display: 'flex',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 913 |                   flexDirection: 'column',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 914 |                   align-items: 'center',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                        ^
+  > 1022 |                   position: 'fixed',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1023 |                   top: '55px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1024 |                   left: '10px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1025 |                   background: isDarkTheme ? '#212529' : '#fff',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1026 |                   border: '1px solid #ccc',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1027 |                   borderRadius: '4px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1028 |                   zIndex: 1000,
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1029 |                   padding: '5px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1030 |                   display: 'flex',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1031 |                   flexDirection: 'column',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1032 |                   align-items: 'center',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:19
+ERROR in src/App.tsx:1032:19
 TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                   ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                   ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:24
+ERROR in src/App.tsx:1032:24
 TS1005: ',' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                        ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                        ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:25
+ERROR in src/App.tsx:1032:25
 TS2304: Cannot find name 'items'.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                         ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                         ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:30
+ERROR in src/App.tsx:1032:30
 TS1005: '}' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                              ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                              ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:915:17
+ERROR in src/App.tsx:1033:17
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                 ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                 ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:915:18
+ERROR in src/App.tsx:1033:18
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                  ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                  ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:916:15
+ERROR in src/App.tsx:1034:15
 TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
-    914 |                   align-items: 'center',
-    915 |                 }}
-  > 916 |               >
-        |               ^
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-    919 |                   onClick={handleUpdate}
+    1032 |                   align-items: 'center',
+    1033 |                 }}
+  > 1034 |               >
+         |               ^
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
+    1037 |                   onClick={handleUpdate}
 
-ERROR in src/App.tsx:932:14
+ERROR in src/App.tsx:1050:14
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    930 |                 </button>
-    931 |               </div>
-  > 932 |             )}
-        |              ^
-    933 |           </div>
-    934 |           <div>
-    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+    1048 |                 </button>
+    1049 |               </div>
+  > 1050 |             )}
+         |              ^
+    1051 |           </div>
+    1052 |           <div>
+    1053 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
 
-ERROR in src/App.tsx:975:7
+ERROR in src/App.tsx:1111:7
 TS1005: ')' expected.
-    973 |       </div>
-    974 |
-  > 975 |       {isSearchOpen && (
-        |       ^
-    976 |         <div
-    977 |           style={{
-    978 |             position: 'fixed',
+    1109 |       </div>
+    1110 |
+  > 1111 |       {isSearchOpen && (
+         |       ^
+    1112 |         <div
+    1113 |           style={{
+    1114 |             position: 'fixed',
 
-ERROR in src/App.tsx:1038:66
+ERROR in src/App.tsx:1179:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1177 |                 <video
+    1178 |                   className="video-remote"
+  > 1179 |                   ref={(video) => video && (video.srcObject = callState.remoteStream)}
+         |                   ^^^
+    1180 |                   autoPlay
+    1181 |                   playsInline
+    1182 |                 />
+
+ERROR in src/App.tsx:1187:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1185 |                 <video
+    1186 |                   className="video-local"
+  > 1187 |                   ref={(video) => video && (video.srcObject = callState.localStream)}
+         |                   ^^^
+    1188 |                   autoPlay
+    1189 |                   playsInline
+    1190 |                   muted
+
+ERROR in src/App.tsx:1227:68
 TS2531: Object is possibly 'null'.
-    1036 |             {p2pRequest && (
-    1037 |               <div className="mb-2 text-center">
-  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
-         |                                                                  ^^^^^^^^^^
-    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
-    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
-    1041 |               </div>
+    1225 |             {p2pRequest && (
+    1226 |               <div className="mb-2 text-center">
+  > 1227 |                 <p>P2P request from {contacts.find((c) => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                    ^^^^^^^^^^
+    1228 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1229 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1230 |               </div>
 
-ERROR in src/App.tsx:1147:5
+ERROR in src/App.tsx:1336:5
 TS1128: Declaration or statement expected.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |     ^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1147:7
+ERROR in src/App.tsx:1336:7
 TS2304: Cannot find name 'div'.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |       ^^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1148:3
+ERROR in src/App.tsx:1337:3
 TS1109: Expression expected.
-    1146 |       )}
-    1147 |     </div>
-  > 1148 |   );
+    1335 |       )}
+    1336 |     </div>
+  > 1337 |   );
          |   ^
-    1149 | };
-    1150 |
-    1151 | export default App;
+    1338 | };
+    1339 |
+    1340 | export default App;
 
-ERROR in src/App.tsx:1149:1
+ERROR in src/App.tsx:1338:1
 TS1128: Declaration or statement expected.
-    1147 |     </div>
-    1148 |   );
-  > 1149 | };
+    1336 |     </div>
+    1337 |   );
+  > 1338 | };
          | ^
-    1150 |
-    1151 | export default App;
+    1339 |
+    1340 | export default App;
 
+ERROR in src/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/VideoCallService.tsx:38:23
+TS2532: Object is possibly 'undefined'.
+    36 |       remoteStream: this.remoteStream,
+    37 |       isCalling: !!this.peerConnection,
+  > 38 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    39 |     });
+    40 |   }
+    41 |
+
+ERROR in src/services/VideoCallService.tsx:176:23
+TS2532: Object is possibly 'undefined'.
+    174 |       remoteStream: this.remoteStream,
+    175 |       isCalling: !!this.peerConnection,
+  > 176 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+        |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    177 |     };
+    178 |   }
+    179 | }
+
+Compiling...
 Failed to compile.
 
 [eslint] 
 src/App.tsx
-Syntax error: ',' expected (914:23)
+Syntax error: ',' expected (1032:23)
 ERROR in ./src/App.tsx
 Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (1032:23)
 
-  912 |                   display: 'flex',
-  913 |                   flexDirection: 'column',
-> 914 |                   align-items: 'center',
-      |                        ^
-  915 |                 }}
-  916 |               >
-  917 |                 <button
+  1030 |                   display: 'flex',
+  1031 |                   flexDirection: 'column',
+> 1032 |                   align-items: 'center',
+       |                        ^
+  1033 |                 }}
+  1034 |               >
+  1035 |                 <button
     at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
     at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
     at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
@@ -402,244 +489,288 @@ SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected
 
 ERROR in [eslint] 
 src/App.tsx
-  Line 914:23:  Parsing error: ',' expected
+  Line 1032:23:  Parsing error: ',' expected
 
 webpack compiled with 2 errors
-ERROR in src/App.tsx:174:9
-TS2554: Expected 3 arguments, but got 4.
-    172 |         socketRef.current!,
-    173 |         handleP2PMessage,
-  > 174 |         (active) => setIsP2PActive(active)
-        |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    175 |       );
-    176 |     }
-    177 |   }, [userId]);
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:11:24
+TS2307: Cannot find module './services/p2p' or its corresponding type declarations.
+     9 | import * as nacl from 'tweetnacl';
+    10 | import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo } from 'react-icons/fa';
+  > 11 | import P2PService from './services/p2p';
+       |                        ^^^^^^^^^^^^^^^^
+    12 | import VideoCallService, { CallState } from './services/VideoCallService';
+    13 | import io, { Socket } from 'socket.io-client';
+    14 |
 
-ERROR in src/App.tsx:174:10
+ERROR in src/App.tsx:187:10
 TS7006: Parameter 'active' implicitly has an 'any' type.
-    172 |         socketRef.current!,
-    173 |         handleP2PMessage,
-  > 174 |         (active) => setIsP2PActive(active)
+    185 |         socketRef.current,
+    186 |         handleP2PMessage,
+  > 187 |         (active) => {
         |          ^^^^^^
-    175 |       );
-    176 |     }
-    177 |   }, [userId]);
+    188 |           console.log('P2P status changed:', active);
+    189 |           setIsP2PActive(active);
+    190 |         }
 
-ERROR in src/App.tsx:444:21
-TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
-  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
-    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
-      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-          Types of property 'id' are incompatible.
-            Type 'string | undefined' is not assignable to type 'string'.
-              Type 'undefined' is not assignable to type 'string'.
-    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
-    443 |         contact = res.data;
-  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
-        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    445 |       } catch (err) {
-    446 |         alert('Cannot send message: Contact not found');
-    447 |         return;
-
-ERROR in src/App.tsx:903:17
+ERROR in src/App.tsx:1021:17
 TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                 ^^^^^
-    904 |                   position: 'fixed',
-    905 |                   top: 55,
-    906 |                   left: 10,
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                 ^^^^^
+    1022 |                   position: 'fixed',
+    1023 |                   top: '55px',
+    1024 |                   left: '10px',
 
-ERROR in src/App.tsx:903:24
+ERROR in src/App.tsx:1021:24
 TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                        ^
-  > 904 |                   position: 'fixed',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 905 |                   top: 55,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 906 |                   left: 10,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 908 |                   border: '1px solid #ccc',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 909 |                   borderRadius: '4px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 910 |                   zIndex: 1000,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 911 |                   padding: '5px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 912 |                   display: 'flex',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 913 |                   flexDirection: 'column',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 914 |                   align-items: 'center',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                        ^
+  > 1022 |                   position: 'fixed',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1023 |                   top: '55px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1024 |                   left: '10px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1025 |                   background: isDarkTheme ? '#212529' : '#fff',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1026 |                   border: '1px solid #ccc',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1027 |                   borderRadius: '4px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1028 |                   zIndex: 1000,
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1029 |                   padding: '5px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1030 |                   display: 'flex',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1031 |                   flexDirection: 'column',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1032 |                   align-items: 'center',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:19
+ERROR in src/App.tsx:1032:19
 TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                   ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                   ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:24
+ERROR in src/App.tsx:1032:24
 TS1005: ',' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                        ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                        ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:25
+ERROR in src/App.tsx:1032:25
 TS2304: Cannot find name 'items'.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                         ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                         ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:30
+ERROR in src/App.tsx:1032:30
 TS1005: '}' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                              ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                              ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:915:17
+ERROR in src/App.tsx:1033:17
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                 ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                 ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:915:18
+ERROR in src/App.tsx:1033:18
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                  ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                  ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:916:15
+ERROR in src/App.tsx:1034:15
 TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
-    914 |                   align-items: 'center',
-    915 |                 }}
-  > 916 |               >
-        |               ^
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-    919 |                   onClick={handleUpdate}
+    1032 |                   align-items: 'center',
+    1033 |                 }}
+  > 1034 |               >
+         |               ^
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
+    1037 |                   onClick={handleUpdate}
 
-ERROR in src/App.tsx:932:14
+ERROR in src/App.tsx:1050:14
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    930 |                 </button>
-    931 |               </div>
-  > 932 |             )}
-        |              ^
-    933 |           </div>
-    934 |           <div>
-    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+    1048 |                 </button>
+    1049 |               </div>
+  > 1050 |             )}
+         |              ^
+    1051 |           </div>
+    1052 |           <div>
+    1053 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
 
-ERROR in src/App.tsx:975:7
+ERROR in src/App.tsx:1111:7
 TS1005: ')' expected.
-    973 |       </div>
-    974 |
-  > 975 |       {isSearchOpen && (
-        |       ^
-    976 |         <div
-    977 |           style={{
-    978 |             position: 'fixed',
+    1109 |       </div>
+    1110 |
+  > 1111 |       {isSearchOpen && (
+         |       ^
+    1112 |         <div
+    1113 |           style={{
+    1114 |             position: 'fixed',
 
-ERROR in src/App.tsx:1038:66
+ERROR in src/App.tsx:1179:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1177 |                 <video
+    1178 |                   className="video-remote"
+  > 1179 |                   ref={(video) => video && (video.srcObject = callState.remoteStream)}
+         |                   ^^^
+    1180 |                   autoPlay
+    1181 |                   playsInline
+    1182 |                 />
+
+ERROR in src/App.tsx:1187:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1185 |                 <video
+    1186 |                   className="video-local"
+  > 1187 |                   ref={(video) => video && (video.srcObject = callState.localStream)}
+         |                   ^^^
+    1188 |                   autoPlay
+    1189 |                   playsInline
+    1190 |                   muted
+
+ERROR in src/App.tsx:1227:68
 TS2531: Object is possibly 'null'.
-    1036 |             {p2pRequest && (
-    1037 |               <div className="mb-2 text-center">
-  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
-         |                                                                  ^^^^^^^^^^
-    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
-    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
-    1041 |               </div>
+    1225 |             {p2pRequest && (
+    1226 |               <div className="mb-2 text-center">
+  > 1227 |                 <p>P2P request from {contacts.find((c) => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                    ^^^^^^^^^^
+    1228 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1229 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1230 |               </div>
 
-ERROR in src/App.tsx:1147:5
+ERROR in src/App.tsx:1336:5
 TS1128: Declaration or statement expected.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |     ^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1147:7
+ERROR in src/App.tsx:1336:7
 TS2304: Cannot find name 'div'.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |       ^^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1148:3
+ERROR in src/App.tsx:1337:3
 TS1109: Expression expected.
-    1146 |       )}
-    1147 |     </div>
-  > 1148 |   );
+    1335 |       )}
+    1336 |     </div>
+  > 1337 |   );
          |   ^
-    1149 | };
-    1150 |
-    1151 | export default App;
+    1338 | };
+    1339 |
+    1340 | export default App;
 
-ERROR in src/App.tsx:1149:1
+ERROR in src/App.tsx:1338:1
 TS1128: Declaration or statement expected.
-    1147 |     </div>
-    1148 |   );
-  > 1149 | };
+    1336 |     </div>
+    1337 |   );
+  > 1338 | };
          | ^
-    1150 |
-    1151 | export default App;
+    1339 |
+    1340 | export default App;
+
+ERROR in src/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/p2p.ts
+TS1208: 'p2p.ts' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+ERROR in src/services/VideoCallService.tsx:38:23
+TS2532: Object is possibly 'undefined'.
+    36 |       remoteStream: this.remoteStream,
+    37 |       isCalling: !!this.peerConnection,
+  > 38 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    39 |     });
+    40 |   }
+    41 |
+
+ERROR in src/services/VideoCallService.tsx:176:23
+TS2532: Object is possibly 'undefined'.
+    174 |       remoteStream: this.remoteStream,
+    175 |       isCalling: !!this.peerConnection,
+  > 176 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+        |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    177 |     };
+    178 |   }
+    179 | }
 
 Compiling...
 Failed to compile.
 
 [eslint] 
 src/App.tsx
-Syntax error: ',' expected (914:23)
+Syntax error: ',' expected (1032:23)
 ERROR in ./src/App.tsx
 Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (1032:23)
 
-  912 |                   display: 'flex',
-  913 |                   flexDirection: 'column',
-> 914 |                   align-items: 'center',
-      |                        ^
-  915 |                 }}
-  916 |               >
-  917 |                 <button
+  1030 |                   display: 'flex',
+  1031 |                   flexDirection: 'column',
+> 1032 |                   align-items: 'center',
+       |                        ^
+  1033 |                 }}
+  1034 |               >
+  1035 |                 <button
     at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
     at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
     at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
@@ -693,236 +824,284 @@ SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected
 
 ERROR in [eslint] 
 src/App.tsx
-  Line 914:23:  Parsing error: ',' expected
+  Line 1032:23:  Parsing error: ',' expected
 
 webpack compiled with 2 errors
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
-ERROR in src/App.tsx:444:21
-TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
-  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
-    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
-      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-          Types of property 'id' are incompatible.
-            Type 'string | undefined' is not assignable to type 'string'.
-              Type 'undefined' is not assignable to type 'string'.
-    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
-    443 |         contact = res.data;
-  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
-        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    445 |       } catch (err) {
-    446 |         alert('Cannot send message: Contact not found');
-    447 |         return;
-
-ERROR in src/App.tsx:903:17
+ERROR in src/App.tsx:1021:17
 TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                 ^^^^^
-    904 |                   position: 'fixed',
-    905 |                   top: 55,
-    906 |                   left: 10,
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                 ^^^^^
+    1022 |                   position: 'fixed',
+    1023 |                   top: '55px',
+    1024 |                   left: '10px',
 
-ERROR in src/App.tsx:903:24
+ERROR in src/App.tsx:1021:24
 TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                        ^
-  > 904 |                   position: 'fixed',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 905 |                   top: 55,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 906 |                   left: 10,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 908 |                   border: '1px solid #ccc',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 909 |                   borderRadius: '4px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 910 |                   zIndex: 1000,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 911 |                   padding: '5px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 912 |                   display: 'flex',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 913 |                   flexDirection: 'column',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 914 |                   align-items: 'center',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                        ^
+  > 1022 |                   position: 'fixed',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1023 |                   top: '55px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1024 |                   left: '10px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1025 |                   background: isDarkTheme ? '#212529' : '#fff',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1026 |                   border: '1px solid #ccc',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1027 |                   borderRadius: '4px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1028 |                   zIndex: 1000,
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1029 |                   padding: '5px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1030 |                   display: 'flex',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1031 |                   flexDirection: 'column',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1032 |                   align-items: 'center',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:19
+ERROR in src/App.tsx:1032:19
 TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                   ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                   ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:24
+ERROR in src/App.tsx:1032:24
 TS1005: ',' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                        ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                        ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:25
+ERROR in src/App.tsx:1032:25
 TS2304: Cannot find name 'items'.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                         ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                         ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:30
+ERROR in src/App.tsx:1032:30
 TS1005: '}' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                              ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                              ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:915:17
+ERROR in src/App.tsx:1033:17
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                 ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                 ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:915:18
+ERROR in src/App.tsx:1033:18
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                  ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                  ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:916:15
+ERROR in src/App.tsx:1034:15
 TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
-    914 |                   align-items: 'center',
-    915 |                 }}
-  > 916 |               >
-        |               ^
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-    919 |                   onClick={handleUpdate}
+    1032 |                   align-items: 'center',
+    1033 |                 }}
+  > 1034 |               >
+         |               ^
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
+    1037 |                   onClick={handleUpdate}
 
-ERROR in src/App.tsx:932:14
+ERROR in src/App.tsx:1050:14
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    930 |                 </button>
-    931 |               </div>
-  > 932 |             )}
-        |              ^
-    933 |           </div>
-    934 |           <div>
-    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+    1048 |                 </button>
+    1049 |               </div>
+  > 1050 |             )}
+         |              ^
+    1051 |           </div>
+    1052 |           <div>
+    1053 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
 
-ERROR in src/App.tsx:975:7
+ERROR in src/App.tsx:1111:7
 TS1005: ')' expected.
-    973 |       </div>
-    974 |
-  > 975 |       {isSearchOpen && (
-        |       ^
-    976 |         <div
-    977 |           style={{
-    978 |             position: 'fixed',
+    1109 |       </div>
+    1110 |
+  > 1111 |       {isSearchOpen && (
+         |       ^
+    1112 |         <div
+    1113 |           style={{
+    1114 |             position: 'fixed',
 
-ERROR in src/App.tsx:1038:66
+ERROR in src/App.tsx:1179:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1177 |                 <video
+    1178 |                   className="video-remote"
+  > 1179 |                   ref={(video) => video && (video.srcObject = callState.remoteStream)}
+         |                   ^^^
+    1180 |                   autoPlay
+    1181 |                   playsInline
+    1182 |                 />
+
+ERROR in src/App.tsx:1187:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1185 |                 <video
+    1186 |                   className="video-local"
+  > 1187 |                   ref={(video) => video && (video.srcObject = callState.localStream)}
+         |                   ^^^
+    1188 |                   autoPlay
+    1189 |                   playsInline
+    1190 |                   muted
+
+ERROR in src/App.tsx:1227:68
 TS2531: Object is possibly 'null'.
-    1036 |             {p2pRequest && (
-    1037 |               <div className="mb-2 text-center">
-  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
-         |                                                                  ^^^^^^^^^^
-    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
-    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
-    1041 |               </div>
+    1225 |             {p2pRequest && (
+    1226 |               <div className="mb-2 text-center">
+  > 1227 |                 <p>P2P request from {contacts.find((c) => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                    ^^^^^^^^^^
+    1228 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1229 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1230 |               </div>
 
-ERROR in src/App.tsx:1147:5
+ERROR in src/App.tsx:1336:5
 TS1128: Declaration or statement expected.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |     ^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1147:7
+ERROR in src/App.tsx:1336:7
 TS2304: Cannot find name 'div'.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |       ^^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1148:3
+ERROR in src/App.tsx:1337:3
 TS1109: Expression expected.
-    1146 |       )}
-    1147 |     </div>
-  > 1148 |   );
+    1335 |       )}
+    1336 |     </div>
+  > 1337 |   );
          |   ^
-    1149 | };
-    1150 |
-    1151 | export default App;
+    1338 | };
+    1339 |
+    1340 | export default App;
 
-ERROR in src/App.tsx:1149:1
+ERROR in src/App.tsx:1338:1
 TS1128: Declaration or statement expected.
-    1147 |     </div>
-    1148 |   );
-  > 1149 | };
+    1336 |     </div>
+    1337 |   );
+  > 1338 | };
          | ^
-    1150 |
-    1151 | export default App;
+    1339 |
+    1340 | export default App;
 
-ERROR in src/p2p.ts:333:32
-TS2783: 'type' is specified more than once, so this usage will be overwritten.
-    331 |         userId: data.source,
-    332 |         contactId: this.userId,
-  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
-        |                                ^^^^^^^^^^^^^
-    334 |         timestamp: Date.now(),
-    335 |         isRead: 0,
-    336 |         isP2P: true,
+ERROR in src/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/p2p.ts:1:43
+TS2307: Cannot find module './types' or its corresponding type declarations.
+  > 1 | import { Message, TweetNaClKeyPair } from './types';
+      |                                           ^^^^^^^^^
+    2 | import { Socket } from 'socket.io-client';
+    3 |
+    4 | export class P2PService {
+
+ERROR in src/services/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/VideoCallService.tsx:38:23
+TS2532: Object is possibly 'undefined'.
+    36 |       remoteStream: this.remoteStream,
+    37 |       isCalling: !!this.peerConnection,
+  > 38 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    39 |     });
+    40 |   }
+    41 |
+
+ERROR in src/services/VideoCallService.tsx:176:23
+TS2532: Object is possibly 'undefined'.
+    174 |       remoteStream: this.remoteStream,
+    175 |       isCalling: !!this.peerConnection,
+  > 176 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+        |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    177 |     };
+    178 |   }
+    179 | }
 
 Compiling...
 Failed to compile.
 
 [eslint] 
 src/App.tsx
-Syntax error: ',' expected (914:23)
+Syntax error: ',' expected (1032:23)
 ERROR in ./src/App.tsx
 Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (1032:23)
 
-  912 |                   display: 'flex',
-  913 |                   flexDirection: 'column',
-> 914 |                   align-items: 'center',
-      |                        ^
-  915 |                 }}
-  916 |               >
-  917 |                 <button
+  1030 |                   display: 'flex',
+  1031 |                   flexDirection: 'column',
+> 1032 |                   align-items: 'center',
+       |                        ^
+  1033 |                 }}
+  1034 |               >
+  1035 |                 <button
     at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
     at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
     at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
@@ -976,518 +1155,28 @@ SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected
 
 ERROR in [eslint] 
 src/App.tsx
-  Line 914:23:  Parsing error: ',' expected
+  Line 1032:23:  Parsing error: ',' expected
 
 webpack compiled with 2 errors
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
-ERROR in src/App.tsx:444:21
-TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
-  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
-    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
-      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-          Types of property 'id' are incompatible.
-            Type 'string | undefined' is not assignable to type 'string'.
-              Type 'undefined' is not assignable to type 'string'.
-    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
-    443 |         contact = res.data;
-  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
-        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    445 |       } catch (err) {
-    446 |         alert('Cannot send message: Contact not found');
-    447 |         return;
-
-ERROR in src/App.tsx:903:17
-TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                 ^^^^^
-    904 |                   position: 'fixed',
-    905 |                   top: 55,
-    906 |                   left: 10,
-
-ERROR in src/App.tsx:903:24
-TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                        ^
-  > 904 |                   position: 'fixed',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 905 |                   top: 55,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 906 |                   left: 10,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 908 |                   border: '1px solid #ccc',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 909 |                   borderRadius: '4px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 910 |                   zIndex: 1000,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 911 |                   padding: '5px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 912 |                   display: 'flex',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 913 |                   flexDirection: 'column',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 914 |                   align-items: 'center',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:19
-TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                   ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:24
-TS1005: ',' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                        ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:25
-TS2304: Cannot find name 'items'.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                         ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:30
-TS1005: '}' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                              ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:915:17
-TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                 ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-
-ERROR in src/App.tsx:915:18
-TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                  ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-
-ERROR in src/App.tsx:916:15
-TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
-    914 |                   align-items: 'center',
-    915 |                 }}
-  > 916 |               >
-        |               ^
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-    919 |                   onClick={handleUpdate}
-
-ERROR in src/App.tsx:932:14
-TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    930 |                 </button>
-    931 |               </div>
-  > 932 |             )}
-        |              ^
-    933 |           </div>
-    934 |           <div>
-    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
-
-ERROR in src/App.tsx:975:7
-TS1005: ')' expected.
-    973 |       </div>
-    974 |
-  > 975 |       {isSearchOpen && (
-        |       ^
-    976 |         <div
-    977 |           style={{
-    978 |             position: 'fixed',
-
-ERROR in src/App.tsx:1038:66
-TS2531: Object is possibly 'null'.
-    1036 |             {p2pRequest && (
-    1037 |               <div className="mb-2 text-center">
-  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
-         |                                                                  ^^^^^^^^^^
-    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
-    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
-    1041 |               </div>
-
-ERROR in src/App.tsx:1147:5
-TS1128: Declaration or statement expected.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
-         |     ^^
-    1148 |   );
-    1149 | };
-    1150 |
-
-ERROR in src/App.tsx:1147:7
-TS2304: Cannot find name 'div'.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
-         |       ^^^
-    1148 |   );
-    1149 | };
-    1150 |
-
-ERROR in src/App.tsx:1148:3
-TS1109: Expression expected.
-    1146 |       )}
-    1147 |     </div>
-  > 1148 |   );
-         |   ^
-    1149 | };
-    1150 |
-    1151 | export default App;
-
-ERROR in src/App.tsx:1149:1
-TS1128: Declaration or statement expected.
-    1147 |     </div>
-    1148 |   );
-  > 1149 | };
-         | ^
-    1150 |
-    1151 | export default App;
-
-ERROR in src/p2p.ts:333:32
-TS2783: 'type' is specified more than once, so this usage will be overwritten.
-    331 |         userId: data.source,
-    332 |         contactId: this.userId,
-  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
-        |                                ^^^^^^^^^^^^^
-    334 |         timestamp: Date.now(),
-    335 |         isRead: 0,
-    336 |         isP2P: true,
-
-Failed to compile.
-
-[eslint] 
-src/App.tsx
-Syntax error: ',' expected (914:23)
-ERROR in ./src/App.tsx
-Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
-
-  912 |                   display: 'flex',
-  913 |                   flexDirection: 'column',
-> 914 |                   align-items: 'center',
-      |                        ^
-  915 |                 }}
-  916 |               >
-  917 |                 <button
-    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
-    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
-    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
-    at TypeScriptParserMixin.expect (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3657:12)
-    at TypeScriptParserMixin.parseObjectLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11506:14)
-    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11024:23)
-    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
-    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
-    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
-    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
-    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
-    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
-    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
-    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
-    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
-    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
-    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
-    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
-    at TypeScriptParserMixin.jsxParseExpressionContainer (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6805:31)
-    at TypeScriptParserMixin.jsxParseAttributeValue (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6777:21)
-    at TypeScriptParserMixin.jsxParseAttribute (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6826:38)
-    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6840:28)
-    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9885:18)
-    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6835:17)
-    at TypeScriptParserMixin.jsxParseElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6859:33)
-    at TypeScriptParserMixin.jsxParseElement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6922:17)
-    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6932:19)
-    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
-    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
-    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
-    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
-    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
-    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
-    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:39
-    at TypeScriptParserMixin.tryParse (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3665:20)
-    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:18)
-    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
-    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
-    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
-    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11359:28)
-    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
-    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
-    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
-    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
-    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
-
-ERROR in [eslint] 
-src/App.tsx
-  Line 914:23:  Parsing error: ',' expected
-
-webpack compiled with 2 errors
-Files successfully emitted, waiting for typecheck results...
-Issues checking in progress...
-ERROR in src/App.tsx:444:21
-TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
-  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
-    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
-      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-          Types of property 'id' are incompatible.
-            Type 'string | undefined' is not assignable to type 'string'.
-              Type 'undefined' is not assignable to type 'string'.
-    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
-    443 |         contact = res.data;
-  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
-        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    445 |       } catch (err) {
-    446 |         alert('Cannot send message: Contact not found');
-    447 |         return;
-
-ERROR in src/App.tsx:903:17
-TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                 ^^^^^
-    904 |                   position: 'fixed',
-    905 |                   top: 55,
-    906 |                   left: 10,
-
-ERROR in src/App.tsx:903:24
-TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                        ^
-  > 904 |                   position: 'fixed',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 905 |                   top: 55,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 906 |                   left: 10,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 908 |                   border: '1px solid #ccc',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 909 |                   borderRadius: '4px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 910 |                   zIndex: 1000,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 911 |                   padding: '5px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 912 |                   display: 'flex',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 913 |                   flexDirection: 'column',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 914 |                   align-items: 'center',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:19
-TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                   ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:24
-TS1005: ',' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                        ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:25
-TS2304: Cannot find name 'items'.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                         ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:914:30
-TS1005: '}' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                              ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
-
-ERROR in src/App.tsx:915:17
-TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                 ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-
-ERROR in src/App.tsx:915:18
-TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                  ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-
-ERROR in src/App.tsx:916:15
-TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
-    914 |                   align-items: 'center',
-    915 |                 }}
-  > 916 |               >
-        |               ^
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-    919 |                   onClick={handleUpdate}
-
-ERROR in src/App.tsx:932:14
-TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    930 |                 </button>
-    931 |               </div>
-  > 932 |             )}
-        |              ^
-    933 |           </div>
-    934 |           <div>
-    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
-
-ERROR in src/App.tsx:975:7
-TS1005: ')' expected.
-    973 |       </div>
-    974 |
-  > 975 |       {isSearchOpen && (
-        |       ^
-    976 |         <div
-    977 |           style={{
-    978 |             position: 'fixed',
-
-ERROR in src/App.tsx:1038:66
-TS2531: Object is possibly 'null'.
-    1036 |             {p2pRequest && (
-    1037 |               <div className="mb-2 text-center">
-  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
-         |                                                                  ^^^^^^^^^^
-    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
-    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
-    1041 |               </div>
-
-ERROR in src/App.tsx:1147:5
-TS1128: Declaration or statement expected.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
-         |     ^^
-    1148 |   );
-    1149 | };
-    1150 |
-
-ERROR in src/App.tsx:1147:7
-TS2304: Cannot find name 'div'.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
-         |       ^^^
-    1148 |   );
-    1149 | };
-    1150 |
-
-ERROR in src/App.tsx:1148:3
-TS1109: Expression expected.
-    1146 |       )}
-    1147 |     </div>
-  > 1148 |   );
-         |   ^
-    1149 | };
-    1150 |
-    1151 | export default App;
-
-ERROR in src/App.tsx:1149:1
-TS1128: Declaration or statement expected.
-    1147 |     </div>
-    1148 |   );
-  > 1149 | };
-         | ^
-    1150 |
-    1151 | export default App;
-
-ERROR in src/p2p.ts:333:32
-TS2783: 'type' is specified more than once, so this usage will be overwritten.
-    331 |         userId: data.source,
-    332 |         contactId: this.userId,
-  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
-        |                                ^^^^^^^^^^^^^
-    334 |         timestamp: Date.now(),
-    335 |         isRead: 0,
-    336 |         isP2P: true,
-
 Compiling...
 Failed to compile.
 
 [eslint] 
 src/App.tsx
-Syntax error: ',' expected (914:23)
+Syntax error: ',' expected (1032:23)
 ERROR in ./src/App.tsx
 Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (1032:23)
 
-  912 |                   display: 'flex',
-  913 |                   flexDirection: 'column',
-> 914 |                   align-items: 'center',
-      |                        ^
-  915 |                 }}
-  916 |               >
-  917 |                 <button
+  1030 |                   display: 'flex',
+  1031 |                   flexDirection: 'column',
+> 1032 |                   align-items: 'center',
+       |                        ^
+  1033 |                 }}
+  1034 |               >
+  1035 |                 <button
     at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
     at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
     at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
@@ -1541,214 +1230,264 @@ SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected
 
 ERROR in [eslint] 
 src/App.tsx
-  Line 914:23:  Parsing error: ',' expected
+  Line 1032:23:  Parsing error: ',' expected
 
 webpack compiled with 2 errors
-ERROR in src/App.tsx:444:21
-TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
-  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
-    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
-      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
-          Types of property 'id' are incompatible.
-            Type 'string | undefined' is not assignable to type 'string'.
-              Type 'undefined' is not assignable to type 'string'.
-    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
-    443 |         contact = res.data;
-  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
-        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    445 |       } catch (err) {
-    446 |         alert('Cannot send message: Contact not found');
-    447 |         return;
-
-ERROR in src/App.tsx:903:17
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:1021:17
 TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                 ^^^^^
-    904 |                   position: 'fixed',
-    905 |                   top: 55,
-    906 |                   left: 10,
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                 ^^^^^
+    1022 |                   position: 'fixed',
+    1023 |                   top: '55px',
+    1024 |                   left: '10px',
 
-ERROR in src/App.tsx:903:24
+ERROR in src/App.tsx:1021:24
 TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-    901 |             {isMenuOpen && (
-    902 |               <div
-  > 903 |                 style={{
-        |                        ^
-  > 904 |                   position: 'fixed',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 905 |                   top: 55,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 906 |                   left: 10,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 908 |                   border: '1px solid #ccc',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 909 |                   borderRadius: '4px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 910 |                   zIndex: 1000,
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 911 |                   padding: '5px',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 912 |                   display: 'flex',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 913 |                   flexDirection: 'column',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  > 914 |                   align-items: 'center',
-        | ^^^^^^^^^^^^^^^^^^^^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1019 |             {isMenuOpen && (
+    1020 |               <div
+  > 1021 |                 style={{
+         |                        ^
+  > 1022 |                   position: 'fixed',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1023 |                   top: '55px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1024 |                   left: '10px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1025 |                   background: isDarkTheme ? '#212529' : '#fff',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1026 |                   border: '1px solid #ccc',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1027 |                   borderRadius: '4px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1028 |                   zIndex: 1000,
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1029 |                   padding: '5px',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1030 |                   display: 'flex',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1031 |                   flexDirection: 'column',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 1032 |                   align-items: 'center',
+         | ^^^^^^^^^^^^^^^^^^^^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:19
+ERROR in src/App.tsx:1032:19
 TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                   ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                   ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:24
+ERROR in src/App.tsx:1032:24
 TS1005: ',' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                        ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                        ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:25
+ERROR in src/App.tsx:1032:25
 TS2304: Cannot find name 'items'.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                         ^^^^^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                         ^^^^^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:914:30
+ERROR in src/App.tsx:1032:30
 TS1005: '}' expected.
-    912 |                   display: 'flex',
-    913 |                   flexDirection: 'column',
-  > 914 |                   align-items: 'center',
-        |                              ^
-    915 |                 }}
-    916 |               >
-    917 |                 <button
+    1030 |                   display: 'flex',
+    1031 |                   flexDirection: 'column',
+  > 1032 |                   align-items: 'center',
+         |                              ^
+    1033 |                 }}
+    1034 |               >
+    1035 |                 <button
 
-ERROR in src/App.tsx:915:17
+ERROR in src/App.tsx:1033:17
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                 ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                 ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:915:18
+ERROR in src/App.tsx:1033:18
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    913 |                   flexDirection: 'column',
-    914 |                   align-items: 'center',
-  > 915 |                 }}
-        |                  ^
-    916 |               >
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
+    1031 |                   flexDirection: 'column',
+    1032 |                   align-items: 'center',
+  > 1033 |                 }}
+         |                  ^
+    1034 |               >
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
 
-ERROR in src/App.tsx:916:15
+ERROR in src/App.tsx:1034:15
 TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
-    914 |                   align-items: 'center',
-    915 |                 }}
-  > 916 |               >
-        |               ^
-    917 |                 <button
-    918 |                   className="btn btn-sm btn-success mb-2"
-    919 |                   onClick={handleUpdate}
+    1032 |                   align-items: 'center',
+    1033 |                 }}
+  > 1034 |               >
+         |               ^
+    1035 |                 <button
+    1036 |                   className="btn btn-sm btn-success mb-2"
+    1037 |                   onClick={handleUpdate}
 
-ERROR in src/App.tsx:932:14
+ERROR in src/App.tsx:1050:14
 TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-    930 |                 </button>
-    931 |               </div>
-  > 932 |             )}
-        |              ^
-    933 |           </div>
-    934 |           <div>
-    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+    1048 |                 </button>
+    1049 |               </div>
+  > 1050 |             )}
+         |              ^
+    1051 |           </div>
+    1052 |           <div>
+    1053 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
 
-ERROR in src/App.tsx:975:7
+ERROR in src/App.tsx:1111:7
 TS1005: ')' expected.
-    973 |       </div>
-    974 |
-  > 975 |       {isSearchOpen && (
-        |       ^
-    976 |         <div
-    977 |           style={{
-    978 |             position: 'fixed',
+    1109 |       </div>
+    1110 |
+  > 1111 |       {isSearchOpen && (
+         |       ^
+    1112 |         <div
+    1113 |           style={{
+    1114 |             position: 'fixed',
 
-ERROR in src/App.tsx:1038:66
+ERROR in src/App.tsx:1179:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1177 |                 <video
+    1178 |                   className="video-remote"
+  > 1179 |                   ref={(video) => video && (video.srcObject = callState.remoteStream)}
+         |                   ^^^
+    1180 |                   autoPlay
+    1181 |                   playsInline
+    1182 |                 />
+
+ERROR in src/App.tsx:1187:19
+TS2322: Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type 'Ref<HTMLVideoElement> | undefined'.
+  Type '(video: HTMLVideoElement | null) => MediaStream | null' is not assignable to type '(instance: HTMLVideoElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'MediaStream | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+    1185 |                 <video
+    1186 |                   className="video-local"
+  > 1187 |                   ref={(video) => video && (video.srcObject = callState.localStream)}
+         |                   ^^^
+    1188 |                   autoPlay
+    1189 |                   playsInline
+    1190 |                   muted
+
+ERROR in src/App.tsx:1227:68
 TS2531: Object is possibly 'null'.
-    1036 |             {p2pRequest && (
-    1037 |               <div className="mb-2 text-center">
-  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
-         |                                                                  ^^^^^^^^^^
-    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
-    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
-    1041 |               </div>
+    1225 |             {p2pRequest && (
+    1226 |               <div className="mb-2 text-center">
+  > 1227 |                 <p>P2P request from {contacts.find((c) => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                    ^^^^^^^^^^
+    1228 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1229 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1230 |               </div>
 
-ERROR in src/App.tsx:1147:5
+ERROR in src/App.tsx:1336:5
 TS1128: Declaration or statement expected.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |     ^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1147:7
+ERROR in src/App.tsx:1336:7
 TS2304: Cannot find name 'div'.
-    1145 |         </div>
-    1146 |       )}
-  > 1147 |     </div>
+    1334 |         </div>
+    1335 |       )}
+  > 1336 |     </div>
          |       ^^^
-    1148 |   );
-    1149 | };
-    1150 |
+    1337 |   );
+    1338 | };
+    1339 |
 
-ERROR in src/App.tsx:1148:3
+ERROR in src/App.tsx:1337:3
 TS1109: Expression expected.
-    1146 |       )}
-    1147 |     </div>
-  > 1148 |   );
+    1335 |       )}
+    1336 |     </div>
+  > 1337 |   );
          |   ^
-    1149 | };
-    1150 |
-    1151 | export default App;
+    1338 | };
+    1339 |
+    1340 | export default App;
 
-ERROR in src/App.tsx:1149:1
+ERROR in src/App.tsx:1338:1
 TS1128: Declaration or statement expected.
-    1147 |     </div>
-    1148 |   );
-  > 1149 | };
+    1336 |     </div>
+    1337 |   );
+  > 1338 | };
          | ^
-    1150 |
-    1151 | export default App;
+    1339 |
+    1340 | export default App;
 
-ERROR in src/p2p.ts:333:32
-TS2783: 'type' is specified more than once, so this usage will be overwritten.
-    331 |         userId: data.source,
-    332 |         contactId: this.userId,
-  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
-        |                                ^^^^^^^^^^^^^
-    334 |         timestamp: Date.now(),
-    335 |         isRead: 0,
-    336 |         isP2P: true,
+ERROR in src/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/p2p.ts:1:43
+TS2307: Cannot find module './types' or its corresponding type declarations.
+  > 1 | import { Message, TweetNaClKeyPair } from './types';
+      |                                           ^^^^^^^^^
+    2 | import { Socket } from 'socket.io-client';
+    3 |
+    4 | export class P2PService {
+
+ERROR in src/services/p2p.ts:314:7
+TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
+  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
+    312 |       bundlePolicy: 'max-bundle',
+    313 |       rtcpMuxPolicy: 'require',
+  > 314 |       sdpSemantics: 'unified-plan'
+        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    315 |     });
+    316 |
+    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
+
+ERROR in src/services/VideoCallService.tsx:38:23
+TS2532: Object is possibly 'undefined'.
+    36 |       remoteStream: this.remoteStream,
+    37 |       isCalling: !!this.peerConnection,
+  > 38 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    39 |     });
+    40 |   }
+    41 |
+
+ERROR in src/services/VideoCallService.tsx:176:23
+TS2532: Object is possibly 'undefined'.
+    174 |       remoteStream: this.remoteStream,
+    175 |       isCalling: !!this.peerConnection,
+  > 176 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+        |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    177 |     };
+    178 |   }
+    179 | }
 

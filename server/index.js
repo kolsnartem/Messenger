@@ -1,3 +1,4 @@
+// index.js
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -158,6 +159,35 @@ io.on('connection', (socket) => {
     const targetSocketId = users.get(data.target);
     if (targetSocketId) {
       io.to(targetSocketId).emit('p2p-reject', { source: data.source });
+    }
+  });
+
+  // Відеодзвінки
+  socket.on('call-offer', (data) => {
+    const targetSocketId = users.get(data.target);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('call-offer', { offer: data.offer, source: data.source });
+    }
+  });
+
+  socket.on('call-answer', (data) => {
+    const targetSocketId = users.get(data.target);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('call-answer', { answer: data.answer });
+    }
+  });
+
+  socket.on('ice-candidate', (data) => {
+    const targetSocketId = users.get(data.target);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('ice-candidate', { candidate: data.candidate });
+    }
+  });
+
+  socket.on('call-ended', (data) => {
+    const targetSocketId = users.get(data.target);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('call-ended');
     }
   });
 
