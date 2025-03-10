@@ -4,7 +4,7 @@ class SocketService {
   private socket: Socket | null = null;
 
   connect(userId: string): Socket {
-    this.socket = io('http://100.64.221.88:4000', { query: { userId } });
+    this.socket = io('https://100.64.221.88:4000', { query: { userId } });
     this.socket.on('connect', () => console.log(`Socket.IO connected for user: ${userId}`));
     return this.socket;
   }

@@ -3,9 +3,15 @@ const http = require('http');
 const socketIo = require('socket.io');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const fs = require('fs');
+const https = require('https');
 
 const app = express();
-const server = http.createServer(app);
+const options = {
+  key: fs.readFileSync('./certs/key.pem'),
+  cert: fs.readFileSync('./certs/cert.pem')
+};
+const server = https.createServer(options, app);
 const io = socketIo(server, {
   cors: {
     origin: '*',
@@ -344,5 +350,5 @@ process.on('SIGINT', () => {
 
 const PORT = 4000;
 server.listen(PORT, '100.64.221.88', () => {
-  console.log(`Server running on http://100.64.221.88:${PORT}`);
+  console.log(`Server running on https://100.64.221.88:${PORT}`);
 });

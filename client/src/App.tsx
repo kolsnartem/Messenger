@@ -158,7 +158,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!userId) return;
-    socketRef.current = io('http://100.64.221.88:4000', { query: { userId } });
+    socketRef.current = io('https://100.64.221.88:4000', { query: { userId } });
     socketRef.current.on('connect', () => console.log('Socket.IO connected'));
 
     return () => {
@@ -203,7 +203,7 @@ const App: React.FC = () => {
     if (!senderPublicKey) {
       logEncryptionEvent(`No public key found locally for sender ${senderId}, fetching from server`);
       try {
-        const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${senderId}`);
+        const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${senderId}`);
         const key = cleanBase64(res.data.publicKey || '');
         if (key && key.length === 44) {
           senderPublicKey = key;
@@ -454,7 +454,7 @@ const App: React.FC = () => {
     let contact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId);
     if (!contact) {
       try {
-        const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
+        const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`);
         contact = res.data;
         setContacts(prev => [...prev, { ...contact, lastMessage: null } as Contact]);
       } catch (err) {
@@ -649,7 +649,7 @@ const App: React.FC = () => {
 
     const search = async () => {
       try {
-        const res = await axios.get<Contact[]>(`http://100.64.221.88:4000/search?query=${searchQuery}`);
+        const res = await axios.get<Contact[]>(`https://100.64.221.88:4000/search?query=${searchQuery}`);
         setSearchResults(res.data.filter(c => c.id !== userId));
       } catch (err) {
         console.error('Search error:', (err as AxiosError).message);
@@ -681,14 +681,14 @@ const App: React.FC = () => {
     try {
       const endpoint = isLogin ? '/login' : '/register';
       const res = await axios.post<{ id: string; publicKey?: string }>(
-        `http://100.64.221.88:4000${endpoint}`,
+        `https://100.64.221.88:4000${endpoint}`,
         { email, password: hashedPassword }
       );
 
       if (!isLogin) {
         const newKeyPair = nacl.box.keyPair();
         const publicKey = Buffer.from(newKeyPair.publicKey).toString('base64');
-        await axios.put('http://100.64.221.88:4000/update-keys', { userId: res.data.id, publicKey });
+        await axios.put('https://100.64.221.88:4000/update-keys', { userId: res.data.id, publicKey });
         setTweetNaclKeyPair(newKeyPair);
         setIsKeysLoaded(true);
         localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
@@ -1048,7 +1048,7 @@ const App: React.FC = () => {
               onClick={toggleP2PMode}
               disabled={!tweetNaclKeyPair || !selectedChatId}
             >
-              <FaLock /> {isP2PActive ? 'P2P Active' : 'Start P2P'}
+              <FaLock /> {isP2PActive ? 'P2P' : 'P2P'}
             </button>
           </div>
         )}
