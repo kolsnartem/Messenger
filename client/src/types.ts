@@ -13,12 +13,24 @@ export interface Message {
   userId: string;
   contactId: string;
   text: string;
-  encryptedText?: string;
   timestamp: number;
-  isRead?: number;
+  isRead: number;
   isMine?: boolean;
-  type?: string;
-  isP2P?: boolean; // Додано для позначення P2P-повідомлень
+  isP2P?: boolean;
+  encryptedText?: string;
+  lastMessage?: Message | null; // Додано для узгодження з Contact
+}
+
+export interface Contact {
+  id: string;
+  email: string;
+  publicKey: string;
+  lastMessage: Message | null;
+}
+
+export interface TweetNaClKeyPair {
+  publicKey: Uint8Array;
+  secretKey: Uint8Array;
 }
 
 export interface Contact {

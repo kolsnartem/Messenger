@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Contact, Message, TweetNaClKeyPair } from './types';
 import ChatList from './components/ChatList';
 import { fetchChats, fetchMessages, markAsRead } from './services/api';
-import webSocketService from './services/websocket';
 import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock } from 'react-icons/fa';
 import P2PService from './p2p';
+import io, { Socket } from 'socket.io-client';
 
 interface ApiErrorResponse {
   error?: string;
@@ -154,14 +154,30 @@ const App: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
   const p2pServiceRef = useRef<P2PService | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (userId && !p2pServiceRef.current) {
+    if (!userId) return;
+    socketRef.current = io('http://100.64.221.88:4000', { query: { userId } });
+    socketRef.current.on('connect', () => console.log('Socket.IO connected'));
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId && !p2pServiceRef.current && socketRef.current) {
       p2pServiceRef.current = new P2PService(
         userId,
+        socketRef.current,
         handleP2PMessage,
-        (active) => setIsP2PActive(active)
+        (active) => {
+          console.log('P2P status changed:', active);
+          setIsP2PActive(active);
+        }
       );
+      console.log('P2PService initialized');
     }
   }, [userId]);
 
@@ -169,6 +185,7 @@ const App: React.FC = () => {
     if (p2pServiceRef.current && tweetNaclKeyPair) {
       p2pServiceRef.current.setTweetNaclKeyPair(tweetNaclKeyPair);
       p2pServiceRef.current.setEncryptionFunctions(encryptMessage, decryptMessage);
+      console.log('Encryption functions set in P2PService');
     }
   }, [tweetNaclKeyPair]);
 
@@ -186,7 +203,7 @@ const App: React.FC = () => {
     if (!senderPublicKey) {
       logEncryptionEvent(`No public key found locally for sender ${senderId}, fetching from server`);
       try {
-        const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${senderId}`);
+        const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${senderId}`);
         const key = cleanBase64(res.data.publicKey || '');
         if (key && key.length === 44) {
           senderPublicKey = key;
@@ -200,11 +217,11 @@ const App: React.FC = () => {
                 email: res.data.email || '',
                 publicKey: key,
                 lastMessage: null
-              }];
+              } as Contact];
             }
-            return prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c);
+            return prev.map(c => c.id === senderId ? { ...c, publicKey: key } as Contact : c);
           });
-          setSearchResults(prev => prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c));
+          setSearchResults(prev => prev.map(c => c.id === senderId ? { ...c, publicKey: key } as Contact : c));
           logEncryptionEvent(`Fetched and updated public key for ${senderId}`, { key });
         } else {
           throw new Error('Invalid public key format from server');
@@ -310,21 +327,27 @@ const App: React.FC = () => {
 
   const updateContactsWithLastMessage = useCallback(async (newMessage: Message) => {
     try {
-      let messageToUpdate = { ...newMessage };
-      messageToUpdate.text = await decryptMessageText(newMessage);
+      const decryptedText = await decryptMessageText(newMessage);
+      const updatedMessage: Message = {
+        ...newMessage,
+        text: decryptedText,
+        isMine: newMessage.userId === userId,
+        lastMessage: newMessage
+      };
 
       setContacts(prev => {
-        const contactId = messageToUpdate.userId === userId ? messageToUpdate.contactId : messageToUpdate.userId;
+        const contactId = updatedMessage.userId === userId ? updatedMessage.contactId : updatedMessage.userId;
         const existingContact = prev.find(c => c.id === contactId);
 
         if (existingContact) {
-          return prev
-            .map(c =>
-              c.id === contactId
-                ? { ...c, lastMessage: { ...messageToUpdate, isMine: messageToUpdate.userId === userId } }
-                : c
-            )
-            .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+          return prev.map(c =>
+            c.id === contactId
+              ? {
+                  ...c,
+                  lastMessage: updatedMessage
+                } as Contact
+              : c
+          ).sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
         }
 
         const newContact = searchResults.find(c => c.id === contactId) || {
@@ -334,8 +357,13 @@ const App: React.FC = () => {
           lastMessage: null
         };
 
-        return [...prev, { ...newContact, lastMessage: { ...messageToUpdate, isMine: messageToUpdate.userId === userId } }]
-          .sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+        return [
+          ...prev,
+          {
+            ...newContact,
+            lastMessage: updatedMessage
+          } as Contact
+        ].sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
       });
     } catch (error) {
       logEncryptionEvent('Failed to update contacts with last message', {
@@ -346,7 +374,7 @@ const App: React.FC = () => {
   }, [userId, searchResults, selectedChatId]);
 
   const handleIncomingMessage = async (message: Message) => {
-    console.log('Received WebSocket message:', message);
+    console.log('Received Socket.IO message:', message);
 
     try {
       if (message.isP2P) {
@@ -359,11 +387,9 @@ const App: React.FC = () => {
           return;
         }
 
-        if (signalData.type === 'offer') {
-          if (message.contactId === userId && message.userId === selectedChatId) {
-            console.log('P2P offer received for current chat');
-            setP2PRequest(message);
-          }
+        if (signalData.type === 'offer' && message.contactId === userId) {
+          console.log('P2P offer received');
+          setP2PRequest(message);
         } else if (signalData.type === 'answer') {
           await p2pServiceRef.current?.handleP2PAnswer(message);
         } else if (signalData.candidate) {
@@ -428,9 +454,9 @@ const App: React.FC = () => {
     let contact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId);
     if (!contact) {
       try {
-        const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${selectedChatId}`);
+        const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
         contact = res.data;
-        setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        setContacts(prev => [...prev, { ...contact, lastMessage: null } as Contact]);
       } catch (err) {
         alert('Cannot send message: Contact not found');
         return;
@@ -441,7 +467,7 @@ const App: React.FC = () => {
       const messageText = input.trim();
       const newMessage: Message = {
         id: Date.now().toString(),
-        userId,
+        userId: userId!,
         contactId: selectedChatId,
         text: messageText,
         timestamp: Date.now(),
@@ -452,7 +478,7 @@ const App: React.FC = () => {
 
       const localMessage = { ...newMessage, text: messageText };
 
-      if (isP2PActive && p2pServiceRef.current) {
+      if (isP2PActive && p2pServiceRef.current && p2pServiceRef.current.isP2PActive()) {
         console.log("Sending message via P2P:", newMessage);
         storeSentMessage(newMessage.id, messageText, selectedChatId);
         await p2pServiceRef.current.sendP2PMessage(newMessage);
@@ -468,7 +494,7 @@ const App: React.FC = () => {
         newMessage.text = encryptedText;
         storeSentMessage(newMessage.id, messageText, selectedChatId);
 
-        await webSocketService.send(newMessage);
+        socketRef.current?.emit('message', newMessage);
         setMessages(prev => {
           if (prev.some(m => m.id === newMessage.id)) return prev;
           return [...prev, localMessage].sort((a, b) => a.timestamp - b.timestamp);
@@ -523,7 +549,7 @@ const App: React.FC = () => {
               chat.lastMessage.text = 'Encrypted message';
             }
           }
-          return chat;
+          return chat as Contact;
         })
       );
       setContacts(chatsWithDecryptedLastMessages);
@@ -541,10 +567,9 @@ const App: React.FC = () => {
           })
         );
 
-        // Об'єднуємо серверні повідомлення з локальними P2P-повідомленнями
         setMessages(prev => {
-          const p2pMessages = prev.filter(msg => msg.isP2P); // Зберігаємо тільки P2P-повідомлення
-          const serverMessages = decryptedMessages.filter(msg => !p2pMessages.some(p => p.id === msg.id)); // Уникаємо дублювання
+          const p2pMessages = prev.filter(msg => msg.isP2P);
+          const serverMessages = decryptedMessages.filter(msg => !p2pMessages.some(p => p.id === msg.id));
           return [...p2pMessages, ...serverMessages].sort((a, b) => a.timestamp - b.timestamp);
         });
 
@@ -573,39 +598,47 @@ const App: React.FC = () => {
   }, [userId, selectedChatId, tweetNaclKeyPair, isKeysLoaded]);
 
   useEffect(() => {
-    if (!userId || !tweetNaclKeyPair || !isKeysLoaded) return;
+    if (!userId || !tweetNaclKeyPair || !isKeysLoaded || !socketRef.current) return;
 
-    webSocketService.connect(userId, async (msg: Message | { type: string; userId: string; contactId: string }) => {
-      if ('type' in msg && msg.type === 'read') {
-        setMessages(prev =>
-          prev.map(m =>
-            m.contactId === msg.userId && m.userId === msg.contactId && m.isRead === 0
-              ? { ...m, isRead: 1 }
-              : m
-          )
-        );
-        setContacts(prev =>
-          prev.map(c => ({
-            ...c,
-            lastMessage: c.lastMessage && c.lastMessage.contactId === msg.userId && c.lastMessage.isRead === 0
-              ? { ...c.lastMessage, isRead: 1 }
-              : c.lastMessage,
-          }))
-        );
-        return;
-      }
-
-      const newMsg = msg as Message;
-      const isMine = newMsg.userId === userId;
-      newMsg.isMine = isMine;
-
+    socketRef.current.on('message', async (msg: Message) => {
+      const newMsg = { ...msg, isMine: msg.userId === userId };
       if ((newMsg.userId === selectedChatId && newMsg.contactId === userId) ||
           (newMsg.contactId === selectedChatId && newMsg.userId === userId)) {
         await handleIncomingMessage(newMsg);
       }
     });
 
-    return () => webSocketService.disconnect();
+    socketRef.current.on('read', (data: { userId: string; contactId: string }) => {
+      setMessages(prev =>
+        prev.map(m =>
+          m.contactId === data.userId && m.userId === data.contactId && m.isRead === 0
+            ? { ...m, isRead: 1 }
+            : m
+        )
+      );
+      setContacts(prev =>
+        prev.map(c => ({
+          ...c,
+          lastMessage: c.lastMessage && c.lastMessage.contactId === data.userId && c.lastMessage.isRead === 0
+            ? { ...c.lastMessage, isRead: 1 }
+            : c.lastMessage,
+        }) as Contact)
+      );
+    });
+
+    socketRef.current.on('p2p-offer-notify', (data: { message: Message }) => {
+      if (data.message.contactId === userId) {
+        console.log('Received P2P request:', data.message);
+        setP2PRequest(data.message);
+        setSelectedChatId(data.message.userId);
+      }
+    });
+
+    return () => {
+      socketRef.current?.off('message');
+      socketRef.current?.off('read');
+      socketRef.current?.off('p2p-offer-notify');
+    };
   }, [userId, selectedChatId, tweetNaclKeyPair, isKeysLoaded]);
 
   useEffect(() => {
@@ -616,7 +649,7 @@ const App: React.FC = () => {
 
     const search = async () => {
       try {
-        const res = await axios.get<Contact[]>(`http://192.168.31.185:4000/search?query=${searchQuery}`);
+        const res = await axios.get<Contact[]>(`http://100.64.221.88:4000/search?query=${searchQuery}`);
         setSearchResults(res.data.filter(c => c.id !== userId));
       } catch (err) {
         console.error('Search error:', (err as AxiosError).message);
@@ -648,14 +681,14 @@ const App: React.FC = () => {
     try {
       const endpoint = isLogin ? '/login' : '/register';
       const res = await axios.post<{ id: string; publicKey?: string }>(
-        `http://192.168.31.185:4000${endpoint}`,
+        `http://100.64.221.88:4000${endpoint}`,
         { email, password: hashedPassword }
       );
 
       if (!isLogin) {
         const newKeyPair = nacl.box.keyPair();
         const publicKey = Buffer.from(newKeyPair.publicKey).toString('base64');
-        await axios.put('http://192.168.31.185:4000/update-keys', { userId: res.data.id, publicKey });
+        await axios.put('http://100.64.221.88:4000/update-keys', { userId: res.data.id, publicKey });
         setTweetNaclKeyPair(newKeyPair);
         setIsKeysLoaded(true);
         localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
@@ -687,7 +720,7 @@ const App: React.FC = () => {
     setContacts(prev => {
       const contactExists = prev.some(c => c.id === contact.id);
       if (!contactExists) {
-        return [...prev, { ...contact, lastMessage: null }].sort(
+        return [...prev, { ...contact, lastMessage: null } as Contact].sort(
           (a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)
         );
       }
@@ -730,7 +763,7 @@ const App: React.FC = () => {
     setTweetNaclKeyPair(null);
     setIsKeysLoaded(false);
     p2pServiceRef.current?.disconnectP2P();
-    webSocketService.disconnect();
+    socketRef.current?.disconnect();
   };
 
   const handleUpdate = () => {
@@ -738,45 +771,104 @@ const App: React.FC = () => {
   };
 
   const initiateP2P = async () => {
-    if (!selectedChatId || !p2pServiceRef.current) return;
+    if (!selectedChatId || !p2pServiceRef.current) {
+      console.error('Cannot initiate P2P: selectedChatId or p2pServiceRef is null');
+      alert('Cannot initiate P2P: Contact or service not ready');
+      return;
+    }
 
     const contact = contacts.find(c => c.id === selectedChatId) || searchResults.find(c => c.id === selectedChatId);
     if (!contact || !contact.publicKey) {
-      console.error('Contact or public key not found');
+      console.error('Contact or public key not found for P2P initiation');
       alert('Cannot initiate P2P: Contact information missing');
       return;
     }
 
     try {
+      console.log('Initiating P2P with contact:', contact.id);
       p2pServiceRef.current.setContactPublicKey(contact.publicKey);
       await p2pServiceRef.current.initiateP2P(selectedChatId);
-      console.log('P2P initiation sent');
+      console.log('P2P initiation completed');
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `p2p-request-${Date.now()}`,
+          userId: userId!,
+          contactId: selectedChatId,
+          text: 'P2P connection requested',
+          timestamp: Date.now(),
+          isRead: 0,
+          isMine: true,
+          isP2P: true,
+        },
+      ]);
     } catch (error) {
       console.error('Failed to initiate P2P:', error);
-      alert('Failed to initiate P2P connection');
+      alert('Failed to initiate P2P connection: ' + (error as Error).message);
     }
   };
 
   const handleP2PResponse = async (accept: boolean) => {
-    if (!p2pRequest || !p2pServiceRef.current) return;
+    if (!p2pRequest || !p2pServiceRef.current) {
+      console.error('Cannot handle P2P response: p2pRequest or p2pServiceRef is null');
+      return;
+    }
 
     const contact = contacts.find(c => c.id === p2pRequest.userId);
     if (!contact || !contact.publicKey) {
       console.error('Contact or public key not found for P2P request');
       alert('Cannot respond to P2P: Contact information missing');
+      setP2PRequest(null);
       return;
     }
 
     try {
       if (accept) {
         p2pServiceRef.current.setContactPublicKey(contact.publicKey);
+        await p2pServiceRef.current.handleP2PRequest(p2pRequest, accept);
+        setMessages(prev => [
+          ...prev,
+          {
+            id: `p2p-accept-${Date.now()}`,
+            userId: userId!,
+            contactId: p2pRequest.userId,
+            text: 'P2P connection accepted',
+            timestamp: Date.now(),
+            isRead: 0,
+            isMine: true,
+            isP2P: true,
+          },
+        ]);
+      } else {
+        socketRef.current?.emit('p2p-reject', { target: p2pRequest.userId, source: userId });
       }
-      await p2pServiceRef.current.handleP2PRequest(p2pRequest, accept);
       setP2PRequest(null);
     } catch (error) {
       console.error('Failed to handle P2P response:', error);
-      alert('Failed to establish P2P connection');
+      alert('Failed to establish P2P connection: ' + (error as Error).message);
       setP2PRequest(null);
+    }
+  };
+
+  const toggleP2PMode = () => {
+    if (isP2PActive) {
+      p2pServiceRef.current?.disconnectP2P();
+      setIsP2PActive(false);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `p2p-disconnect-${Date.now()}`,
+          userId: userId!,
+          contactId: selectedChatId!,
+          text: 'P2P connection disabled',
+          timestamp: Date.now(),
+          isRead: 0,
+          isMine: true,
+          isP2P: false,
+        },
+      ]);
+    } else {
+      initiateP2P();
     }
   };
 
@@ -791,14 +883,14 @@ const App: React.FC = () => {
           type="email"
           className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
         />
         <input
           type="password"
           className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`}
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
         />
         <button className="btn btn-primary w-100 mb-2" onClick={() => handleAuth(true)}>Login</button>
@@ -880,7 +972,7 @@ const App: React.FC = () => {
           right: 0,
           background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)',
           zIndex: 20,
-          height: selectedChatId ? "90px" : "50px",
+          height: selectedChatId ? '90px' : '50px',
         }}
       >
         <div className="d-flex justify-content-between align-items-center">
@@ -892,8 +984,8 @@ const App: React.FC = () => {
               <div
                 style={{
                   position: 'fixed',
-                  top: 55,
-                  left: 10,
+                  top: '55px',
+                  left: '10px',
                   background: isDarkTheme ? '#212529' : '#fff',
                   border: '1px solid #ccc',
                   borderRadius: '4px',
@@ -953,10 +1045,10 @@ const App: React.FC = () => {
             <h6 className="m-0 me-2">{selectedContact?.email || 'Loading...'}</h6>
             <button
               className={`btn btn-sm ${isP2PActive ? 'btn-success' : 'btn-outline-secondary'}`}
-              onClick={initiateP2P}
-              disabled={isP2PActive}
+              onClick={toggleP2PMode}
+              disabled={!tweetNaclKeyPair || !selectedChatId}
             >
-              <FaLock /> P2P
+              <FaLock /> {isP2PActive ? 'P2P Active' : 'Start P2P'}
             </button>
           </div>
         )}
@@ -966,7 +1058,7 @@ const App: React.FC = () => {
         <div
           style={{
             position: 'fixed',
-            top: selectedChatId ? 90 : 50,
+            top: selectedChatId ? '90px' : '50px',
             left: 0,
             right: 0,
             background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)',
@@ -979,12 +1071,12 @@ const App: React.FC = () => {
               type="text"
               className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light search-placeholder-dark' : ''}`}
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search users..."
             />
           </div>
           <div style={{ overflowY: 'auto', maxHeight: selectedChatId ? 'calc(100vh - 150px)' : 'calc(100vh - 90px)' }}>
-            {searchResults.map(result => (
+            {searchResults.map((result) => (
               <div
                 key={result.id}
                 className="p-2 border-bottom container"
@@ -1003,8 +1095,8 @@ const App: React.FC = () => {
         className="flex-grow-1"
         style={{
           position: 'absolute',
-          top: selectedChatId ? 90 : 50,
-          bottom: selectedChatId ? 60 : 0,
+          top: selectedChatId ? '90px' : '50px',
+          bottom: selectedChatId ? '60px' : '0',
           left: 0,
           right: 0,
           overflow: 'hidden',
@@ -1025,7 +1117,7 @@ const App: React.FC = () => {
             <div style={{ flexGrow: 1 }} />
             {p2pRequest && (
               <div className="mb-2 text-center">
-                <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
+                <p>P2P request from {contacts.find((c) => c.id === p2pRequest.userId)?.email || 'User'}</p>
                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
               </div>
@@ -1043,7 +1135,9 @@ const App: React.FC = () => {
                           ? 'bg-primary text-white'
                           : msg.isP2P
                           ? 'p2p-message'
-                          : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'
+                          : isDarkTheme
+                          ? 'bg-secondary text-white'
+                          : 'bg-light border'
                       }`}
                       style={{
                         maxWidth: '75%',
@@ -1071,9 +1165,7 @@ const App: React.FC = () => {
                       <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
                         {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         {msg.isMine && (
-                          <span style={{ marginLeft: '5px' }}>
-                            {msg.isRead === 1 ? '✓✓' : '✓'}
-                          </span>
+                          <span style={{ marginLeft: '5px' }}>{msg.isRead === 1 ? '✓✓' : '✓'}</span>
                         )}
                       </div>
                     </div>
@@ -1118,8 +1210,8 @@ const App: React.FC = () => {
               type="text"
               className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light input-placeholder-dark' : ''}`}
               value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && sendMessage()}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
               placeholder="Message..."
               style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }}
             />

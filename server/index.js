@@ -1,13 +1,17 @@
 const express = require('express');
 const http = require('http');
-const WebSocket = require('ws');
+const socketIo = require('socket.io');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
-const url = require('url');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const io = socketIo(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
 
 app.use(cors());
 app.use(express.json());
@@ -37,69 +41,32 @@ db.serialize(() => {
       contactId TEXT NOT NULL,
       text TEXT NOT NULL,
       timestamp INTEGER NOT NULL,
-      isRead INTEGER DEFAULT 0
+      isRead INTEGER DEFAULT 0,
+      isP2P INTEGER DEFAULT 0
     )
   `);
-
-  // Перевірка і додавання стовпця isP2P
-  db.all("PRAGMA table_info(messages)", (err, rows) => {
-    if (err) {
-      console.error('Error checking table schema:', err);
-      return;
-    }
-    const hasIsP2P = rows.some(row => row.name === 'isP2P');
-    if (!hasIsP2P) {
-      console.log('Adding isP2P column to messages table');
-      db.run(`
-        ALTER TABLE messages
-        ADD COLUMN isP2P INTEGER DEFAULT 0
-      `, (alterErr) => {
-        if (alterErr) {
-          console.error('Failed to add isP2P column:', alterErr);
-        } else {
-          console.log('Successfully added isP2P column');
-        }
-      });
-    } else {
-      console.log('isP2P column already exists');
-    }
-  });
 });
 
-const clients = new Map();
+const users = new Map();
 
-wss.on('connection', (ws, req) => {
-  const params = url.parse(req.url, true).query;
-  const userId = params.userId;
+io.on('connection', (socket) => {
+  const userId = socket.handshake.query.userId;
   if (!userId) {
-    ws.close(4000, 'Missing userId');
+    socket.disconnect();
     return;
   }
 
-  clients.set(userId, ws);
-  console.log(`New WebSocket connection established for user: ${userId}`);
+  users.set(userId, socket.id);
+  console.log(`New Socket.IO connection for user: ${userId}, total users: ${users.size}`);
 
-  ws.on('message', (message) => {
-    let msg;
-    try {
-      msg = JSON.parse(message);
-    } catch (error) {
-      console.error('Failed to parse WebSocket message:', error);
-      return;
-    }
-
+  socket.on('message', (msg) => {
     if (msg.isP2P) {
-      console.log(`Handling P2P message from ${msg.userId} to ${msg.contactId}: ${msg.text}`);
-      sendToParticipants(msg);
+      const targetSocketId = users.get(msg.contactId);
+      if (targetSocketId) {
+        io.to(targetSocketId).emit('message', msg);
+      }
       return;
     }
-
-    if (msg.type === 'read') {
-      sendToParticipants(msg);
-      return;
-    }
-
-    console.log(`Received WebSocket message: From ${msg.userId} to ${msg.contactId} (ID: ${msg.id}, Text: ${msg.text})`);
 
     db.get('SELECT id FROM messages WHERE id = ?', [msg.id], (err, row) => {
       if (err) {
@@ -116,38 +83,85 @@ wss.on('connection', (ws, req) => {
         [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0, msg.isP2P || 0],
         (err) => {
           if (err) {
-            console.error('Failed to save WebSocket message to DB:', err);
+            console.error('Failed to save message to DB:', err);
           } else {
-            console.log(`WebSocket message saved to DB: ${msg.id}, Text: ${msg.text}`);
-            sendToParticipants(msg);
+            console.log(`Message saved to DB: ${msg.id}`);
+            const participants = [msg.userId, msg.contactId];
+            participants.forEach((id) => {
+              const clientId = users.get(id);
+              if (clientId) {
+                io.to(clientId).emit('message', msg);
+              }
+            });
           }
         }
       );
     });
   });
 
-  ws.on('close', (code, reason) => {
-    console.log(`WebSocket connection closed for user: ${userId} (Code: ${code}, Reason: ${reason || 'unknown'})`);
-    clients.delete(userId);
+  socket.on('p2p-offer', (data) => {
+    const targetSocketId = users.get(data.target);
+    console.log(`P2P offer from ${data.source} to ${data.target}, target online: ${!!targetSocketId}`);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('p2p-offer', { offer: data.offer, source: data.source });
+      io.to(targetSocketId).emit('p2p-offer-notify', {
+        message: {
+          id: `p2p-request-${Date.now()}`,
+          userId: data.source,
+          contactId: data.target,
+          text: JSON.stringify({ type: 'offer', sdp: data.offer.sdp }),
+          timestamp: Date.now(),
+          isRead: 0,
+          isP2P: true,
+        }
+      });
+    } else {
+      console.log(`Target ${data.target} offline, storing P2P offer`);
+      db.run(
+        'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead, isP2P) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [`p2p-offer-${Date.now()}`, data.source, data.target, JSON.stringify({ type: 'offer', sdp: data.offer.sdp }), Date.now(), 0, 1],
+        (err) => {
+          if (err) console.error('Failed to save P2P offer:', err);
+        }
+      );
+    }
   });
 
-  ws.on('error', (err) => {
-    console.error(`WebSocket error for user ${userId}:`, err);
+  socket.on('p2p-answer', (data) => {
+    const targetSocketId = users.get(data.target);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('p2p-answer', { answer: data.answer, source: data.source });
+    }
+  });
+
+  socket.on('p2p-ice-candidate', (data) => {
+    const targetSocketId = users.get(data.target);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('p2p-ice-candidate', { candidate: data.candidate, source: data.source });
+    }
+  });
+
+  socket.on('p2p-offer-notify', (data) => {
+    const targetSocketId = users.get(data.message.contactId);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('p2p-offer-notify', { message: data.message });
+    }
+  });
+
+  socket.on('p2p-reject', (data) => {
+    const targetSocketId = users.get(data.target);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('p2p-reject', { source: data.source });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    users.delete(userId);
+    console.log(`User disconnected: ${userId}, remaining users: ${users.size}`);
   });
 });
 
-const sendToParticipants = (message) => {
-  const participants = message.type === 'read' ? [message.contactId] : [message.userId, message.contactId];
-  participants.forEach((id) => {
-    const client = clients.get(id);
-    if (client && client.readyState === WebSocket.OPEN) {
-      console.log(`Sending message to user ${id}:`, message);
-      client.send(JSON.stringify(message));
-    }
-  });
-};
-
-// Решта ендпоінтів залишилися без змін
+// API endpoints
 app.post('/register', (req, res) => {
   const { email, password } = req.body;
   db.get('SELECT email FROM users WHERE email = ?', [email], (err, row) => {
@@ -182,9 +196,7 @@ app.post('/login', (req, res) => {
 
 app.put('/update-keys', (req, res) => {
   const { userId, publicKey } = req.body;
-  console.log('Received public key (before save):', publicKey, 'Length:', publicKey.length);
   if (!publicKey || publicKey.length !== 44) {
-    console.error('Invalid public key length or empty, expected 44 characters, got:', publicKey?.length || 0);
     return res.status(400).json({ error: 'Invalid public key format' });
   }
   db.run(
@@ -192,7 +204,7 @@ app.put('/update-keys', (req, res) => {
     [publicKey, userId],
     (err) => {
       if (err) return res.status(500).json({ error: 'Update failed' });
-      console.log(`Updated keys for user ID: ${userId}, PublicKey: ${publicKey}`);
+      console.log(`Updated keys for user ID: ${userId}`);
       res.json({ success: true });
     }
   );
@@ -205,7 +217,6 @@ app.get('/users', (req, res) => {
   db.get('SELECT id, email, publicKey FROM users WHERE id = ?', [id], (err, row) => {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (!row) return res.status(404).json({ error: 'User not found' });
-    console.log(`Fetched user ${id} publicKey:`, row.publicKey, 'Length:', row.publicKey?.length || 0);
     res.json({
       id: row.id.toString(),
       email: row.email,
@@ -221,7 +232,6 @@ app.get('/search', (req, res) => {
     [`%${query}%`],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Search failed' });
-      rows.forEach(row => console.log(`Search result for ${row.email}, publicKey:`, row.publicKey, 'Length:', row.publicKey?.length || 0));
       res.json(rows.map(row => ({
         id: row.id.toString(),
         email: row.email,
@@ -299,7 +309,6 @@ app.get('/messages', (req, res) => {
         console.error('Error fetching messages:', err);
         return res.status(500).json({ error: 'Database error' });
       }
-      console.log(`Fetched messages for user ${userId} and contact ${contactId}:`, rows);
       res.json(rows);
     }
   );
@@ -315,8 +324,11 @@ app.post('/mark-as-read', (req, res) => {
         console.error('Error marking messages as read:', err);
         return res.status(500).json({ error: 'Database error' });
       }
-      const readUpdate = { type: 'read', userId, contactId };
-      sendToParticipants(readUpdate);
+      const readUpdate = { userId, contactId };
+      const senderSocketId = users.get(contactId);
+      if (senderSocketId) {
+        io.to(senderSocketId).emit('read', readUpdate);
+      }
       res.json({ success: true });
     }
   );
@@ -331,6 +343,6 @@ process.on('SIGINT', () => {
 });
 
 const PORT = 4000;
-server.listen(PORT, '192.168.31.185', () => {
-  console.log(`Server running on http://192.168.31.185:${PORT}`);
+server.listen(PORT, '100.64.221.88', () => {
+  console.log(`Server running on http://100.64.221.88:${PORT}`);
 });

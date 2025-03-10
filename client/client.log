@@ -6,9 +6,9 @@ Applying Webpack configuration...
 Updated source-map-loader rule with exclude: [ /node_modules\/@signalapp\/libsignal-client/ ]
 Webpack configuration applied successfully.
 Dev server middlewares set up.
-(node:147882) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:6041) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:147882) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:6041) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -24,35 +24,1731 @@ To create a production build, use npm run build.
 webpack compiled successfully
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
-ERROR in src/App.tsx:378:59
-TS2339: Property 'error' does not exist on type '{}'.
-    376 |     } catch (err) {
-    377 |       console.error('Auth error:', err);
-  > 378 |       alert(`Error: ${(err as AxiosError).response?.data?.error || (err as AxiosError).message || 'Unknown error'}`);
-        |                                                           ^^^^^
-    379 |     }
-    380 |   };
-    381 |
+ERROR in src/App.tsx:433:21
+TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
+  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
+    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
+      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+          Types of property 'id' are incompatible.
+            Type 'string | undefined' is not assignable to type 'string'.
+              Type 'undefined' is not assignable to type 'string'.
+    431 |         const res = await axios.get<Contact>(`http://192.168.31.185:4000/users?id=${selectedChatId}`);
+    432 |         contact = res.data;
+  > 433 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    434 |       } catch (err) {
+    435 |         alert('Cannot send message: Contact not found');
+    436 |         return;
 
-ERROR in src/App.tsx:450:9
-TS2322: Type 'string | null' is not assignable to type 'string'.
-  Type 'null' is not assignable to type 'string'.
-    448 |       const newMessage: Message = {
-    449 |         id: Date.now().toString(),
-  > 450 |         userId,
-        |         ^^^^^^
-    451 |         contactId: contact.id,
-    452 |         text: encryptedText,
-    453 |         timestamp: Date.now(),
+Compiling...
+Failed to compile.
 
-ERROR in src/App.tsx:459:67
-TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
-  Type 'null' is not assignable to type 'string'.
-    457 |
-    458 |       await webSocketService.send(newMessage);
-  > 459 |       const decryptedText = await decryptMessage(newMessage.text, userId);
-        |                                                                   ^^^^^^
-    460 |       setMessages(prev => {
-    461 |         if (prev.some(m => m.id === newMessage.id)) return prev;
-    462 |         return [...prev, { ...newMessage, text: decryptedText }].sort((a, b) => a.timestamp - b.timestamp);
+[eslint] 
+src/App.tsx
+Syntax error: ',' expected (914:23)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+
+  912 |                   display: 'flex',
+  913 |                   flexDirection: 'column',
+> 914 |                   align-items: 'center',
+      |                        ^
+  915 |                 }}
+  916 |               >
+  917 |                 <button
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.expect (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3657:12)
+    at TypeScriptParserMixin.parseObjectLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11506:14)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11024:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.jsxParseExpressionContainer (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6805:31)
+    at TypeScriptParserMixin.jsxParseAttributeValue (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6777:21)
+    at TypeScriptParserMixin.jsxParseAttribute (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6826:38)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6840:28)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9885:18)
+    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6835:17)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6859:33)
+    at TypeScriptParserMixin.jsxParseElement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6922:17)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6932:19)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:39
+    at TypeScriptParserMixin.tryParse (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3665:20)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:18)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11359:28)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 914:23:  Parsing error: ',' expected
+
+webpack compiled with 2 errors
+Compiling...
+ERROR in src/App.tsx:174:9
+TS2554: Expected 3 arguments, but got 4.
+    172 |         socketRef.current!,
+    173 |         handleP2PMessage,
+  > 174 |         (active) => setIsP2PActive(active)
+        |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    175 |       );
+    176 |     }
+    177 |   }, [userId]);
+
+ERROR in src/App.tsx:174:10
+TS7006: Parameter 'active' implicitly has an 'any' type.
+    172 |         socketRef.current!,
+    173 |         handleP2PMessage,
+  > 174 |         (active) => setIsP2PActive(active)
+        |          ^^^^^^
+    175 |       );
+    176 |     }
+    177 |   }, [userId]);
+
+ERROR in src/App.tsx:444:21
+TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
+  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
+    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
+      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+          Types of property 'id' are incompatible.
+            Type 'string | undefined' is not assignable to type 'string'.
+              Type 'undefined' is not assignable to type 'string'.
+    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
+    443 |         contact = res.data;
+  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    445 |       } catch (err) {
+    446 |         alert('Cannot send message: Contact not found');
+    447 |         return;
+
+ERROR in src/App.tsx:903:17
+TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                 ^^^^^
+    904 |                   position: 'fixed',
+    905 |                   top: 55,
+    906 |                   left: 10,
+
+ERROR in src/App.tsx:903:24
+TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                        ^
+  > 904 |                   position: 'fixed',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 905 |                   top: 55,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 906 |                   left: 10,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 908 |                   border: '1px solid #ccc',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 909 |                   borderRadius: '4px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 910 |                   zIndex: 1000,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 911 |                   padding: '5px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 912 |                   display: 'flex',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 913 |                   flexDirection: 'column',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 914 |                   align-items: 'center',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:19
+TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                   ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:24
+TS1005: ',' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                        ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:25
+TS2304: Cannot find name 'items'.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                         ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:30
+TS1005: '}' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                              ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:915:17
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                 ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:915:18
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                  ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:916:15
+TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+    914 |                   align-items: 'center',
+    915 |                 }}
+  > 916 |               >
+        |               ^
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+    919 |                   onClick={handleUpdate}
+
+ERROR in src/App.tsx:932:14
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    930 |                 </button>
+    931 |               </div>
+  > 932 |             )}
+        |              ^
+    933 |           </div>
+    934 |           <div>
+    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+
+ERROR in src/App.tsx:975:7
+TS1005: ')' expected.
+    973 |       </div>
+    974 |
+  > 975 |       {isSearchOpen && (
+        |       ^
+    976 |         <div
+    977 |           style={{
+    978 |             position: 'fixed',
+
+ERROR in src/App.tsx:1038:66
+TS2531: Object is possibly 'null'.
+    1036 |             {p2pRequest && (
+    1037 |               <div className="mb-2 text-center">
+  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                  ^^^^^^^^^^
+    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1041 |               </div>
+
+ERROR in src/App.tsx:1147:5
+TS1128: Declaration or statement expected.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |     ^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1147:7
+TS2304: Cannot find name 'div'.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |       ^^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1148:3
+TS1109: Expression expected.
+    1146 |       )}
+    1147 |     </div>
+  > 1148 |   );
+         |   ^
+    1149 | };
+    1150 |
+    1151 | export default App;
+
+ERROR in src/App.tsx:1149:1
+TS1128: Declaration or statement expected.
+    1147 |     </div>
+    1148 |   );
+  > 1149 | };
+         | ^
+    1150 |
+    1151 | export default App;
+
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: ',' expected (914:23)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+
+  912 |                   display: 'flex',
+  913 |                   flexDirection: 'column',
+> 914 |                   align-items: 'center',
+      |                        ^
+  915 |                 }}
+  916 |               >
+  917 |                 <button
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.expect (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3657:12)
+    at TypeScriptParserMixin.parseObjectLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11506:14)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11024:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.jsxParseExpressionContainer (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6805:31)
+    at TypeScriptParserMixin.jsxParseAttributeValue (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6777:21)
+    at TypeScriptParserMixin.jsxParseAttribute (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6826:38)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6840:28)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9885:18)
+    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6835:17)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6859:33)
+    at TypeScriptParserMixin.jsxParseElement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6922:17)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6932:19)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:39
+    at TypeScriptParserMixin.tryParse (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3665:20)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:18)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11359:28)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 914:23:  Parsing error: ',' expected
+
+webpack compiled with 2 errors
+ERROR in src/App.tsx:174:9
+TS2554: Expected 3 arguments, but got 4.
+    172 |         socketRef.current!,
+    173 |         handleP2PMessage,
+  > 174 |         (active) => setIsP2PActive(active)
+        |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    175 |       );
+    176 |     }
+    177 |   }, [userId]);
+
+ERROR in src/App.tsx:174:10
+TS7006: Parameter 'active' implicitly has an 'any' type.
+    172 |         socketRef.current!,
+    173 |         handleP2PMessage,
+  > 174 |         (active) => setIsP2PActive(active)
+        |          ^^^^^^
+    175 |       );
+    176 |     }
+    177 |   }, [userId]);
+
+ERROR in src/App.tsx:444:21
+TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
+  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
+    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
+      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+          Types of property 'id' are incompatible.
+            Type 'string | undefined' is not assignable to type 'string'.
+              Type 'undefined' is not assignable to type 'string'.
+    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
+    443 |         contact = res.data;
+  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    445 |       } catch (err) {
+    446 |         alert('Cannot send message: Contact not found');
+    447 |         return;
+
+ERROR in src/App.tsx:903:17
+TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                 ^^^^^
+    904 |                   position: 'fixed',
+    905 |                   top: 55,
+    906 |                   left: 10,
+
+ERROR in src/App.tsx:903:24
+TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                        ^
+  > 904 |                   position: 'fixed',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 905 |                   top: 55,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 906 |                   left: 10,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 908 |                   border: '1px solid #ccc',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 909 |                   borderRadius: '4px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 910 |                   zIndex: 1000,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 911 |                   padding: '5px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 912 |                   display: 'flex',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 913 |                   flexDirection: 'column',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 914 |                   align-items: 'center',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:19
+TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                   ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:24
+TS1005: ',' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                        ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:25
+TS2304: Cannot find name 'items'.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                         ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:30
+TS1005: '}' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                              ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:915:17
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                 ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:915:18
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                  ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:916:15
+TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+    914 |                   align-items: 'center',
+    915 |                 }}
+  > 916 |               >
+        |               ^
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+    919 |                   onClick={handleUpdate}
+
+ERROR in src/App.tsx:932:14
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    930 |                 </button>
+    931 |               </div>
+  > 932 |             )}
+        |              ^
+    933 |           </div>
+    934 |           <div>
+    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+
+ERROR in src/App.tsx:975:7
+TS1005: ')' expected.
+    973 |       </div>
+    974 |
+  > 975 |       {isSearchOpen && (
+        |       ^
+    976 |         <div
+    977 |           style={{
+    978 |             position: 'fixed',
+
+ERROR in src/App.tsx:1038:66
+TS2531: Object is possibly 'null'.
+    1036 |             {p2pRequest && (
+    1037 |               <div className="mb-2 text-center">
+  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                  ^^^^^^^^^^
+    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1041 |               </div>
+
+ERROR in src/App.tsx:1147:5
+TS1128: Declaration or statement expected.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |     ^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1147:7
+TS2304: Cannot find name 'div'.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |       ^^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1148:3
+TS1109: Expression expected.
+    1146 |       )}
+    1147 |     </div>
+  > 1148 |   );
+         |   ^
+    1149 | };
+    1150 |
+    1151 | export default App;
+
+ERROR in src/App.tsx:1149:1
+TS1128: Declaration or statement expected.
+    1147 |     </div>
+    1148 |   );
+  > 1149 | };
+         | ^
+    1150 |
+    1151 | export default App;
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: ',' expected (914:23)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+
+  912 |                   display: 'flex',
+  913 |                   flexDirection: 'column',
+> 914 |                   align-items: 'center',
+      |                        ^
+  915 |                 }}
+  916 |               >
+  917 |                 <button
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.expect (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3657:12)
+    at TypeScriptParserMixin.parseObjectLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11506:14)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11024:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.jsxParseExpressionContainer (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6805:31)
+    at TypeScriptParserMixin.jsxParseAttributeValue (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6777:21)
+    at TypeScriptParserMixin.jsxParseAttribute (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6826:38)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6840:28)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9885:18)
+    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6835:17)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6859:33)
+    at TypeScriptParserMixin.jsxParseElement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6922:17)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6932:19)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:39
+    at TypeScriptParserMixin.tryParse (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3665:20)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:18)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11359:28)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 914:23:  Parsing error: ',' expected
+
+webpack compiled with 2 errors
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:444:21
+TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
+  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
+    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
+      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+          Types of property 'id' are incompatible.
+            Type 'string | undefined' is not assignable to type 'string'.
+              Type 'undefined' is not assignable to type 'string'.
+    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
+    443 |         contact = res.data;
+  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    445 |       } catch (err) {
+    446 |         alert('Cannot send message: Contact not found');
+    447 |         return;
+
+ERROR in src/App.tsx:903:17
+TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                 ^^^^^
+    904 |                   position: 'fixed',
+    905 |                   top: 55,
+    906 |                   left: 10,
+
+ERROR in src/App.tsx:903:24
+TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                        ^
+  > 904 |                   position: 'fixed',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 905 |                   top: 55,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 906 |                   left: 10,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 908 |                   border: '1px solid #ccc',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 909 |                   borderRadius: '4px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 910 |                   zIndex: 1000,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 911 |                   padding: '5px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 912 |                   display: 'flex',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 913 |                   flexDirection: 'column',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 914 |                   align-items: 'center',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:19
+TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                   ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:24
+TS1005: ',' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                        ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:25
+TS2304: Cannot find name 'items'.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                         ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:30
+TS1005: '}' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                              ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:915:17
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                 ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:915:18
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                  ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:916:15
+TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+    914 |                   align-items: 'center',
+    915 |                 }}
+  > 916 |               >
+        |               ^
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+    919 |                   onClick={handleUpdate}
+
+ERROR in src/App.tsx:932:14
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    930 |                 </button>
+    931 |               </div>
+  > 932 |             )}
+        |              ^
+    933 |           </div>
+    934 |           <div>
+    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+
+ERROR in src/App.tsx:975:7
+TS1005: ')' expected.
+    973 |       </div>
+    974 |
+  > 975 |       {isSearchOpen && (
+        |       ^
+    976 |         <div
+    977 |           style={{
+    978 |             position: 'fixed',
+
+ERROR in src/App.tsx:1038:66
+TS2531: Object is possibly 'null'.
+    1036 |             {p2pRequest && (
+    1037 |               <div className="mb-2 text-center">
+  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                  ^^^^^^^^^^
+    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1041 |               </div>
+
+ERROR in src/App.tsx:1147:5
+TS1128: Declaration or statement expected.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |     ^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1147:7
+TS2304: Cannot find name 'div'.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |       ^^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1148:3
+TS1109: Expression expected.
+    1146 |       )}
+    1147 |     </div>
+  > 1148 |   );
+         |   ^
+    1149 | };
+    1150 |
+    1151 | export default App;
+
+ERROR in src/App.tsx:1149:1
+TS1128: Declaration or statement expected.
+    1147 |     </div>
+    1148 |   );
+  > 1149 | };
+         | ^
+    1150 |
+    1151 | export default App;
+
+ERROR in src/p2p.ts:333:32
+TS2783: 'type' is specified more than once, so this usage will be overwritten.
+    331 |         userId: data.source,
+    332 |         contactId: this.userId,
+  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
+        |                                ^^^^^^^^^^^^^
+    334 |         timestamp: Date.now(),
+    335 |         isRead: 0,
+    336 |         isP2P: true,
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: ',' expected (914:23)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+
+  912 |                   display: 'flex',
+  913 |                   flexDirection: 'column',
+> 914 |                   align-items: 'center',
+      |                        ^
+  915 |                 }}
+  916 |               >
+  917 |                 <button
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.expect (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3657:12)
+    at TypeScriptParserMixin.parseObjectLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11506:14)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11024:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.jsxParseExpressionContainer (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6805:31)
+    at TypeScriptParserMixin.jsxParseAttributeValue (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6777:21)
+    at TypeScriptParserMixin.jsxParseAttribute (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6826:38)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6840:28)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9885:18)
+    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6835:17)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6859:33)
+    at TypeScriptParserMixin.jsxParseElement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6922:17)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6932:19)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:39
+    at TypeScriptParserMixin.tryParse (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3665:20)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:18)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11359:28)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 914:23:  Parsing error: ',' expected
+
+webpack compiled with 2 errors
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:444:21
+TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
+  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
+    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
+      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+          Types of property 'id' are incompatible.
+            Type 'string | undefined' is not assignable to type 'string'.
+              Type 'undefined' is not assignable to type 'string'.
+    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
+    443 |         contact = res.data;
+  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    445 |       } catch (err) {
+    446 |         alert('Cannot send message: Contact not found');
+    447 |         return;
+
+ERROR in src/App.tsx:903:17
+TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                 ^^^^^
+    904 |                   position: 'fixed',
+    905 |                   top: 55,
+    906 |                   left: 10,
+
+ERROR in src/App.tsx:903:24
+TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                        ^
+  > 904 |                   position: 'fixed',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 905 |                   top: 55,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 906 |                   left: 10,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 908 |                   border: '1px solid #ccc',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 909 |                   borderRadius: '4px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 910 |                   zIndex: 1000,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 911 |                   padding: '5px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 912 |                   display: 'flex',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 913 |                   flexDirection: 'column',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 914 |                   align-items: 'center',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:19
+TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                   ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:24
+TS1005: ',' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                        ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:25
+TS2304: Cannot find name 'items'.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                         ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:30
+TS1005: '}' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                              ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:915:17
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                 ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:915:18
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                  ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:916:15
+TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+    914 |                   align-items: 'center',
+    915 |                 }}
+  > 916 |               >
+        |               ^
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+    919 |                   onClick={handleUpdate}
+
+ERROR in src/App.tsx:932:14
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    930 |                 </button>
+    931 |               </div>
+  > 932 |             )}
+        |              ^
+    933 |           </div>
+    934 |           <div>
+    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+
+ERROR in src/App.tsx:975:7
+TS1005: ')' expected.
+    973 |       </div>
+    974 |
+  > 975 |       {isSearchOpen && (
+        |       ^
+    976 |         <div
+    977 |           style={{
+    978 |             position: 'fixed',
+
+ERROR in src/App.tsx:1038:66
+TS2531: Object is possibly 'null'.
+    1036 |             {p2pRequest && (
+    1037 |               <div className="mb-2 text-center">
+  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                  ^^^^^^^^^^
+    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1041 |               </div>
+
+ERROR in src/App.tsx:1147:5
+TS1128: Declaration or statement expected.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |     ^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1147:7
+TS2304: Cannot find name 'div'.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |       ^^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1148:3
+TS1109: Expression expected.
+    1146 |       )}
+    1147 |     </div>
+  > 1148 |   );
+         |   ^
+    1149 | };
+    1150 |
+    1151 | export default App;
+
+ERROR in src/App.tsx:1149:1
+TS1128: Declaration or statement expected.
+    1147 |     </div>
+    1148 |   );
+  > 1149 | };
+         | ^
+    1150 |
+    1151 | export default App;
+
+ERROR in src/p2p.ts:333:32
+TS2783: 'type' is specified more than once, so this usage will be overwritten.
+    331 |         userId: data.source,
+    332 |         contactId: this.userId,
+  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
+        |                                ^^^^^^^^^^^^^
+    334 |         timestamp: Date.now(),
+    335 |         isRead: 0,
+    336 |         isP2P: true,
+
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: ',' expected (914:23)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+
+  912 |                   display: 'flex',
+  913 |                   flexDirection: 'column',
+> 914 |                   align-items: 'center',
+      |                        ^
+  915 |                 }}
+  916 |               >
+  917 |                 <button
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.expect (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3657:12)
+    at TypeScriptParserMixin.parseObjectLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11506:14)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11024:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.jsxParseExpressionContainer (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6805:31)
+    at TypeScriptParserMixin.jsxParseAttributeValue (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6777:21)
+    at TypeScriptParserMixin.jsxParseAttribute (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6826:38)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6840:28)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9885:18)
+    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6835:17)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6859:33)
+    at TypeScriptParserMixin.jsxParseElement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6922:17)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6932:19)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:39
+    at TypeScriptParserMixin.tryParse (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3665:20)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:18)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11359:28)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 914:23:  Parsing error: ',' expected
+
+webpack compiled with 2 errors
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/App.tsx:444:21
+TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
+  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
+    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
+      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+          Types of property 'id' are incompatible.
+            Type 'string | undefined' is not assignable to type 'string'.
+              Type 'undefined' is not assignable to type 'string'.
+    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
+    443 |         contact = res.data;
+  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    445 |       } catch (err) {
+    446 |         alert('Cannot send message: Contact not found');
+    447 |         return;
+
+ERROR in src/App.tsx:903:17
+TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                 ^^^^^
+    904 |                   position: 'fixed',
+    905 |                   top: 55,
+    906 |                   left: 10,
+
+ERROR in src/App.tsx:903:24
+TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                        ^
+  > 904 |                   position: 'fixed',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 905 |                   top: 55,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 906 |                   left: 10,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 908 |                   border: '1px solid #ccc',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 909 |                   borderRadius: '4px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 910 |                   zIndex: 1000,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 911 |                   padding: '5px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 912 |                   display: 'flex',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 913 |                   flexDirection: 'column',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 914 |                   align-items: 'center',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:19
+TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                   ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:24
+TS1005: ',' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                        ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:25
+TS2304: Cannot find name 'items'.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                         ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:30
+TS1005: '}' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                              ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:915:17
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                 ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:915:18
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                  ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:916:15
+TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+    914 |                   align-items: 'center',
+    915 |                 }}
+  > 916 |               >
+        |               ^
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+    919 |                   onClick={handleUpdate}
+
+ERROR in src/App.tsx:932:14
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    930 |                 </button>
+    931 |               </div>
+  > 932 |             )}
+        |              ^
+    933 |           </div>
+    934 |           <div>
+    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+
+ERROR in src/App.tsx:975:7
+TS1005: ')' expected.
+    973 |       </div>
+    974 |
+  > 975 |       {isSearchOpen && (
+        |       ^
+    976 |         <div
+    977 |           style={{
+    978 |             position: 'fixed',
+
+ERROR in src/App.tsx:1038:66
+TS2531: Object is possibly 'null'.
+    1036 |             {p2pRequest && (
+    1037 |               <div className="mb-2 text-center">
+  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                  ^^^^^^^^^^
+    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1041 |               </div>
+
+ERROR in src/App.tsx:1147:5
+TS1128: Declaration or statement expected.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |     ^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1147:7
+TS2304: Cannot find name 'div'.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |       ^^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1148:3
+TS1109: Expression expected.
+    1146 |       )}
+    1147 |     </div>
+  > 1148 |   );
+         |   ^
+    1149 | };
+    1150 |
+    1151 | export default App;
+
+ERROR in src/App.tsx:1149:1
+TS1128: Declaration or statement expected.
+    1147 |     </div>
+    1148 |   );
+  > 1149 | };
+         | ^
+    1150 |
+    1151 | export default App;
+
+ERROR in src/p2p.ts:333:32
+TS2783: 'type' is specified more than once, so this usage will be overwritten.
+    331 |         userId: data.source,
+    332 |         contactId: this.userId,
+  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
+        |                                ^^^^^^^^^^^^^
+    334 |         timestamp: Date.now(),
+    335 |         isRead: 0,
+    336 |         isP2P: true,
+
+Compiling...
+Failed to compile.
+
+[eslint] 
+src/App.tsx
+Syntax error: ',' expected (914:23)
+ERROR in ./src/App.tsx
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /home/john/vscode_projects/messenger/client/src/App.tsx: Unexpected token, expected "," (914:23)
+
+  912 |                   display: 'flex',
+  913 |                   flexDirection: 'column',
+> 914 |                   align-items: 'center',
+      |                        ^
+  915 |                 }}
+  916 |               >
+  917 |                 <button
+    at constructor (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.unexpected (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3347:16)
+    at TypeScriptParserMixin.expect (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3657:12)
+    at TypeScriptParserMixin.parseObjectLike (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11506:14)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11024:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.jsxParseExpressionContainer (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6805:31)
+    at TypeScriptParserMixin.jsxParseAttributeValue (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6777:21)
+    at TypeScriptParserMixin.jsxParseAttribute (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6826:38)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6840:28)
+    at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9885:18)
+    at TypeScriptParserMixin.jsxParseOpeningElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6835:17)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6859:33)
+    at TypeScriptParserMixin.jsxParseElement (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6922:17)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6932:19)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10521:21)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:39
+    at TypeScriptParserMixin.tryParse (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:3665:20)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9610:18)
+    at /home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11359:28)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/john/vscode_projects/messenger/client/node_modules/@babel/parser/lib/index.js:9672:18)
+
+ERROR in [eslint] 
+src/App.tsx
+  Line 914:23:  Parsing error: ',' expected
+
+webpack compiled with 2 errors
+ERROR in src/App.tsx:444:21
+TS2345: Argument of type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to parameter of type 'SetStateAction<Contact[]>'.
+  Type '(prev: Contact[]) => (Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type '(prevState: Contact[]) => Contact[]'.
+    Type '(Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; })[]' is not assignable to type 'Contact[]'.
+      Type 'Contact | { lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+        Type '{ lastMessage: null; id?: string | undefined; email?: string | undefined; publicKey?: string | undefined; }' is not assignable to type 'Contact'.
+          Types of property 'id' are incompatible.
+            Type 'string | undefined' is not assignable to type 'string'.
+              Type 'undefined' is not assignable to type 'string'.
+    442 |         const res = await axios.get<Contact>(`http://100.64.221.88:4000/users?id=${selectedChatId}`);
+    443 |         contact = res.data;
+  > 444 |         setContacts(prev => [...prev, { ...contact, lastMessage: null }]);
+        |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    445 |       } catch (err) {
+    446 |         alert('Cannot send message: Contact not found');
+    447 |         return;
+
+ERROR in src/App.tsx:903:17
+TS2559: Type 'number' has no properties in common with type 'Properties<string | number, string & {}>'.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                 ^^^^^
+    904 |                   position: 'fixed',
+    905 |                   top: 55,
+    906 |                   left: 10,
+
+ERROR in src/App.tsx:903:24
+TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+    901 |             {isMenuOpen && (
+    902 |               <div
+  > 903 |                 style={{
+        |                        ^
+  > 904 |                   position: 'fixed',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 905 |                   top: 55,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 906 |                   left: 10,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 907 |                   background: isDarkTheme ? '#212529' : '#fff',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 908 |                   border: '1px solid #ccc',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 909 |                   borderRadius: '4px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 910 |                   zIndex: 1000,
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 911 |                   padding: '5px',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 912 |                   display: 'flex',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 913 |                   flexDirection: 'column',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 914 |                   align-items: 'center',
+        | ^^^^^^^^^^^^^^^^^^^^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:19
+TS18004: No value exists in scope for the shorthand property 'align'. Either declare one or provide an initializer.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                   ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:24
+TS1005: ',' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                        ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:25
+TS2304: Cannot find name 'items'.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                         ^^^^^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:914:30
+TS1005: '}' expected.
+    912 |                   display: 'flex',
+    913 |                   flexDirection: 'column',
+  > 914 |                   align-items: 'center',
+        |                              ^
+    915 |                 }}
+    916 |               >
+    917 |                 <button
+
+ERROR in src/App.tsx:915:17
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                 ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:915:18
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    913 |                   flexDirection: 'column',
+    914 |                   align-items: 'center',
+  > 915 |                 }}
+        |                  ^
+    916 |               >
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+
+ERROR in src/App.tsx:916:15
+TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+    914 |                   align-items: 'center',
+    915 |                 }}
+  > 916 |               >
+        |               ^
+    917 |                 <button
+    918 |                   className="btn btn-sm btn-success mb-2"
+    919 |                   onClick={handleUpdate}
+
+ERROR in src/App.tsx:932:14
+TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    930 |                 </button>
+    931 |               </div>
+  > 932 |             )}
+        |              ^
+    933 |           </div>
+    934 |           <div>
+    935 |             <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+
+ERROR in src/App.tsx:975:7
+TS1005: ')' expected.
+    973 |       </div>
+    974 |
+  > 975 |       {isSearchOpen && (
+        |       ^
+    976 |         <div
+    977 |           style={{
+    978 |             position: 'fixed',
+
+ERROR in src/App.tsx:1038:66
+TS2531: Object is possibly 'null'.
+    1036 |             {p2pRequest && (
+    1037 |               <div className="mb-2 text-center">
+  > 1038 |                 <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
+         |                                                                  ^^^^^^^^^^
+    1039 |                 <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
+    1040 |                 <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
+    1041 |               </div>
+
+ERROR in src/App.tsx:1147:5
+TS1128: Declaration or statement expected.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |     ^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1147:7
+TS2304: Cannot find name 'div'.
+    1145 |         </div>
+    1146 |       )}
+  > 1147 |     </div>
+         |       ^^^
+    1148 |   );
+    1149 | };
+    1150 |
+
+ERROR in src/App.tsx:1148:3
+TS1109: Expression expected.
+    1146 |       )}
+    1147 |     </div>
+  > 1148 |   );
+         |   ^
+    1149 | };
+    1150 |
+    1151 | export default App;
+
+ERROR in src/App.tsx:1149:1
+TS1128: Declaration or statement expected.
+    1147 |     </div>
+    1148 |   );
+  > 1149 | };
+         | ^
+    1150 |
+    1151 | export default App;
+
+ERROR in src/p2p.ts:333:32
+TS2783: 'type' is specified more than once, so this usage will be overwritten.
+    331 |         userId: data.source,
+    332 |         contactId: this.userId,
+  > 333 |         text: JSON.stringify({ type: 'offer', ...data.offer }),
+        |                                ^^^^^^^^^^^^^
+    334 |         timestamp: Date.now(),
+    335 |         isRead: 0,
+    336 |         isP2P: true,
 

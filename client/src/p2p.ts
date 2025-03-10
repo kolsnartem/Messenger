@@ -1,5 +1,5 @@
 import { Message, TweetNaClKeyPair } from './types';
-import webSocketService from './services/websocket';
+import { Socket } from 'socket.io-client';
 
 export class P2PService {
   private peerConnection: RTCPeerConnection | null = null;
@@ -7,21 +7,26 @@ export class P2PService {
   private userId: string;
   private contactId: string | null = null;
   private contactPublicKey: Uint8Array | null = null;
+  private socket: Socket;
   private onP2PMessage: (message: Message) => void;
   private onP2PStatusChange: (isActive: boolean) => void;
   private tweetNaclKeyPair: TweetNaClKeyPair | null = null;
   private pendingCandidates: RTCIceCandidateInit[] = [];
-  private encryptMessageFn: ((text: string, contactPublicKey: string, tweetNaclKeyPair: TweetNaClKeyPair) => string) | null = null;
+
+  private encryptMessageFn: ((text: string, contactPublicKey: string, tweetNaClKeyPair: TweetNaClKeyPair) => string) | null = null;
   private decryptMessageFn: ((encryptedText: string, senderId: string) => Promise<string>) | null = null;
 
   constructor(
     userId: string,
+    socket: Socket,
     onP2PMessage: (message: Message) => void,
     onP2PStatusChange: (isActive: boolean) => void
   ) {
     this.userId = userId;
+    this.socket = socket;
     this.onP2PMessage = onP2PMessage;
     this.onP2PStatusChange = onP2PStatusChange;
+    this.setupSocketListeners();
   }
 
   setTweetNaclKeyPair(keyPair: TweetNaClKeyPair | null) {
@@ -30,7 +35,7 @@ export class P2PService {
   }
 
   setEncryptionFunctions(
-    encryptFn: (text: string, contactPublicKey: string, tweetNaclKeyPair: TweetNaClKeyPair) => string,
+    encryptFn: (text: string, contactPublicKey: string, tweetNaClKeyPair: TweetNaClKeyPair) => string,
     decryptFn: (encryptedText: string, senderId: string) => Promise<string>
   ) {
     this.encryptMessageFn = encryptFn;
@@ -47,7 +52,7 @@ export class P2PService {
       }
       console.log('Contact public key set for P2P encryption:', publicKey);
     } catch (error) {
-      console.error('Failed to set contact public key:', error);
+      console.error('Failed to set contact public key:', (error as Error).message);
       this.contactPublicKey = null;
     }
   }
@@ -58,19 +63,14 @@ export class P2PService {
 
     try {
       const offer = await this.peerConnection!.createOffer();
+      console.log('Created offer:', offer.sdp);
       await this.peerConnection!.setLocalDescription(offer);
-      await webSocketService.send({
-        id: `p2p-request-${Date.now()}`,
-        userId: this.userId,
-        contactId,
-        text: JSON.stringify({ type: 'offer', sdp: offer }),
-        timestamp: Date.now(),
-        isRead: 0,
-        isP2P: true,
-      });
-      console.log('P2P offer sent:', offer);
+      console.log('Set local description (offer), signaling state:', this.peerConnection!.signalingState);
+      this.socket.emit('p2p-offer', { target: contactId, source: this.userId, offer });
+      console.log('P2P offer sent:', offer.sdp);
     } catch (error) {
-      console.error('Failed to initiate P2P offer:', error);
+      console.error('Failed to initiate P2P offer:', (error as Error).message);
+      throw error;
     }
   }
 
@@ -81,8 +81,9 @@ export class P2PService {
     let offerData;
     try {
       offerData = JSON.parse(message.text);
+      console.log('Handling P2P request, offer:', offerData);
     } catch (error) {
-      console.error('Failed to parse P2P request:', error);
+      console.error('Failed to parse P2P request:', (error as Error).message);
       return;
     }
 
@@ -90,27 +91,24 @@ export class P2PService {
 
     this.setupPeerConnection(false);
     try {
-      await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(offerData.sdp));
+      await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(offerData));
+      console.log('Set remote description (offer), signaling state:', this.peerConnection!.signalingState);
       const answer = await this.peerConnection!.createAnswer();
+      console.log('Created answer:', answer.sdp);
       await this.peerConnection!.setLocalDescription(answer);
+      console.log('Set local description (answer), signaling state:', this.peerConnection!.signalingState);
 
-      await webSocketService.send({
-        id: `p2p-answer-${Date.now()}`,
-        userId: this.userId,
-        contactId: this.contactId,
-        text: JSON.stringify({ type: 'answer', sdp: answer }),
-        timestamp: Date.now(),
-        isRead: 0,
-        isP2P: true,
-      });
-      console.log('P2P answer sent:', answer);
+      this.socket.emit('p2p-answer', { target: this.contactId, source: this.userId, answer });
+      console.log('P2P answer sent:', answer.sdp);
 
-      this.pendingCandidates.forEach(candidate => {
-        this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
-      });
+      for (const candidate of this.pendingCandidates) {
+        await this.peerConnection!.addIceCandidate(new RTCIceCandidate(candidate));
+        console.log('Added pending ICE candidate:', candidate);
+      }
       this.pendingCandidates = [];
     } catch (error) {
-      console.error('Failed to handle P2P request:', error);
+      console.error('Failed to handle P2P request:', (error as Error).message);
+      throw error;
     }
   }
 
@@ -120,23 +118,27 @@ export class P2PService {
     let answerData;
     try {
       answerData = JSON.parse(message.text);
+      console.log('Received P2P answer:', answerData);
     } catch (error) {
-      console.error('Failed to parse P2P answer:', error);
+      console.error('Failed to parse P2P answer:', (error as Error).message);
       return;
     }
 
-    if (answerData.type !== 'answer') return;
+    if (!answerData || typeof answerData !== 'object') return;
 
     try {
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answerData.sdp));
-      console.log('P2P answer received and set');
+      console.log('Current signaling state before setting answer:', this.peerConnection.signalingState);
+      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answerData));
+      console.log('P2P answer set successfully, signaling state:', this.peerConnection.signalingState);
 
-      this.pendingCandidates.forEach(candidate => {
-        this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
-      });
+      for (const candidate of this.pendingCandidates) {
+        await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        console.log('Added pending ICE candidate:', candidate);
+      }
       this.pendingCandidates = [];
     } catch (error) {
-      console.error('Failed to set P2P answer:', error);
+      console.error('Failed to set P2P answer:', (error as Error).message, (error as Error).name, (error as Error).stack);
+      throw error;
     }
   }
 
@@ -146,24 +148,25 @@ export class P2PService {
     let candidateData;
     try {
       candidateData = JSON.parse(message.text);
+      console.log('Received ICE candidate:', candidateData);
     } catch (error) {
-      console.error('Failed to parse ICE candidate:', error);
+      console.error('Failed to parse ICE candidate:', (error as Error).message);
       return;
     }
 
-    if (!candidateData.candidate) return;
+    if (!candidateData || typeof candidateData !== 'object' || !candidateData.candidate) return;
 
     const candidate = new RTCIceCandidate(candidateData);
     try {
       if (this.peerConnection.remoteDescription) {
         await this.peerConnection.addIceCandidate(candidate);
-        console.log('ICE candidate added:', candidate);
+        console.log('ICE candidate added:', candidate.candidate);
       } else {
         this.pendingCandidates.push(candidate);
-        console.log('ICE candidate queued:', candidate);
+        console.log('ICE candidate queued:', candidate.candidate);
       }
     } catch (error) {
-      console.error('Failed to add ICE candidate:', error);
+      console.error('Failed to add ICE candidate:', (error as Error).message);
     }
   }
 
@@ -201,12 +204,12 @@ export class P2PService {
         isP2P: true,
       };
 
-      console.log('Sending P2P message:', p2pMessage);
+      console.log('Sending P2P message via DataChannel:', p2pMessage);
       this.dataChannel.send(JSON.stringify(p2pMessage));
       console.log('P2P message sent successfully');
-      this.onP2PMessage({ ...p2pMessage, text: message.text }); // Локально додаємо оригінальний текст
+      this.onP2PMessage({ ...p2pMessage, text: message.text });
     } catch (error) {
-      console.error('Failed to send P2P message:', error);
+      console.error('Failed to send P2P message:', (error as Error).message);
       throw error;
     }
   }
@@ -235,10 +238,7 @@ export class P2PService {
     this.peerConnection = new RTCPeerConnection({
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
       ],
-      iceTransportPolicy: 'all',
-      bundlePolicy: 'max-bundle',
     });
 
     if (isInitiator) {
@@ -256,14 +256,10 @@ export class P2PService {
 
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate && this.contactId) {
-        webSocketService.send({
-          id: `p2p-candidate-${Date.now()}`,
-          userId: this.userId,
-          contactId: this.contactId!,
-          text: JSON.stringify(event.candidate),
-          timestamp: Date.now(),
-          isRead: 0,
-          isP2P: true,
+        this.socket.emit('p2p-ice-candidate', {
+          target: this.contactId,
+          source: this.userId,
+          candidate: event.candidate,
         });
         console.log('ICE candidate sent:', event.candidate);
       }
@@ -276,11 +272,13 @@ export class P2PService {
         case 'connected':
         case 'completed':
           this.onP2PStatusChange(true);
+          console.log('P2P connection established');
           break;
         case 'disconnected':
         case 'failed':
         case 'closed':
           this.onP2PStatusChange(false);
+          console.log('P2P connection failed or closed');
           this.disconnectP2P();
           break;
       }
@@ -295,7 +293,7 @@ export class P2PService {
     if (!this.dataChannel) return;
 
     this.dataChannel.onopen = () => {
-      console.log('P2P DataChannel opened');
+      console.log('P2P DataChannel opened, readyState:', this.dataChannel?.readyState);
       this.onP2PStatusChange(true);
     };
 
@@ -313,9 +311,14 @@ export class P2PService {
         }
         receivedMessage.isP2P = true;
         console.log('Received P2P message:', receivedMessage);
-        this.onP2PMessage(receivedMessage); // Передаємо отримане повідомлення для обробки
+        if (this.decryptMessageFn) {
+          const decryptedText = await this.decryptMessageFn(receivedMessage.text, receivedMessage.userId);
+          this.onP2PMessage({ ...receivedMessage, text: decryptedText });
+        } else {
+          this.onP2PMessage(receivedMessage);
+        }
       } catch (error) {
-        console.error('Failed to parse P2P message:', error);
+        console.error('Failed to parse or decrypt P2P message:', (error as Error).message);
       }
     };
 
@@ -326,8 +329,60 @@ export class P2PService {
     };
 
     this.dataChannel.onerror = (error) => {
-      console.error('DataChannel error:', error);
+      console.error('DataChannel error:', (error as Error).message);
     };
+  }
+
+  private setupSocketListeners() {
+    this.socket.on('p2p-offer', async (data: { offer: RTCSessionDescriptionInit; source: string }) => {
+      const message: Message = {
+        id: `p2p-request-${Date.now()}`,
+        userId: data.source,
+        contactId: this.userId,
+        text: JSON.stringify({ type: 'offer', sdp: data.offer.sdp }),
+        timestamp: Date.now(),
+        isRead: 0,
+        isP2P: true,
+      };
+      if (this.contactId === data.source) {
+        await this.handleP2PRequest(message, true);
+      } else {
+        this.socket.emit('p2p-offer-notify', { message });
+      }
+    });
+
+    this.socket.on('p2p-answer', (data: { answer: RTCSessionDescriptionInit; source: string }) => {
+      const message: Message = {
+        id: `p2p-answer-${Date.now()}`,
+        userId: data.source,
+        contactId: this.userId,
+        text: JSON.stringify(data.answer),
+        timestamp: Date.now(),
+        isRead: 0,
+        isP2P: true,
+      };
+      this.handleP2PAnswer(message);
+    });
+
+    this.socket.on('p2p-ice-candidate', (data: { candidate: RTCIceCandidateInit; source: string }) => {
+      const message: Message = {
+        id: `p2p-candidate-${Date.now()}`,
+        userId: data.source,
+        contactId: this.userId,
+        text: JSON.stringify(data.candidate),
+        timestamp: Date.now(),
+        isRead: 0,
+        isP2P: true,
+      };
+      this.handleP2PCandidate(message);
+    });
+
+    this.socket.on('p2p-reject', (data: { source: string }) => {
+      if (data.source === this.contactId) {
+        console.log('P2P request rejected by:', data.source);
+        this.disconnectP2P();
+      }
+    });
   }
 
   isP2PActive(): boolean {
