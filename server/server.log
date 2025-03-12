@@ -1,16 +1,15 @@
 Server running on https://100.64.221.88:4000
 Connected to SQLite database
-User logged in: berlin (ID: 78)
-New Socket.IO connection for user: 78, total users: 1
-Message saved to DB: 1741621578838
-P2P offer from 78 to 79, target online: false
-Target 79 offline, storing P2P offer
-P2P offer from 78 to 79, target online: false
-Target 79 offline, storing P2P offer
-Message saved to DB: 1741621598835
-P2P offer from 78 to 79, target online: false
-Target 79 offline, storing P2P offer
-Message saved to DB: 1741621603976
-User disconnected: 78, remaining users: 0
-New Socket.IO connection for user: 78, total users: 1
-User disconnected: 78, remaining users: 0
+User registered: vbnj (ID: 121)
+Updated keys for user ID: 121
+New Socket.IO connection for user: 121, total users: 1
+Message saved to DB: 1741737480581
+P2P offer from 121 to 90, target online: false
+Target 90 offline, storing P2P offer
+P2P offer from 121 to 90, target online: false
+Target 90 offline, storing P2P offer
+P2P offer from 121 to 90, target online: false
+Target 90 offline, storing P2P offer
+User disconnected: 121, remaining users: 0
+New Socket.IO connection for user: 120, total users: 1
+User disconnected: 120, remaining users: 0
