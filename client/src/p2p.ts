@@ -14,7 +14,7 @@ export class P2PService {
   private pendingCandidates: RTCIceCandidateInit[] = [];
   private iceConnectionTimeout: ReturnType<typeof setTimeout> | null = null;
   private reconnectAttempts: number = 0;
-  private maxReconnectAttempts: number = 3;
+  private maxReconnectAttempts: number = 5;
   private messageQueue: Message[] = [];
 
   private encryptMessageFn: ((text: string, contactPublicKey: string, tweetNaClKeyPair: TweetNaClKeyPair) => string) | null = null;
@@ -71,7 +71,7 @@ export class P2PService {
       const offer = await this.peerConnection!.createOffer({
         offerToReceiveAudio: false,
         offerToReceiveVideo: false,
-        iceRestart: true
+        iceRestart: true,
       });
       await this.peerConnection!.setLocalDescription(offer);
       this.socket.emit('p2p-offer', { target: contactId, source: this.userId, offer });
@@ -126,6 +126,7 @@ export class P2PService {
     try {
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answerData));
       await this.addPendingIceCandidates();
+      console.log('P2P answer set successfully, signaling state:', this.peerConnection.signalingState);
     } catch (error) {
       console.error('Failed to set P2P answer:', error);
       this.tryReconnect();
@@ -162,6 +163,7 @@ export class P2PService {
   private async addPendingIceCandidates() {
     if (!this.peerConnection || !this.peerConnection.remoteDescription) return;
 
+    console.log(`Adding ${this.pendingCandidates.length} pending ICE candidates`);
     for (const candidate of this.pendingCandidates) {
       try {
         await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
@@ -188,6 +190,7 @@ export class P2PService {
     if (this.dataChannel.readyState !== 'open') {
       console.warn('DataChannel not open, queuing message. Current state:', this.dataChannel.readyState);
       this.messageQueue.push(message);
+      this.requestIceRestart();
       return;
     }
 
@@ -242,11 +245,19 @@ export class P2PService {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'turn:numb.viagenie.ca', username: 'webrtc@live.com', credential: 'muazkh' },
-        { urls: 'turn:turn.anyfirewall.com:443?transport=tcp', username: 'webrtc', credential: 'webrtc' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { 
+          urls: [
+            'turn:openrelay.metered.ca:80',
+            'turn:openrelay.metered.ca:443',
+            'turn:openrelay.metered.ca:443?transport=tcp',
+          ],
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
       ],
       iceCandidatePoolSize: 10,
-      iceTransportPolicy: 'all',
+      iceTransportPolicy: 'all', // Залишаємо 'all', щоб використовувати всі доступні кандидати
     });
 
     if (isInitiator) {
@@ -269,7 +280,14 @@ export class P2PService {
           source: this.userId,
           candidate: event.candidate,
         });
-        console.log('ICE candidate sent:', event.candidate.candidate);
+        console.log('ICE candidate generated:', {
+          candidate: event.candidate.candidate,
+          type: event.candidate.type,
+          address: event.candidate.address,
+          port: event.candidate.port,
+        });
+      } else if (!event.candidate) {
+        console.log('ICE candidate gathering completed');
       }
     };
 
@@ -296,6 +314,10 @@ export class P2PService {
           console.log('P2P connection closed');
           break;
       }
+    };
+
+    this.peerConnection.onicegatheringstatechange = () => {
+      console.log('ICE Gathering State:', this.peerConnection?.iceGatheringState);
     };
 
     this.peerConnection.onconnectionstatechange = () => {
@@ -418,7 +440,7 @@ export class P2PService {
         console.log('ICE connection timeout');
         this.tryReconnect();
       }
-    }, 20000);
+    }, 30000); // Збільшено до 30 секунд для повільного NAT traversal
   }
 
   private async tryReconnect() {

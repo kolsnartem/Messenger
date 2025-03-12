@@ -148,7 +148,14 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!userId) return;
-    socketRef.current = io('https://100.64.221.88:4000', { query: { userId }, transports: ['websocket'], withCredentials: true });
+    socketRef.current = io('https://100.64.221.88:4000', { 
+      query: { userId }, 
+      transports: ['websocket'], 
+      withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
     videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
       setCallState(prev => ({
         ...prev,
@@ -242,7 +249,6 @@ const App: React.FC = () => {
   }, [userId]);
 
   const handleIncomingMessage = async (message: Message) => {
-    // Обробка звичайних (не P2P) повідомлень
     if (!message.isP2P) {
       const decryptedText = await decryptMessageText(message);
       const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
@@ -251,7 +257,6 @@ const App: React.FC = () => {
       return;
     }
 
-    // Обробка сигналізаційних P2P повідомлень
     try {
       const signalData = JSON.parse(message.text);
       if (signalData.type === 'offer' && message.contactId === userId) {
@@ -263,7 +268,6 @@ const App: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to parse P2P signaling message:', error);
-      // Якщо це не сигналізаційне повідомлення, а зашифроване P2P через сокет (резервний шлях)
       if (message.text.startsWith('base64:')) {
         console.warn('Received P2P message via socket instead of DataChannel');
         const decryptedText = await decryptMessageText(message);
@@ -285,7 +289,7 @@ const App: React.FC = () => {
     if (!input.trim() || !userId || !selectedChatId || !tweetNaclKeyPair) return;
     const contact = contacts.find(c => c.id === selectedChatId) || (await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`)).data;
     const message: Message = { 
-      id: Date.now().toString(), 
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`, 
       userId: userId!, 
       contactId: selectedChatId, 
       text: input.trim(), 
@@ -568,7 +572,7 @@ const App: React.FC = () => {
               </div>
             )}
             {messages.map(msg => (
-              <div key={msg.id} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
+              <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
                 <div className={`p-2 rounded-3 ${msg.isMine ? 'bg-primary text-white' : msg.isP2P ? 'p2p-message' : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'}`} style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}>
                   <div>{msg.text}</div>
                   <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}</div>
