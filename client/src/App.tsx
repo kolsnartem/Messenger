@@ -425,12 +425,17 @@ const App: React.FC = () => {
       return;
     }
     try {
+      // Запит до getUserMedia для Safari
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Ми не будемо використовувати цей потік, але він потрібен для WebRTC у Safari
+      stream.getTracks().forEach(track => track.stop()); // Зупиняємо треки, щоб не використовувати мікрофон
       p2pServiceRef.current.setContactPublicKey(contact.publicKey);
       await p2pServiceRef.current.initiateP2P(selectedChatId);
       setIsP2PActive(true);
     } catch (error) {
       console.error('Failed to initiate P2P:', error);
       setIsP2PActive(false);
+      alert('Не вдалося отримати доступ до медіа для P2P з\'єднання');
     }
   };
 
@@ -439,12 +444,16 @@ const App: React.FC = () => {
     const contact = contacts.find(c => c.id === p2pRequest.userId);
     if (accept && contact?.publicKey) {
       try {
+        // Запит до getUserMedia для Safari
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop()); // Зупиняємо треки
         p2pServiceRef.current.setContactPublicKey(contact.publicKey);
         await p2pServiceRef.current.handleP2PRequest({ ...p2pRequest, lastMessage: undefined }, true);
         setIsP2PActive(true);
       } catch (error) {
         console.error('Failed to accept P2P request:', error);
         setIsP2PActive(false);
+        alert('Не вдалося отримати доступ до медіа для P2P з\'єднання');
       }
     } else {
       socketRef.current?.emit('p2p-reject', { target: p2pRequest.userId, source: userId });

@@ -16,8 +16,9 @@ export class P2PService {
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
   private messageQueue: Message[] = [];
+  private dummyStream: MediaStream | null = null;
 
-  private encryptMessageFn: ((text: string, contactPublicKey: string, tweetNaClKeyPair: TweetNaClKeyPair) => string) | null = null;
+  private encryptMessageFn: ((text: string, contactPublicKey: string, tweetNaclKeyPair: TweetNaClKeyPair) => string) | null = null;
   private decryptMessageFn: ((encryptedText: string, senderId: string) => Promise<string>) | null = null;
 
   constructor(
@@ -39,7 +40,7 @@ export class P2PService {
   }
 
   setEncryptionFunctions(
-    encryptFn: (text: string, contactPublicKey: string, tweetNaClKeyPair: TweetNaClKeyPair) => string,
+    encryptFn: (text: string, contactPublicKey: string, tweetNaclKeyPair: TweetNaClKeyPair) => string,
     decryptFn: (encryptedText: string, senderId: string) => Promise<string>
   ) {
     this.encryptMessageFn = encryptFn;
@@ -69,7 +70,7 @@ export class P2PService {
     try {
       this.setIceConnectionTimeout();
       const offer = await this.peerConnection!.createOffer({
-        offerToReceiveAudio: false,
+        offerToReceiveAudio: true, // Додаємо аудіо для сумісності з Safari
         offerToReceiveVideo: false,
         iceRestart: true,
       });
@@ -228,10 +229,12 @@ export class P2PService {
     if (this.iceConnectionTimeout) clearTimeout(this.iceConnectionTimeout);
     if (this.dataChannel) this.dataChannel.close();
     if (this.peerConnection) this.peerConnection.close();
+    if (this.dummyStream) this.dummyStream.getTracks().forEach(track => track.stop());
     this.peerConnection = null;
     this.dataChannel = null;
     this.contactId = null;
     this.contactPublicKey = null;
+    this.dummyStream = null;
     this.pendingCandidates = [];
     this.messageQueue = [];
     this.onP2PStatusChange(false);
@@ -240,92 +243,103 @@ export class P2PService {
 
   private async setupPeerConnection(isInitiator: boolean) {
     if (this.peerConnection) this.peerConnection.close();
+    if (this.dummyStream) this.dummyStream.getTracks().forEach(track => track.stop());
 
-    this.peerConnection = new RTCPeerConnection({
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { 
-          urls: [
-            'turn:openrelay.metered.ca:80',
-            'turn:openrelay.metered.ca:443',
-            'turn:openrelay.metered.ca:443?transport=tcp',
-          ],
-          username: 'openrelayproject',
-          credential: 'openrelayproject',
-        },
-      ],
-      iceCandidatePoolSize: 10,
-      iceTransportPolicy: 'all', // Залишаємо 'all', щоб використовувати всі доступні кандидати
-    });
-
-    if (isInitiator) {
-      this.dataChannel = this.peerConnection.createDataChannel('chat', {
-        ordered: true,
-        maxPacketLifeTime: 3000,
+    try {
+      // Запитуємо медіапотік для сумісності з Safari
+      this.dummyStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.peerConnection = new RTCPeerConnection({
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { 
+            urls: [
+              'turn:openrelay.metered.ca:80',
+              'turn:openrelay.metered.ca:443',
+              'turn:openrelay.metered.ca:443?transport=tcp',
+            ],
+            username: 'openrelayproject',
+            credential: 'openrelayproject',
+          },
+        ],
+        iceCandidatePoolSize: 10,
+        iceTransportPolicy: 'all',
       });
-      this.setupDataChannel();
-    } else {
-      this.peerConnection.ondatachannel = (event) => {
-        this.dataChannel = event.channel;
+
+      // Додаємо dummy аудіопотік до peerConnection
+      this.dummyStream.getTracks().forEach(track => this.peerConnection!.addTrack(track, this.dummyStream!));
+
+      if (isInitiator) {
+        this.dataChannel = this.peerConnection.createDataChannel('chat', {
+          ordered: true,
+          maxPacketLifeTime: 3000,
+        });
         this.setupDataChannel();
+      } else {
+        this.peerConnection.ondatachannel = (event) => {
+          this.dataChannel = event.channel;
+          this.setupDataChannel();
+        };
+      }
+
+      this.peerConnection.onicecandidate = (event) => {
+        if (event.candidate && this.contactId) {
+          this.socket.emit('p2p-ice-candidate', {
+            target: this.contactId,
+            source: this.userId,
+            candidate: event.candidate,
+          });
+          console.log('ICE candidate generated:', {
+            candidate: event.candidate.candidate,
+            type: event.candidate.type,
+            address: event.candidate.address,
+            port: event.candidate.port,
+          });
+        } else if (!event.candidate) {
+          console.log('ICE candidate gathering completed');
+        }
       };
-    }
 
-    this.peerConnection.onicecandidate = (event) => {
-      if (event.candidate && this.contactId) {
-        this.socket.emit('p2p-ice-candidate', {
-          target: this.contactId,
-          source: this.userId,
-          candidate: event.candidate,
-        });
-        console.log('ICE candidate generated:', {
-          candidate: event.candidate.candidate,
-          type: event.candidate.type,
-          address: event.candidate.address,
-          port: event.candidate.port,
-        });
-      } else if (!event.candidate) {
-        console.log('ICE candidate gathering completed');
-      }
-    };
+      this.peerConnection.oniceconnectionstatechange = () => {
+        if (!this.peerConnection) return;
+        const state = this.peerConnection.iceConnectionState;
+        console.log('ICE Connection State:', state);
+        switch (state) {
+          case 'connected':
+          case 'completed':
+            if (this.iceConnectionTimeout) clearTimeout(this.iceConnectionTimeout);
+            this.reconnectAttempts = 0;
+            this.onP2PStatusChange(true);
+            this.processMessageQueue();
+            console.log('P2P connection established');
+            break;
+          case 'failed':
+          case 'disconnected':
+            console.log('ICE connection failed or disconnected');
+            this.tryReconnect();
+            break;
+          case 'closed':
+            this.onP2PStatusChange(false);
+            console.log('P2P connection closed');
+            break;
+        }
+      };
 
-    this.peerConnection.oniceconnectionstatechange = () => {
-      if (!this.peerConnection) return;
-      const state = this.peerConnection.iceConnectionState;
-      console.log('ICE Connection State:', state);
-      switch (state) {
-        case 'connected':
-        case 'completed':
-          if (this.iceConnectionTimeout) clearTimeout(this.iceConnectionTimeout);
-          this.reconnectAttempts = 0;
-          this.onP2PStatusChange(true);
-          this.processMessageQueue();
-          console.log('P2P connection established');
-          break;
-        case 'failed':
-        case 'disconnected':
-          console.log('ICE connection failed or disconnected');
+      this.peerConnection.onicegatheringstatechange = () => {
+        console.log('ICE Gathering State:', this.peerConnection?.iceGatheringState);
+      };
+
+      this.peerConnection.onconnectionstatechange = () => {
+        console.log('Connection State:', this.peerConnection?.connectionState);
+        if (this.peerConnection?.connectionState === 'failed') {
           this.tryReconnect();
-          break;
-        case 'closed':
-          this.onP2PStatusChange(false);
-          console.log('P2P connection closed');
-          break;
-      }
-    };
-
-    this.peerConnection.onicegatheringstatechange = () => {
-      console.log('ICE Gathering State:', this.peerConnection?.iceGatheringState);
-    };
-
-    this.peerConnection.onconnectionstatechange = () => {
-      console.log('Connection State:', this.peerConnection?.connectionState);
-      if (this.peerConnection?.connectionState === 'failed') {
-        this.tryReconnect();
-      }
-    };
+        }
+      };
+    } catch (error) {
+      console.error('Failed to setup peer connection with media stream:', error);
+      throw error;
+    }
   }
 
   private setupDataChannel() {
@@ -440,7 +454,7 @@ export class P2PService {
         console.log('ICE connection timeout');
         this.tryReconnect();
       }
-    }, 30000); // Збільшено до 30 секунд для повільного NAT traversal
+    }, 30000);
   }
 
   private async tryReconnect() {
