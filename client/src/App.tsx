@@ -6,7 +6,7 @@ import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaRedo } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
@@ -211,14 +211,14 @@ const App: React.FC = () => {
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
     if (publicKeysCache.has(senderId)) return publicKeysCache.get(senderId)!;
     let key = cleanBase64(contacts.find(c => c.id === senderId)?.publicKey || localStorage.getItem(`publicKey_${senderId}`) || '');
-    if (!key) {
+    if (!key && socketRef.current?.connected) {
       const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${senderId}`);
       key = cleanBase64(res.data.publicKey || '');
       publicKeysCache.set(senderId, key);
       localStorage.setItem(`publicKey_${senderId}`, key);
       setContacts(prev => prev.some(c => c.id === senderId) ? prev : [...prev, { id: senderId, email: res.data.email || '', publicKey: key, lastMessage: null }]);
     }
-    return key;
+    return key || ''; // Повертаємо порожній рядок, якщо ключ недоступний
   };
 
   const decryptMessage = async (encryptedText: string, senderId: string): Promise<string> => {
@@ -227,14 +227,20 @@ const App: React.FC = () => {
     const nonce = data.subarray(0, nacl.box.nonceLength);
     const cipher = data.subarray(nacl.box.nonceLength);
     const senderPublicKey = await fetchSenderPublicKey(senderId);
+    if (!senderPublicKey) return 'Decryption Failed: Public key unavailable';
     const theirPublicKey = fixPublicKey(new Uint8Array(Buffer.from(senderPublicKey, 'base64')));
     const decrypted = nacl.box.open(new Uint8Array(cipher), new Uint8Array(nonce), theirPublicKey, tweetNaclKeyPair.secretKey);
-    return decrypted ? new TextDecoder().decode(decrypted) : encryptedText;
+    return decrypted ? new TextDecoder().decode(decrypted) : 'Decryption Failed';
   };
 
   const decryptMessageText = async (message: Message): Promise<string> => {
     if (message.userId === userId) return getSentMessage(message.id, message.contactId || selectedChatId || '') || message.text;
     return message.text.startsWith('base64:') ? await decryptMessage(message.text, message.userId) : message.text;
+  };
+
+  const retryDecryption = async (message: Message) => {
+    const decryptedText = await decryptMessageText(message);
+    setMessages(prev => prev.map(m => m.id === message.id ? { ...m, text: decryptedText } : m));
   };
 
   const updateContactsWithLastMessage = useCallback(async (newMessage: Message) => {
@@ -259,7 +265,7 @@ const App: React.FC = () => {
 
     try {
       const signalData = JSON.parse(message.text);
-      if (signalData.type === 'offer' && message.contactId === userId) {
+      if (signalData.type === 'offer' && message.contactId === userId && !isP2PActive) {
         setP2PRequest(message);
       } else if (signalData.type === 'answer') {
         await p2pServiceRef.current?.handleP2PAnswer({ ...message, lastMessage: undefined });
@@ -287,7 +293,7 @@ const App: React.FC = () => {
 
   const sendMessage = async () => {
     if (!input.trim() || !userId || !selectedChatId || !tweetNaclKeyPair) return;
-    const contact = contacts.find(c => c.id === selectedChatId) || (await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`)).data;
+    const contact = contacts.find(c => c.id === selectedChatId) || (socketRef.current?.connected ? (await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`)).data : { id: selectedChatId, publicKey: '' });
     const message: Message = { 
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`, 
       userId: userId!, 
@@ -333,7 +339,7 @@ const App: React.FC = () => {
   };
 
   const fetchData = async () => {
-    if (!userId) return;
+    if (!userId || !socketRef.current?.connected) return;
     const chats = (await fetchChats(userId)).data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
     setContacts(await Promise.all(chats.map(async chat => ({ ...chat, lastMessage: chat.lastMessage ? { ...chat.lastMessage, text: await decryptMessageText(chat.lastMessage) } : null }))));
     if (selectedChatId) {
@@ -356,16 +362,18 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!userId || !tweetNaclKeyPair || !socketRef.current) return;
     socketRef.current.on('message', handleIncomingMessage);
-    socketRef.current.on('p2p-offer-notify', (data: { message: Message }) => data.message.contactId === userId && setP2PRequest(data.message));
+    socketRef.current.on('p2p-offer-notify', (data: { message: Message }) => data.message.contactId === userId && !isP2PActive && setP2PRequest(data.message));
     return () => { 
       socketRef.current?.off('message'); 
       socketRef.current?.off('p2p-offer-notify'); 
     };
-  }, [userId, selectedChatId, tweetNaclKeyPair]);
+  }, [userId, selectedChatId, tweetNaclKeyPair, isP2PActive]);
 
   useEffect(() => {
     if (!searchQuery || !userId) setSearchResults([]);
-    else axios.get<Contact[]>(`https://100.64.221.88:4000/search?query=${searchQuery}`).then(res => setSearchResults(res.data.filter(c => c.id !== userId)));
+    else if (socketRef.current?.connected) {
+      axios.get<Contact[]>(`https://100.64.221.88:4000/search?query=${searchQuery}`).then(res => setSearchResults(res.data.filter(c => c.id !== userId)));
+    }
   }, [searchQuery, userId]);
 
   useEffect(() => {
@@ -425,10 +433,8 @@ const App: React.FC = () => {
       return;
     }
     try {
-      // Запит до getUserMedia для Safari
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // Ми не будемо використовувати цей потік, але він потрібен для WebRTC у Safari
-      stream.getTracks().forEach(track => track.stop()); // Зупиняємо треки, щоб не використовувати мікрофон
+      stream.getTracks().forEach(track => track.stop());
       p2pServiceRef.current.setContactPublicKey(contact.publicKey);
       await p2pServiceRef.current.initiateP2P(selectedChatId);
       setIsP2PActive(true);
@@ -444,9 +450,8 @@ const App: React.FC = () => {
     const contact = contacts.find(c => c.id === p2pRequest.userId);
     if (accept && contact?.publicKey) {
       try {
-        // Запит до getUserMedia для Safari
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // Зупиняємо треки
+        stream.getTracks().forEach(track => track.stop());
         p2pServiceRef.current.setContactPublicKey(contact.publicKey);
         await p2pServiceRef.current.handleP2PRequest({ ...p2pRequest, lastMessage: undefined }, true);
         setIsP2PActive(true);
@@ -491,10 +496,12 @@ const App: React.FC = () => {
           .scroll-container::-webkit-scrollbar-thumb { background: ${isDarkTheme ? '#6c757d' : '#dee2e6'}; border-radius: 4px; }
           .scroll-container::-webkit-scrollbar-thumb:hover { background: ${isDarkTheme ? '#868e96' : '#adb5bd'}; }
           .p2p-message { background-color: #ff9500 !important; color: white; }
+          .retry-button { margin-left: 5px; cursor: pointer; }
+          .p2p-request-panel { background: ${isDarkTheme ? 'rgba(40, 44, 52, 0.95)' : 'rgba(248, 249, 250, 0.95)'}; padding: 5px; border-top: 1px solid ${isDarkTheme ? '#444' : '#ddd'}; }
         `}
       </style>
 
-      <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', zIndex: 20, height: selectedChatId ? '90px' : '50px' }}>
+      <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', zIndex: 20, height: selectedChatId ? (p2pRequest ? '130px' : '90px') : '50px' }}>
         <div className="d-flex justify-content-between align-items-center">
           <div style={{ position: 'relative' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>MSNGR ({userEmail})</h5>
@@ -526,10 +533,19 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
+        {selectedChatId && p2pRequest && (
+          <div className="p2p-request-panel d-flex justify-content-between align-items-center">
+            <span>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</span>
+            <div>
+              <button className="btn btn-sm btn-success me-2" onClick={() => handleP2PResponse(true)}><FaCheck /></button>
+              <button className="btn btn-sm btn-danger" onClick={() => handleP2PResponse(false)}><FaTimes /></button>
+            </div>
+          </div>
+        )}
       </div>
 
       {isSearchOpen && (
-        <div style={{ position: 'fixed', top: selectedChatId ? '90px' : '50px', left: 0, right: 0, background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', zIndex: 30, padding: '0' }}>
+        <div style={{ position: 'fixed', top: selectedChatId ? (p2pRequest ? '130px' : '90px') : '50px', left: 0, right: 0, background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', zIndex: 30, padding: '0' }}>
           <div className="container p-2">
             <input type="text" className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light search-placeholder-dark' : ''}`} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search users..." />
           </div>
@@ -539,7 +555,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? '90px' : '50px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
+      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? (p2pRequest ? '130px' : '90px') : '50px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
         {callState.isCalling && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(18, 18, 38, 0.98) 0%, rgba(9, 9, 19, 0.98) 100%)', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '16px', boxSizing: 'border-box' }}>
             <div style={{ fontSize: '18px', fontWeight: '500', color: 'white', padding: '12px 0', width: '100%', textAlign: 'center', zIndex: 2 }}>{formatCallDuration(callState.callDuration)}</div>
@@ -573,17 +589,15 @@ const App: React.FC = () => {
         {selectedChatId && !callState.isCalling && (
           <div className="p-3 scroll-container" style={{ height: 'calc(100% - 60px)', overflowY: 'auto', filter: isSearchOpen ? 'blur(5px)' : 'none', transition: 'filter 0.3s', display: 'flex', flexDirection: 'column' }}>
             <div style={{ flexGrow: 1 }} />
-            {p2pRequest && (
-              <div className="mb-2 text-center">
-                <p>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</p>
-                <button className="btn btn-success me-2" onClick={() => handleP2PResponse(true)}>Accept</button>
-                <button className="btn btn-danger" onClick={() => handleP2PResponse(false)}>Decline</button>
-              </div>
-            )}
             {messages.map(msg => (
               <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
                 <div className={`p-2 rounded-3 ${msg.isMine ? 'bg-primary text-white' : msg.isP2P ? 'p2p-message' : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'}`} style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}>
-                  <div>{msg.text}</div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span>{msg.text}</span>
+                    {msg.text.includes('Decryption Failed') && (
+                      <FaRedo className="retry-button" onClick={() => retryDecryption(msg)} style={{ fontSize: '0.8rem', color: isDarkTheme ? '#fff' : '#000' }} />
+                    )}
+                  </div>
                   <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}</div>
                 </div>
               </div>

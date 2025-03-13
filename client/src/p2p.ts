@@ -63,6 +63,10 @@ export class P2PService {
   }
 
   async initiateP2P(contactId: string) {
+    if (this.isP2PActive()) {
+      console.log('P2P already active, skipping initiation');
+      return;
+    }
     this.contactId = contactId;
     this.reconnectAttempts = 0;
     await this.setupPeerConnection(true);
@@ -70,7 +74,7 @@ export class P2PService {
     try {
       this.setIceConnectionTimeout();
       const offer = await this.peerConnection!.createOffer({
-        offerToReceiveAudio: true, // Додаємо аудіо для сумісності з Safari
+        offerToReceiveAudio: true,
         offerToReceiveVideo: false,
         iceRestart: true,
       });
@@ -84,7 +88,7 @@ export class P2PService {
   }
 
   async handleP2PRequest(message: Message, accept: boolean) {
-    if (!accept || !message.userId || !message.text) return;
+    if (!accept || !message.userId || !message.text || this.isP2PActive()) return;
     this.contactId = message.userId;
     this.reconnectAttempts = 0;
 
@@ -246,7 +250,6 @@ export class P2PService {
     if (this.dummyStream) this.dummyStream.getTracks().forEach(track => track.stop());
 
     try {
-      // Запитуємо медіапотік для сумісності з Safari
       this.dummyStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.peerConnection = new RTCPeerConnection({
         iceServers: [
@@ -267,7 +270,6 @@ export class P2PService {
         iceTransportPolicy: 'all',
       });
 
-      // Додаємо dummy аудіопотік до peerConnection
       this.dummyStream.getTracks().forEach(track => this.peerConnection!.addTrack(track, this.dummyStream!));
 
       if (isInitiator) {
@@ -397,6 +399,7 @@ export class P2PService {
 
   private setupSocketListeners() {
     this.socket.on('p2p-offer', async (data: { offer: RTCSessionDescriptionInit; source: string }) => {
+      if (this.isP2PActive()) return;
       const message: Message = {
         id: `p2p-request-${Date.now()}`,
         userId: data.source,
