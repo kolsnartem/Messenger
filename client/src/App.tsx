@@ -211,6 +211,11 @@ const App: React.FC = () => {
     return () => { document.head.removeChild(style); };
   }, []);
 
+  useEffect(() => {
+    if (!userId || tweetNaclKeyPair) return;
+    initializeKeys();
+  }, [userId]);
+
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
     if (publicKeysCache.has(senderId)) return publicKeysCache.get(senderId)!;
     let key = cleanBase64(contacts.find(c => c.id === senderId)?.publicKey || localStorage.getItem(`publicKey_${senderId}`) || '');
@@ -410,12 +415,15 @@ const App: React.FC = () => {
     }
   };
 
-  const handleContactSelect = (contact: Contact) => {
+  const handleContactSelect = async (contact: Contact) => {
     setSelectedChatId(contact.id);
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
     setContacts(prev => prev.some(c => c.id === contact.id) ? prev : [...prev, { ...contact, lastMessage: null }]);
+    if (!tweetNaclKeyPair) {
+      await initializeKeys();
+    }
   };
 
   const handleLogout = () => {
@@ -506,6 +514,25 @@ const App: React.FC = () => {
           .message-mine { background-color: #ff9966 !important; color: #333; }
           .message-theirs { background-color: #ffccb3 !important; color: #333; }
           .retry-button { margin-left: 5px; cursor: pointer; }
+          .send-btn-active {
+            background-color: #ff9966;
+            border-color: #ff9966;
+            color: #333;
+          }
+          .send-btn-inactive {
+            background-color: #ffccb3;
+            border-color: #ffccb3;
+            color: #333;
+          }
+          .send-btn-active:disabled {
+            background-color: #ffccb3;
+            border-color: #ffccb3;
+            opacity: 0.65;
+            color: #333;
+          }
+          .btn {
+            transition: background-color 0.2s ease-in-out;
+          }
         `}
       </style>
 
@@ -620,10 +647,49 @@ const App: React.FC = () => {
       </div>
 
       {selectedChatId && !callState.isCalling && (
-        <div className="p-2" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: headerBackground, zIndex: 10, height: '49px', display: 'flex', alignItems: 'center', borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee' }}>
+        <div 
+          className="p-2" 
+          style={{ 
+            position: 'fixed', 
+            bottom: 0, 
+            left: 0, 
+            right: 0, 
+            background: headerBackground, 
+            zIndex: 10, 
+            height: '49px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee' 
+          }}
+        >
           <div className="d-flex align-items-center w-100 px-2">
-            <input type="text" className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light input-placeholder-dark' : ''}`} value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && sendMessage()} placeholder="Message..." style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }} />
-            <button className="btn btn-primary ms-2 d-flex align-items-center justify-content-center" onClick={sendMessage} style={{ borderRadius: '20px', minWidth: '60px', height: '38px' }} disabled={!input.trim() || !tweetNaclKeyPair || !isKeysLoaded}>Send</button>
+            <input 
+              type="text" 
+              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light input-placeholder-dark' : ''}`} 
+              value={input} 
+              onChange={e => setInput(e.target.value)} 
+              onKeyPress={e => e.key === 'Enter' && sendMessage()} 
+              placeholder="Message..." 
+              style={{ 
+                borderRadius: '20px', 
+                color: isDarkTheme ? '#fff' : '#000' 
+              }} 
+            />
+            <button 
+              className={`btn ms-2 d-flex align-items-center justify-content-center ${
+                input.trim() ? 'send-btn-active' : 'send-btn-inactive'
+              }`}
+              onClick={sendMessage} 
+              disabled={!input.trim() || !tweetNaclKeyPair || !isKeysLoaded}
+              style={{ 
+                borderRadius: '20px', 
+                minWidth: '60px', 
+                height: '38px',
+                transition: 'background-color 0.1s ease'
+              }}
+            >
+              Send
+            </button>
           </div>
         </div>
       )}
