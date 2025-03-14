@@ -1,4 +1,3 @@
-// src/services/VideoCallService.tsx
 import { Socket } from 'socket.io-client';
 
 export interface CallState {
@@ -6,6 +5,9 @@ export interface CallState {
   remoteStream: MediaStream | null;
   isCalling: boolean;
   isVideoEnabled: boolean;
+  isMicrophoneEnabled: boolean;
+  callDuration?: number;
+  reactions?: { emoji: string; timestamp: number }[];
 }
 
 export default class VideoCallService {
@@ -35,7 +37,9 @@ export default class VideoCallService {
       localStream: this.localStream,
       remoteStream: this.remoteStream,
       isCalling: !!this.peerConnection,
-      isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+      // Перевірка на null для localStream
+      isVideoEnabled: this.localStream ? this.localStream.getVideoTracks().length > 0 : false,
+      isMicrophoneEnabled: this.localStream ? this.localStream.getAudioTracks().length > 0 : false,
     });
   }
 
@@ -143,6 +147,35 @@ export default class VideoCallService {
     this.updateState();
   }
 
+  public async toggleMicrophone(enable: boolean) {
+    if (!this.localStream || !this.peerConnection) return;
+
+    const audioTrack = this.localStream.getAudioTracks()[0];
+    if (enable && !audioTrack) {
+      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const newAudioTrack = audioStream.getAudioTracks()[0];
+      this.localStream.addTrack(newAudioTrack);
+      const sender = this.peerConnection.getSenders().find(s => s.track?.kind === 'audio');
+      if (sender) {
+        await sender.replaceTrack(newAudioTrack);
+      } else {
+        this.peerConnection.addTrack(newAudioTrack, this.localStream);
+      }
+      const offer = await this.peerConnection.createOffer();
+      await this.peerConnection.setLocalDescription(offer);
+      this.socket.emit('call-offer', { target: this.targetUserId!, source: this.userId, offer });
+    } else if (!enable && audioTrack) {
+      this.localStream.removeTrack(audioTrack);
+      audioTrack.stop();
+      const sender = this.peerConnection.getSenders().find(s => s.track?.kind === 'audio');
+      if (sender) this.peerConnection.removeTrack(sender);
+      const offer = await this.peerConnection.createOffer();
+      await this.peerConnection.setLocalDescription(offer);
+      this.socket.emit('call-offer', { target: this.targetUserId!, source: this.userId, offer });
+    }
+    this.updateState();
+  }
+
   private async initializeMedia(constraints: MediaStreamConstraints) {
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => track.stop());
@@ -173,7 +206,9 @@ export default class VideoCallService {
       localStream: this.localStream,
       remoteStream: this.remoteStream,
       isCalling: !!this.peerConnection,
-      isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
+      // Перевірка на null для localStream
+      isVideoEnabled: this.localStream ? this.localStream.getVideoTracks().length > 0 : false,
+      isMicrophoneEnabled: this.localStream ? this.localStream.getAudioTracks().length > 0 : false,
     };
   }
 }

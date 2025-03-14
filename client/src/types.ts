@@ -8,6 +8,13 @@ export interface TweetNaClKeyPair {
   secretKey: Uint8Array;
 }
 
+// Додано інтерфейс EncryptionError
+export interface EncryptionError {
+  message: string;
+  details?: string;
+  timestamp: number;
+}
+
 export interface Message {
   id: string;
   userId: string;
@@ -18,19 +25,8 @@ export interface Message {
   isMine?: boolean;
   isP2P?: boolean;
   encryptedText?: string;
-  lastMessage?: Message | null; // Додано для узгодження з Contact
-}
-
-export interface Contact {
-  id: string;
-  email: string;
-  publicKey: string;
-  lastMessage: Message | null;
-}
-
-export interface TweetNaClKeyPair {
-  publicKey: Uint8Array;
-  secretKey: Uint8Array;
+  lastMessage?: Message | null;
+  error?: boolean;
 }
 
 export interface Contact {

@@ -1,6 +1,23 @@
 import { Message, TweetNaClKeyPair } from './types';
 import { Socket } from 'socket.io-client';
 
+declare global {
+  interface Navigator {
+    connection?: {
+      type?: string;
+      effectiveType?: string;
+      downlink?: number;
+      onchange?: ((this: NetworkInformation, ev: Event) => any) | null;
+    };
+  }
+  interface NetworkInformation {
+    type?: string;
+    effectiveType?: string;
+    downlink?: number;
+    onchange?: ((this: NetworkInformation, ev: Event) => any) | null;
+  }
+}
+
 export class P2PService {
   private peerConnection: RTCPeerConnection | null = null;
   private dataChannel: RTCDataChannel | null = null;
@@ -267,8 +284,7 @@ export class P2PService {
       iceCandidatePoolSize: 10,
       iceTransportPolicy: 'all',
       bundlePolicy: 'max-bundle',
-      rtcpMuxPolicy: 'require',
-      sdpSemantics: 'unified-plan'
+      rtcpMuxPolicy: 'require'
     });
 
     if (isInitiator) {
@@ -346,7 +362,6 @@ export class P2PService {
       try {
         const data = JSON.parse(event.data);
         
-        // Обробка фрагментованих повідомлень
         if (data.chunkIndex !== undefined) {
           const msgId = data.id;
           if (!chunkedMessages.has(msgId)) {
@@ -378,8 +393,7 @@ export class P2PService {
           console.error('Decryption failed:', decryptError);
           this.onP2PMessage({
             ...receivedMessage,
-            text: '[Decryption Failed]',
-            error: true
+            text: '[Decryption Failed]'
           });
           return;
         }
@@ -457,7 +471,7 @@ export class P2PService {
   private setIceConnectionTimeout() {
     if (this.iceConnectionTimeout) clearTimeout(this.iceConnectionTimeout);
     
-    const networkType = navigator.connection?.type || 'unknown';
+    const networkType = 'connection' in navigator && navigator.connection?.type || 'unknown';
     const timeoutMs = networkType === 'cellular' ? 20000 : 15000;
     
     this.iceConnectionTimeout = setTimeout(() => {
@@ -509,7 +523,7 @@ export class P2PService {
   }
 
   private monitorNetwork() {
-    if ('connection' in navigator) {
+    if ('connection' in navigator && navigator.connection) {
       const connection = navigator.connection;
       connection.onchange = () => {
         console.log('Network changed:', {
@@ -517,7 +531,7 @@ export class P2PService {
           effectiveType: connection.effectiveType,
           downlink: connection.downlink
         });
-        if (connection.effectiveType === '2g' || connection.downlink < 1) {
+        if (connection.effectiveType === '2g' || (connection.downlink && connection.downlink < 1)) {
           this.requestIceRestart();
         }
       };

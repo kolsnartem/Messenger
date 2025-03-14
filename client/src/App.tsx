@@ -51,7 +51,8 @@ const encryptMessage = (text: string, contactPublicKey: string, keyPair: TweetNa
 
 const storeSentMessage = (messageId: string, text: string, chatId: string) => {
   const stored = JSON.parse(localStorage.getItem(`sentMessages_${chatId}`) || '{}');
-  localStorage.setItem(`sentMessages_${chatId}`, JSON.stringify({ ...stored, [messageId]: text }));
+  stored[messageId] = text;
+  localStorage.setItem(`sentMessages_${chatId}`, JSON.stringify(stored));
 };
 
 const getSentMessage = (messageId: string, chatId: string): string | null => {
@@ -63,7 +64,8 @@ const AudioSpectrogram: React.FC<{ audioStream: MediaStream | null; style?: Reac
 
   useEffect(() => {
     if (!audioStream || !canvasRef.current) return;
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const AudioContext = window.AudioContext;
+    const audioContext = new AudioContext();
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
     const source = audioContext.createMediaStreamSource(audioStream);
@@ -123,7 +125,7 @@ const App: React.FC = () => {
   const [isKeysLoaded, setIsKeysLoaded] = useState(false);
   const [isP2PActive, setIsP2PActive] = useState(false);
   const [p2pRequest, setP2PRequest] = useState<Message | null>(null);
-  const [callState, setCallState] = useState<CallState & { callDuration?: number; reactions?: { emoji: string; timestamp: number }[] }>({
+  const [callState, setCallState] = useState<CallState>({
     localStream: null,
     remoteStream: null,
     isCalling: false,
@@ -140,6 +142,7 @@ const App: React.FC = () => {
   const p2pServiceRef = useRef<P2PService | null>(null);
   const videoCallServiceRef = useRef<VideoCallService | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const sentMessageIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (localVideoRef.current && callState.localStream) localVideoRef.current.srcObject = callState.localStream;
@@ -205,7 +208,7 @@ const App: React.FC = () => {
       .reaction-emoji { animation: float-up 2s ease-out forwards; }
     `;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => { document.head.removeChild(style); };
   }, []);
 
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
@@ -227,7 +230,7 @@ const App: React.FC = () => {
     const nonce = data.subarray(0, nacl.box.nonceLength);
     const cipher = data.subarray(nacl.box.nonceLength);
     const senderPublicKey = await fetchSenderPublicKey(senderId);
-    if (!senderPublicKey) return encryptedText; // Змінено для P2P
+    if (!senderPublicKey) return encryptedText;
     const theirPublicKey = fixPublicKey(new Uint8Array(Buffer.from(senderPublicKey, 'base64')));
     const decrypted = nacl.box.open(new Uint8Array(cipher), new Uint8Array(nonce), theirPublicKey, tweetNaclKeyPair.secretKey);
     return decrypted ? new TextDecoder().decode(decrypted) : encryptedText;
@@ -255,6 +258,7 @@ const App: React.FC = () => {
   }, [userId]);
 
   const handleIncomingMessage = async (message: Message) => {
+    if (sentMessageIds.current.has(message.id)) return;
     if (!message.isP2P) {
       const decryptedText = await decryptMessageText(message);
       const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
@@ -284,6 +288,7 @@ const App: React.FC = () => {
   };
 
   const handleP2PMessage = async (message: Message) => {
+    if (sentMessageIds.current.has(message.id)) return;
     const decryptedText = await decryptMessageText(message);
     const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
     setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
@@ -293,8 +298,9 @@ const App: React.FC = () => {
   const sendMessage = async () => {
     if (!input.trim() || !userId || !selectedChatId || !tweetNaclKeyPair) return;
     const contact = contacts.find(c => c.id === selectedChatId) || (socketRef.current?.connected ? (await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`)).data : { id: selectedChatId, publicKey: '' });
+    const messageId = `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const message: Message = { 
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`, 
+      id: messageId, 
       userId: userId!, 
       contactId: selectedChatId, 
       text: input.trim(), 
@@ -305,6 +311,7 @@ const App: React.FC = () => {
     };
 
     try {
+      sentMessageIds.current.add(messageId);
       if (isP2PActive && p2pServiceRef.current?.isP2PActive()) {
         storeSentMessage(message.id, message.text, selectedChatId);
         await p2pServiceRef.current.sendP2PMessage({ ...message, lastMessage: undefined });
@@ -320,6 +327,7 @@ const App: React.FC = () => {
       setInput('');
     } catch (error) {
       console.error('Failed to send message:', error);
+      sentMessageIds.current.delete(messageId);
       if (isP2PActive) {
         p2pServiceRef.current?.requestIceRestart();
       }
@@ -495,8 +503,8 @@ const App: React.FC = () => {
           .scroll-container::-webkit-scrollbar-track { background: ${isDarkTheme ? '#212529' : '#fff'}; }
           .scroll-container::-webkit-scrollbar-thumb { background: ${isDarkTheme ? '#6c757d' : '#dee2e6'}; border-radius: 4px; }
           .scroll-container::-webkit-scrollbar-thumb:hover { background: ${isDarkTheme ? '#868e96' : '#adb5bd'}; }
-          .p2p-message-mine { background-color: #ffccb3 !important; color: #333; }
-          .p2p-message-theirs { background-color: #ff9966 !important; color: #333; }
+          .message-mine { background-color: #ff9966 !important; color: #333; }
+          .message-theirs { background-color: #ffccb3 !important; color: #333; }
           .retry-button { margin-left: 5px; cursor: pointer; }
         `}
       </style>
@@ -518,7 +526,7 @@ const App: React.FC = () => {
           </div>
         </div>
         {selectedChatId && (
-          <div className="p-2 d-flex align-items-center mt-1 justify-content-between">
+          <div className="p-2 d-flex align-items-center mt-1 justify-content-between" style={{ background: headerBackground }}>
             <div className="d-flex align-items-center">
               <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setSelectedChatId(null)} style={{ border: 'none', background: 'transparent' }}><FaArrowLeft /></button>
               <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '25px', height: '25px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
@@ -592,15 +600,13 @@ const App: React.FC = () => {
             {messages.map(msg => (
               <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
                 <div 
-                  className={`p-2 rounded-3 ${msg.isMine ? 
-                    (msg.isP2P ? 'p2p-message-mine' : 'bg-primary text-white') : 
-                    (msg.isP2P ? 'p2p-message-theirs' : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border')}`} 
+                  className={`p-2 rounded-3 ${msg.isMine ? 'message-mine' : 'message-theirs'}`} 
                   style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <span>{msg.text}</span>
                     {msg.text.startsWith('base64:') && (
-                      <FaRedo className="retry-button" onClick={() => retryDecryption(msg)} style={{ fontSize: '0.8rem', color: isDarkTheme ? '#fff' : '#000' }} />
+                      <FaRedo className="retry-button" onClick={() => retryDecryption(msg)} style={{ fontSize: '0.8rem', color: '#333' }} />
                     )}
                   </div>
                   <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}</div>
