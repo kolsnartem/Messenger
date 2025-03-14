@@ -520,14 +520,14 @@ const App: React.FC = () => {
             color: #333;
           }
           .send-btn-inactive {
-            background-color: #ffccb3;
-            border-color: #ffccb3;
+            background-color: #ff9966;
+            border-color: #ff9966;
             color: #333;
           }
           .send-btn-active:disabled {
-            background-color: #ffccb3;
-            border-color: #ffccb3;
-            opacity: 0.65;
+            background-color: #ff9966;
+            border-color: #ff9966;
+            opacity: 1;
             color: #333;
           }
           .btn {
