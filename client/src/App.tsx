@@ -218,7 +218,7 @@ const App: React.FC = () => {
       localStorage.setItem(`publicKey_${senderId}`, key);
       setContacts(prev => prev.some(c => c.id === senderId) ? prev : [...prev, { id: senderId, email: res.data.email || '', publicKey: key, lastMessage: null }]);
     }
-    return key || ''; // Повертаємо порожній рядок, якщо ключ недоступний
+    return key || '';
   };
 
   const decryptMessage = async (encryptedText: string, senderId: string): Promise<string> => {
@@ -227,10 +227,10 @@ const App: React.FC = () => {
     const nonce = data.subarray(0, nacl.box.nonceLength);
     const cipher = data.subarray(nacl.box.nonceLength);
     const senderPublicKey = await fetchSenderPublicKey(senderId);
-    if (!senderPublicKey) return 'Decryption Failed: Public key unavailable';
+    if (!senderPublicKey) return encryptedText; // Змінено для P2P
     const theirPublicKey = fixPublicKey(new Uint8Array(Buffer.from(senderPublicKey, 'base64')));
     const decrypted = nacl.box.open(new Uint8Array(cipher), new Uint8Array(nonce), theirPublicKey, tweetNaclKeyPair.secretKey);
-    return decrypted ? new TextDecoder().decode(decrypted) : 'Decryption Failed';
+    return decrypted ? new TextDecoder().decode(decrypted) : encryptedText;
   };
 
   const decryptMessageText = async (message: Message): Promise<string> => {
@@ -275,7 +275,6 @@ const App: React.FC = () => {
     } catch (error) {
       console.error('Failed to parse P2P signaling message:', error);
       if (message.text.startsWith('base64:')) {
-        console.warn('Received P2P message via socket instead of DataChannel');
         const decryptedText = await decryptMessageText(message);
         const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
         setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
@@ -467,6 +466,7 @@ const App: React.FC = () => {
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
+  const headerBackground = isDarkTheme ? '#212529' : '#f8f9fa';
 
   if (!userId) {
     return (
@@ -495,18 +495,18 @@ const App: React.FC = () => {
           .scroll-container::-webkit-scrollbar-track { background: ${isDarkTheme ? '#212529' : '#fff'}; }
           .scroll-container::-webkit-scrollbar-thumb { background: ${isDarkTheme ? '#6c757d' : '#dee2e6'}; border-radius: 4px; }
           .scroll-container::-webkit-scrollbar-thumb:hover { background: ${isDarkTheme ? '#868e96' : '#adb5bd'}; }
-          .p2p-message { background-color: #ff9500 !important; color: white; }
+          .p2p-message-mine { background-color: #ffccb3 !important; color: #333; }
+          .p2p-message-theirs { background-color: #ff9966 !important; color: #333; }
           .retry-button { margin-left: 5px; cursor: pointer; }
-          .p2p-request-panel { background: ${isDarkTheme ? 'rgba(40, 44, 52, 0.95)' : 'rgba(248, 249, 250, 0.95)'}; padding: 5px; border-top: 1px solid ${isDarkTheme ? '#444' : '#ddd'}; }
         `}
       </style>
 
-      <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', zIndex: 20, height: selectedChatId ? (p2pRequest ? '130px' : '90px') : '50px' }}>
+      <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: selectedChatId ? '90px' : '50px' }}>
         <div className="d-flex justify-content-between align-items-center">
           <div style={{ position: 'relative' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>MSNGR ({userEmail})</h5>
             {isMenuOpen && (
-              <div style={{ position: 'fixed', top: '55px', left: '10px', background: isDarkTheme ? '#212529' : '#fff', border: '1px solid #ccc', borderRadius: '4px', zIndex: 1000, padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ position: 'fixed', top: '55px', left: '10px', background: headerBackground, border: '1px solid #ccc', borderRadius: '4px', zIndex: 1000, padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <button className="btn btn-sm btn-success mb-2" onClick={() => window.location.reload()} style={{ width: '150px', fontSize: '0.875rem' }}><FaSync /> Update</button>
                 <button className="btn btn-sm btn-outline-danger" onClick={handleLogout} style={{ width: '150px', fontSize: '0.875rem' }}><FaSignOutAlt /> Logout</button>
               </div>
@@ -526,26 +526,26 @@ const App: React.FC = () => {
               </div>
               <h6 className="m-0 me-2">{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
             </div>
-            <div>
-              <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(false)} disabled={callState.isCalling}><FaPhone /></button>
-              <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(true)} disabled={callState.isCalling}><FaVideo /></button>
-              <button className={`btn btn-sm ${isP2PActive ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => isP2PActive ? p2pServiceRef.current?.disconnectP2P() : initiateP2P()} disabled={!tweetNaclKeyPair || !selectedChatId}><FaLock /> {isP2PActive ? 'P2P' : 'P2P'}</button>
-            </div>
-          </div>
-        )}
-        {selectedChatId && p2pRequest && (
-          <div className="p2p-request-panel d-flex justify-content-between align-items-center">
-            <span>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</span>
-            <div>
-              <button className="btn btn-sm btn-success me-2" onClick={() => handleP2PResponse(true)}><FaCheck /></button>
-              <button className="btn btn-sm btn-danger" onClick={() => handleP2PResponse(false)}><FaTimes /></button>
-            </div>
+            {!p2pRequest && (
+              <div>
+                <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(false)} disabled={callState.isCalling}><FaPhone /></button>
+                <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(true)} disabled={callState.isCalling}><FaVideo /></button>
+                <button className={`btn btn-sm ${isP2PActive ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => isP2PActive ? p2pServiceRef.current?.disconnectP2P() : initiateP2P()} disabled={!tweetNaclKeyPair || !selectedChatId}><FaLock /> {isP2PActive ? 'P2P' : 'P2P'}</button>
+              </div>
+            )}
+            {p2pRequest && (
+              <div className="d-flex align-items-center">
+                <span className="me-2" style={{ fontSize: '0.9rem' }}>P2P request from {contacts.find(c => c.id === p2pRequest.userId)?.email || 'User'}</span>
+                <button className="btn btn-sm btn-success me-2" onClick={() => handleP2PResponse(true)}><FaCheck /></button>
+                <button className="btn btn-sm btn-danger" onClick={() => handleP2PResponse(false)}><FaTimes /></button>
+              </div>
+            )}
           </div>
         )}
       </div>
 
       {isSearchOpen && (
-        <div style={{ position: 'fixed', top: selectedChatId ? (p2pRequest ? '130px' : '90px') : '50px', left: 0, right: 0, background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', zIndex: 30, padding: '0' }}>
+        <div style={{ position: 'fixed', top: selectedChatId ? '90px' : '50px', left: 0, right: 0, background: headerBackground, zIndex: 30, padding: '0' }}>
           <div className="container p-2">
             <input type="text" className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light search-placeholder-dark' : ''}`} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search users..." />
           </div>
@@ -555,7 +555,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? (p2pRequest ? '130px' : '90px') : '50px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
+      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? '90px' : '50px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
         {callState.isCalling && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(18, 18, 38, 0.98) 0%, rgba(9, 9, 19, 0.98) 100%)', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '16px', boxSizing: 'border-box' }}>
             <div style={{ fontSize: '18px', fontWeight: '500', color: 'white', padding: '12px 0', width: '100%', textAlign: 'center', zIndex: 2 }}>{formatCallDuration(callState.callDuration)}</div>
@@ -591,10 +591,15 @@ const App: React.FC = () => {
             <div style={{ flexGrow: 1 }} />
             {messages.map(msg => (
               <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
-                <div className={`p-2 rounded-3 ${msg.isMine ? 'bg-primary text-white' : msg.isP2P ? 'p2p-message' : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border'}`} style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}>
+                <div 
+                  className={`p-2 rounded-3 ${msg.isMine ? 
+                    (msg.isP2P ? 'p2p-message-mine' : 'bg-primary text-white') : 
+                    (msg.isP2P ? 'p2p-message-theirs' : isDarkTheme ? 'bg-secondary text-white' : 'bg-light border')}`} 
+                  style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <span>{msg.text}</span>
-                    {msg.text.includes('Decryption Failed') && (
+                    {msg.text.startsWith('base64:') && (
                       <FaRedo className="retry-button" onClick={() => retryDecryption(msg)} style={{ fontSize: '0.8rem', color: isDarkTheme ? '#fff' : '#000' }} />
                     )}
                   </div>
@@ -609,7 +614,7 @@ const App: React.FC = () => {
       </div>
 
       {selectedChatId && !callState.isCalling && (
-        <div className="p-2" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: isDarkTheme ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)', zIndex: 10, height: '49px', display: 'flex', alignItems: 'center', borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee' }}>
+        <div className="p-2" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: headerBackground, zIndex: 10, height: '49px', display: 'flex', alignItems: 'center', borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee' }}>
           <div className="d-flex align-items-center w-100 px-2">
             <input type="text" className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light input-placeholder-dark' : ''}`} value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && sendMessage()} placeholder="Message..." style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }} />
             <button className="btn btn-primary ms-2 d-flex align-items-center justify-content-center" onClick={sendMessage} style={{ borderRadius: '20px', minWidth: '60px', height: '38px' }} disabled={!input.trim() || !tweetNaclKeyPair || !isKeysLoaded}>Send</button>
