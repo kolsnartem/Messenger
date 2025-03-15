@@ -107,6 +107,41 @@ const formatCallDuration = (durationInSeconds: number = 0): string => {
 
 const publicKeysCache = new Map<string, string>();
 
+// Новий компонент для відображення непрочитаних повідомлень
+const UnreadMessagesIndicator: React.FC<{
+  unreadCount: number;
+  onClick: () => void;
+  isDarkTheme: boolean;
+}> = ({ unreadCount, onClick, isDarkTheme }) => {
+  if (unreadCount === 0) return null;
+
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        position: 'absolute',
+        bottom: '70px',
+        left: '20px',
+        width: '30px',
+        height: '30px',
+        borderRadius: '50%',
+        backgroundColor: '#ff9966',
+        color: '#333',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        zIndex: 15,
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+      }}
+    >
+      {unreadCount}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const { userId, setUserId, setIdentityKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('userEmail'));
@@ -134,8 +169,9 @@ const App: React.FC = () => {
     callDuration: 0,
     reactions: [],
   });
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0); // Новий стан для непрочитаних повідомлень
   const chatRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null); // Додано для прокрутки
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -145,6 +181,7 @@ const App: React.FC = () => {
   const socketRef = useRef<Socket | null>(null);
   const sentMessageIds = useRef<Set<string>>(new Set());
   const scrollPositionRef = useRef<number>(0);
+  const lastReadMessageIdRef = useRef<string | null>(null); // Для відстеження останнього прочитаного повідомлення
 
   useEffect(() => {
     if (localVideoRef.current && callState.localStream) localVideoRef.current.srcObject = callState.localStream;
@@ -275,6 +312,15 @@ const App: React.FC = () => {
       const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
       setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
       await updateContactsWithLastMessage(updatedMessage);
+
+      // Оновлення кількості непрочитаних повідомлень
+      const chatContainer = chatContainerRef.current;
+      if (chatContainer && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
+        const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
+        if (!isAtBottom) {
+          setUnreadMessagesCount(prev => prev + 1);
+        }
+      }
       return;
     }
 
@@ -294,6 +340,15 @@ const App: React.FC = () => {
         const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
         setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
         await updateContactsWithLastMessage(updatedMessage);
+
+        // Оновлення кількості непрочитаних повідомлень для P2P
+        const chatContainer = chatContainerRef.current;
+        if (chatContainer && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
+          const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
+          if (!isAtBottom) {
+            setUnreadMessagesCount(prev => prev + 1);
+          }
+        }
       }
     }
   };
@@ -304,6 +359,15 @@ const App: React.FC = () => {
     const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
     setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
     await updateContactsWithLastMessage(updatedMessage);
+
+    // Оновлення кількості непрочитаних повідомлень
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer && selectedChatId === message.userId) {
+      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
+      if (!isAtBottom) {
+        setUnreadMessagesCount(prev => prev + 1);
+      }
+    }
   };
 
   const sendMessage = async () => {
@@ -341,7 +405,7 @@ const App: React.FC = () => {
       }
       setInput('');
       if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight; // Прокрутка вниз після відправки
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
       }
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -401,7 +465,6 @@ const App: React.FC = () => {
     }
   }, [searchQuery, userId]);
 
-  // Збереження позиції прокрутки
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
     if (!chatContainer || !selectedChatId) return;
@@ -417,13 +480,18 @@ const App: React.FC = () => {
     const handleScroll = () => {
       scrollPositionRef.current = chatContainer.scrollTop;
       localStorage.setItem(`scrollPosition_${selectedChatId}`, scrollPositionRef.current.toString());
+      
+      // Оновлення кількості непрочитаних при прокрутці донизу
+      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
+      if (isAtBottom && unreadMessagesCount > 0) {
+        setUnreadMessagesCount(0);
+      }
     };
 
     chatContainer.addEventListener('scroll', handleScroll);
     return () => chatContainer.removeEventListener('scroll', handleScroll);
-  }, [selectedChatId, messages]);
+  }, [selectedChatId, messages, unreadMessagesCount]);
 
-  // Умовна прокрутка вниз
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
     if (!chatContainer || !selectedChatId) return;
@@ -431,6 +499,7 @@ const App: React.FC = () => {
     const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
     if (isAtBottom) {
       chatContainer.scrollTop = chatContainer.scrollHeight;
+      setUnreadMessagesCount(0); // Скидаємо лічильник, якщо ми вже внизу
     }
   }, [messages, selectedChatId]);
 
@@ -461,6 +530,7 @@ const App: React.FC = () => {
     setSearchQuery('');
     setSearchResults([]);
     setContacts(prev => prev.some(c => c.id === contact.id) ? prev : [...prev, { ...contact, lastMessage: null }]);
+    setUnreadMessagesCount(0); // Скидаємо лічильник при виборі чату
     if (!tweetNaclKeyPair) {
       await initializeKeys();
     }
@@ -520,6 +590,14 @@ const App: React.FC = () => {
       socketRef.current?.emit('p2p-reject', { target: p2pRequest.userId, source: userId });
     }
     setP2PRequest(null);
+  };
+
+  const scrollToBottom = () => {
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer) {
+      chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+      setUnreadMessagesCount(0); // Скидаємо лічильник після прокрутки вниз
+    }
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
@@ -663,25 +741,28 @@ const App: React.FC = () => {
           </div>
         )}
         {selectedChatId && !callState.isCalling && (
-          <div ref={chatContainerRef} className="p-3 scroll-container" style={{ height: 'calc(100% - 60px)', overflowY: 'auto', filter: isSearchOpen ? 'blur(5px)' : 'none', transition: 'filter 0.3s', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flexGrow: 1 }} />
-            {messages.map(msg => (
-              <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
-                <div 
-                  className={`p-2 rounded-3 ${msg.isMine ? 'message-mine' : 'message-theirs'}`} 
-                  style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span>{msg.text}</span>
-                    {msg.text.startsWith('base64:') && (
-                      <FaRedo className="retry-button" onClick={() => retryDecryption(msg)} style={{ fontSize: '0.8rem', color: '#333' }} />
-                    )}
+          <div style={{ position: 'relative', height: '100%' }}>
+            <div ref={chatContainerRef} className="p-3 scroll-container" style={{ height: 'calc(100% - 60px)', overflowY: 'auto', filter: isSearchOpen ? 'blur(5px)' : 'none', transition: 'filter 0.3s', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ flexGrow: 1 }} />
+              {messages.map(msg => (
+                <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
+                  <div 
+                    className={`p-2 rounded-3 ${msg.isMine ? 'message-mine' : 'message-theirs'}`} 
+                    style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span>{msg.text}</span>
+                      {msg.text.startsWith('base64:') && (
+                        <FaRedo className="retry-button" onClick={() => retryDecryption(msg)} style={{ fontSize: '0.8rem', color: '#333' }} />
+                      )}
+                    </div>
+                    <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}</div>
                   </div>
-                  <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}</div>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} style={{ height: '1px' }} />
+              ))}
+              <div ref={messagesEndRef} style={{ height: '1px' }} />
+            </div>
+            <UnreadMessagesIndicator unreadCount={unreadMessagesCount} onClick={scrollToBottom} isDarkTheme={isDarkTheme} />
           </div>
         )}
         {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} />}
