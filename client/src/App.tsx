@@ -135,6 +135,7 @@ const App: React.FC = () => {
     reactions: [],
   });
   const chatRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null); // Додано для прокрутки
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -143,6 +144,7 @@ const App: React.FC = () => {
   const videoCallServiceRef = useRef<VideoCallService | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const sentMessageIds = useRef<Set<string>>(new Set());
+  const scrollPositionRef = useRef<number>(0);
 
   useEffect(() => {
     if (localVideoRef.current && callState.localStream) localVideoRef.current.srcObject = callState.localStream;
@@ -338,6 +340,9 @@ const App: React.FC = () => {
         await updateContactsWithLastMessage(message);
       }
       setInput('');
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight; // Прокрутка вниз після відправки
+      }
     } catch (error) {
       console.error('Failed to send message:', error);
       sentMessageIds.current.delete(messageId);
@@ -396,11 +401,38 @@ const App: React.FC = () => {
     }
   }, [searchQuery, userId]);
 
+  // Збереження позиції прокрутки
   useEffect(() => {
-    selectedChatId ? localStorage.setItem('selectedChatId', selectedChatId) : localStorage.removeItem('selectedChatId');
-    messagesEndRef.current?.scrollIntoView({ behavior: isInitialMount.current ? 'auto' : 'smooth' });
+    const chatContainer = chatContainerRef.current;
+    if (!chatContainer || !selectedChatId) return;
+
+    const savedPosition = localStorage.getItem(`scrollPosition_${selectedChatId}`);
+    if (savedPosition && isInitialMount.current) {
+      chatContainer.scrollTop = parseFloat(savedPosition);
+    } else if (isInitialMount.current) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
     isInitialMount.current = false;
+
+    const handleScroll = () => {
+      scrollPositionRef.current = chatContainer.scrollTop;
+      localStorage.setItem(`scrollPosition_${selectedChatId}`, scrollPositionRef.current.toString());
+    };
+
+    chatContainer.addEventListener('scroll', handleScroll);
+    return () => chatContainer.removeEventListener('scroll', handleScroll);
   }, [selectedChatId, messages]);
+
+  // Умовна прокрутка вниз
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+    if (!chatContainer || !selectedChatId) return;
+
+    const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
+    if (isAtBottom) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+  }, [messages, selectedChatId]);
 
   const handleAuth = async (isLogin: boolean) => {
     if (!email || !password) return alert('Fill in all fields');
@@ -432,6 +464,7 @@ const App: React.FC = () => {
     if (!tweetNaclKeyPair) {
       await initializeKeys();
     }
+    isInitialMount.current = true;
   };
 
   const handleLogout = () => {
@@ -630,7 +663,7 @@ const App: React.FC = () => {
           </div>
         )}
         {selectedChatId && !callState.isCalling && (
-          <div className="p-3 scroll-container" style={{ height: 'calc(100% - 60px)', overflowY: 'auto', filter: isSearchOpen ? 'blur(5px)' : 'none', transition: 'filter 0.3s', display: 'flex', flexDirection: 'column' }}>
+          <div ref={chatContainerRef} className="p-3 scroll-container" style={{ height: 'calc(100% - 60px)', overflowY: 'auto', filter: isSearchOpen ? 'blur(5px)' : 'none', transition: 'filter 0.3s', display: 'flex', flexDirection: 'column' }}>
             <div style={{ flexGrow: 1 }} />
             {messages.map(msg => (
               <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
