@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Contact, Message, TweetNaClKeyPair } from './types';
+import { Contact, Message, TweetNaClKeyPair, IdentityKeyPair, EncryptionError } from './types';
 import ChatList from './components/ChatList';
 import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import { useAuth } from './hooks/useAuth';
@@ -113,17 +113,17 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(localStorage.getItem('selectedChatId'));
-  const [input, setInput] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [input, setInput] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isDarkTheme, setIsDarkTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [tweetNaclKeyPair, setTweetNaclKeyPair] = useState<TweetNaClKeyPair | null>(null);
-  const [isKeysLoaded, setIsKeysLoaded] = useState(false);
-  const [isP2PActive, setIsP2PActive] = useState(false);
+  const [isKeysLoaded, setIsKeysLoaded] = useState<boolean>(false);
+  const [isP2PActive, setIsP2PActive] = useState<boolean>(false);
   const [p2pRequest, setP2PRequest] = useState<Message | null>(null);
   const [callState, setCallState] = useState<CallState>({
     localStream: null,
@@ -138,7 +138,7 @@ const App: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const isInitialMount = useRef(true);
+  const isInitialMount = useRef<boolean>(true);
   const p2pServiceRef = useRef<P2PService | null>(null);
   const videoCallServiceRef = useRef<VideoCallService | null>(null);
   const socketRef = useRef<Socket | null>(null);
@@ -158,6 +158,10 @@ const App: React.FC = () => {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+    });
+    socketRef.current.on('connect', () => {
+      console.log('Socket connected');
+      fetchData();
     });
     videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
       setCallState(prev => ({
@@ -301,8 +305,12 @@ const App: React.FC = () => {
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || !userId || !selectedChatId || !tweetNaclKeyPair) return;
-    const contact = contacts.find(c => c.id === selectedChatId) || (socketRef.current?.connected ? (await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`)).data : { id: selectedChatId, publicKey: '' });
+    if (!input.trim()) return;
+    if (!userId || !selectedChatId || !tweetNaclKeyPair) {
+      console.error('Cannot send message: missing prerequisites', { userId, selectedChatId, tweetNaclKeyPair });
+      return;
+    }
+    const contact = contacts.find(c => c.id === selectedChatId) || (socketRef.current?.connected ? (await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`)).data : { id: selectedChatId, publicKey: '', email: '', lastMessage: null });
     const messageId = `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const message: Message = { 
       id: messageId, 
@@ -680,7 +688,7 @@ const App: React.FC = () => {
                 input.trim() ? 'send-btn-active' : 'send-btn-inactive'
               }`}
               onClick={sendMessage} 
-              disabled={!input.trim() || !tweetNaclKeyPair || !isKeysLoaded}
+              disabled={!input.trim()}
               style={{ 
                 borderRadius: '20px', 
                 minWidth: '60px', 
