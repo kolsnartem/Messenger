@@ -6,7 +6,7 @@ import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaRedo } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaRedo, FaArrowDown } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
@@ -107,7 +107,6 @@ const formatCallDuration = (durationInSeconds: number = 0): string => {
 
 const publicKeysCache = new Map<string, string>();
 
-// Новий компонент для відображення непрочитаних повідомлень
 const UnreadMessagesIndicator: React.FC<{
   unreadCount: number;
   onClick: () => void;
@@ -142,6 +141,37 @@ const UnreadMessagesIndicator: React.FC<{
   );
 };
 
+// Новий компонент для кнопки прокрутки вниз
+const ScrollDownButton: React.FC<{
+  onClick: () => void;
+  isDarkTheme: boolean;
+}> = ({ onClick, isDarkTheme }) => {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        position: 'absolute',
+        bottom: '70px',
+        right: '20px',
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        backgroundColor: isDarkTheme ? '#333' : '#fff',
+        color: isDarkTheme ? '#fff' : '#333',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '24px',
+        cursor: 'pointer',
+        zIndex: 15,
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+      }}
+    >
+      <FaArrowDown />
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const { userId, setUserId, setIdentityKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('userEmail'));
@@ -169,7 +199,8 @@ const App: React.FC = () => {
     callDuration: 0,
     reactions: [],
   });
-  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0); // Новий стан для непрочитаних повідомлень
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
+  const [showScrollDown, setShowScrollDown] = useState<boolean>(false); // Додано для стрілки вниз
   const chatRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -181,7 +212,7 @@ const App: React.FC = () => {
   const socketRef = useRef<Socket | null>(null);
   const sentMessageIds = useRef<Set<string>>(new Set());
   const scrollPositionRef = useRef<number>(0);
-  const lastReadMessageIdRef = useRef<string | null>(null); // Для відстеження останнього прочитаного повідомлення
+  const shouldScrollToBottomRef = useRef<boolean>(true); // Додано для автоматичного скролінгу
 
   useEffect(() => {
     if (localVideoRef.current && callState.localStream) localVideoRef.current.srcObject = callState.localStream;
@@ -305,22 +336,36 @@ const App: React.FC = () => {
     });
   }, [userId]);
 
+  const isAtBottom = () => {
+    const chatContainer = chatContainerRef.current;
+    if (!chatContainer) return true;
+    return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 20; // Поріг 20px для точності
+  };
+
+  const scrollToBottom = (force: boolean = false) => {
+    const chatContainer = chatContainerRef.current;
+    if (!chatContainer) return;
+    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+    if (force) {
+      setUnreadMessagesCount(0);
+      setShowScrollDown(false);
+    }
+  };
+
   const handleIncomingMessage = async (message: Message) => {
     if (sentMessageIds.current.has(message.id)) return;
     if (!message.isP2P) {
       const decryptedText = await decryptMessageText(message);
       const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
-      setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
-      await updateContactsWithLastMessage(updatedMessage);
-
-      // Оновлення кількості непрочитаних повідомлень
-      const chatContainer = chatContainerRef.current;
-      if (chatContainer && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
-        const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
-        if (!isAtBottom) {
+      setMessages(prev => {
+        if (prev.some(m => m.id === message.id)) return prev;
+        const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
+        if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
           setUnreadMessagesCount(prev => prev + 1);
         }
-      }
+        return updatedMessages;
+      });
+      await updateContactsWithLastMessage(updatedMessage);
       return;
     }
 
@@ -338,17 +383,15 @@ const App: React.FC = () => {
       if (message.text.startsWith('base64:')) {
         const decryptedText = await decryptMessageText(message);
         const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
-        setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
-        await updateContactsWithLastMessage(updatedMessage);
-
-        // Оновлення кількості непрочитаних повідомлень для P2P
-        const chatContainer = chatContainerRef.current;
-        if (chatContainer && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
-          const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
-          if (!isAtBottom) {
+        setMessages(prev => {
+          if (prev.some(m => m.id === message.id)) return prev;
+          const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
+          if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
             setUnreadMessagesCount(prev => prev + 1);
           }
-        }
+          return updatedMessages;
+        });
+        await updateContactsWithLastMessage(updatedMessage);
       }
     }
   };
@@ -357,17 +400,15 @@ const App: React.FC = () => {
     if (sentMessageIds.current.has(message.id)) return;
     const decryptedText = await decryptMessageText(message);
     const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
-    setMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp));
-    await updateContactsWithLastMessage(updatedMessage);
-
-    // Оновлення кількості непрочитаних повідомлень
-    const chatContainer = chatContainerRef.current;
-    if (chatContainer && selectedChatId === message.userId) {
-      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
-      if (!isAtBottom) {
+    setMessages(prev => {
+      if (prev.some(m => m.id === message.id)) return prev;
+      const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
+      if (!isAtBottom() && selectedChatId === message.userId) {
         setUnreadMessagesCount(prev => prev + 1);
       }
-    }
+      return updatedMessages;
+    });
+    await updateContactsWithLastMessage(updatedMessage);
   };
 
   const sendMessage = async () => {
@@ -404,9 +445,7 @@ const App: React.FC = () => {
         await updateContactsWithLastMessage(message);
       }
       setInput('');
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-      }
+      shouldScrollToBottomRef.current = true; // Автоматичний скрол після відправки
     } catch (error) {
       console.error('Failed to send message:', error);
       sentMessageIds.current.delete(messageId);
@@ -480,12 +519,12 @@ const App: React.FC = () => {
     const handleScroll = () => {
       scrollPositionRef.current = chatContainer.scrollTop;
       localStorage.setItem(`scrollPosition_${selectedChatId}`, scrollPositionRef.current.toString());
-      
-      // Оновлення кількості непрочитаних при прокрутці донизу
-      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
-      if (isAtBottom && unreadMessagesCount > 0) {
+      const atBottom = isAtBottom();
+      setShowScrollDown(!atBottom);
+      if (atBottom && unreadMessagesCount > 0) {
         setUnreadMessagesCount(0);
       }
+      shouldScrollToBottomRef.current = atBottom;
     };
 
     chatContainer.addEventListener('scroll', handleScroll);
@@ -493,13 +532,9 @@ const App: React.FC = () => {
   }, [selectedChatId, messages, unreadMessagesCount]);
 
   useEffect(() => {
-    const chatContainer = chatContainerRef.current;
-    if (!chatContainer || !selectedChatId) return;
-
-    const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 1;
-    if (isAtBottom) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-      setUnreadMessagesCount(0); // Скидаємо лічильник, якщо ми вже внизу
+    if (!selectedChatId || messages.length === 0) return;
+    if (shouldScrollToBottomRef.current || isAtBottom()) {
+      scrollToBottom();
     }
   }, [messages, selectedChatId]);
 
@@ -530,7 +565,7 @@ const App: React.FC = () => {
     setSearchQuery('');
     setSearchResults([]);
     setContacts(prev => prev.some(c => c.id === contact.id) ? prev : [...prev, { ...contact, lastMessage: null }]);
-    setUnreadMessagesCount(0); // Скидаємо лічильник при виборі чату
+    setUnreadMessagesCount(0);
     if (!tweetNaclKeyPair) {
       await initializeKeys();
     }
@@ -590,14 +625,6 @@ const App: React.FC = () => {
       socketRef.current?.emit('p2p-reject', { target: p2pRequest.userId, source: userId });
     }
     setP2PRequest(null);
-  };
-
-  const scrollToBottom = () => {
-    const chatContainer = chatContainerRef.current;
-    if (chatContainer) {
-      chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
-      setUnreadMessagesCount(0); // Скидаємо лічильник після прокрутки вниз
-    }
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
@@ -762,7 +789,8 @@ const App: React.FC = () => {
               ))}
               <div ref={messagesEndRef} style={{ height: '1px' }} />
             </div>
-            <UnreadMessagesIndicator unreadCount={unreadMessagesCount} onClick={scrollToBottom} isDarkTheme={isDarkTheme} />
+            <UnreadMessagesIndicator unreadCount={unreadMessagesCount} onClick={() => scrollToBottom(true)} isDarkTheme={isDarkTheme} />
+            {showScrollDown && <ScrollDownButton onClick={() => scrollToBottom(true)} isDarkTheme={isDarkTheme} />}
           </div>
         )}
         {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} />}
