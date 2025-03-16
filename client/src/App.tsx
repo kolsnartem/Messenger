@@ -6,7 +6,7 @@ import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaRedo, FaArrowDown } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaRedo, FaArrowDown, FaChevronLeft, FaChevronDown, FaAngleDown, FaAngleLeft, FaPhoneAlt } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
@@ -119,10 +119,10 @@ const UnreadMessagesIndicator: React.FC<{
       onClick={onClick}
       style={{
         position: 'absolute',
-        bottom: '70px',
+        bottom: '80px',
         left: '20px',
-        width: '30px',
-        height: '30px',
+        width: '40px',
+        height: '40px',
         borderRadius: '50%',
         backgroundColor: '#ff9966',
         color: '#333',
@@ -151,7 +151,7 @@ const ScrollDownButton: React.FC<{
       onClick={onClick}
       style={{
         position: 'absolute',
-        bottom: '70px',
+        bottom: '80px',
         right: '20px',
         width: '40px',
         height: '40px',
@@ -167,7 +167,7 @@ const ScrollDownButton: React.FC<{
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
       }}
     >
-      <FaArrowDown />
+      <FaAngleDown />
     </div>
   );
 };
@@ -700,8 +700,9 @@ const App: React.FC = () => {
         </div>
         {selectedChatId && (
           <div className="p-2 d-flex align-items-center mt-1 justify-content-between" style={{ background: headerBackground }}>
+    
             <div className="d-flex align-items-center">
-              <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setSelectedChatId(null)} style={{ border: 'none', background: 'transparent' }}><FaArrowLeft /></button>
+              <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setSelectedChatId(null)} style={{ border: 'none', background: 'transparent' }}><FaAngleLeft /></button>
               <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '25px', height: '25px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
@@ -709,7 +710,7 @@ const App: React.FC = () => {
             </div>
             {!p2pRequest && (
               <div>
-                <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(false)} disabled={callState.isCalling}><FaPhone /></button>
+                <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(false)} disabled={callState.isCalling}><FaPhoneAlt /></button>
                 <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(true)} disabled={callState.isCalling}><FaVideo /></button>
                 <button className={`btn btn-sm ${isP2PActive ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => isP2PActive ? p2pServiceRef.current?.disconnectP2P() : initiateP2P()} disabled={!tweetNaclKeyPair || !selectedChatId}><FaLock /> {isP2PActive ? 'P2P' : 'P2P'}</button>
               </div>
