@@ -31,8 +31,8 @@ const UnreadMessagesIndicator: React.FC<{
         width: '40px',
         height: '40px',
         borderRadius: '50%',
-        background: 'linear-gradient(90deg, #00C7D4, #00C79D)', // Градієнт як у повідомлень
-        color: '#fff', // Білий текст для контрасту
+        background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
+        color: '#fff',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -67,13 +67,12 @@ const ScrollDownButton: React.FC<{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '24px',
         cursor: 'pointer',
         zIndex: 15,
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
       }}
     >
-      <FaAngleDown />
+      <FaAngleDown style={{ width: '95px', height: '95px', transform: 'scale(0.4)' }} />
     </div>
   );
 };
@@ -186,7 +185,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           onClick={handleSend}
           style={{
             padding: '10px 20px',
-            background: 'linear-gradient(90deg, #00C7D4, #00C79D)', // Градієнт як у повідомлень
+            background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
             border: 'none',
             borderRadius: '8px',
             color: 'white',

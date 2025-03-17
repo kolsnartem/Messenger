@@ -8,7 +8,7 @@ import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaPhoneAlt } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaPhoneAlt, FaChevronLeft } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
@@ -546,7 +546,22 @@ const App: React.FC = () => {
         {selectedChatId && (
           <div className="p-2 d-flex align-items-center mt-1 justify-content-between" style={{ background: headerBackground }}>
             <div className="d-flex align-items-center">
-              <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setSelectedChatId(null)} style={{ border: 'none', background: 'transparent' }}><FaArrowLeft /></button>
+              <button 
+                className="btn btn-sm btn-outline-secondary me-2" 
+                onClick={() => setSelectedChatId(null)} 
+                style={{ 
+                  border: 'none', 
+                  background: 'transparent', 
+                  width: '25px', 
+                  height: '25px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  padding: 0 
+                }}
+              >
+                <FaChevronLeft style={{ width: '95px', height: '95px', transform: 'scale(0.4)', color: isDarkTheme ? '#fff' : '#212529' }} />
+              </button>
               <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '25px', height: '25px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
