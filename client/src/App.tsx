@@ -91,7 +91,7 @@ const App: React.FC = () => {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
   const [showScrollDown, setShowScrollDown] = useState<boolean>(false);
   const chatRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null); // Змінено тип для уникнення помилки
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef<boolean>(true);
   const p2pServiceRef = useRef<P2PService | null>(null);
   const videoCallServiceRef = useRef<VideoCallService | null>(null);
@@ -520,9 +520,9 @@ const App: React.FC = () => {
           .message-mine { background-color: #ff9966 !important; color: #333; }
           .message-theirs { background-color: #ffccb3 !important; color: #333; }
           .retry-button { margin-left: 5px; cursor: pointer; }
-          .send-btn-active { background-color: #ff9966; border-color: #ff9966; color: #333; }
-          .send-btn-inactive { background-color: #ff9966; border-color: #ff9966; color: #333; }
-          .send-btn-active:disabled { background-color: #ff9966; border-color: #ff9966; opacity: 1; color: #333; }
+          .send-btn-active { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
+          .send-btn-inactive { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
+          .send-btn-active:disabled { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; opacity: 0.5; color: #fff; }
           .btn { transition: background-color 0.2s ease-in-out; }
         `}
       </style>
@@ -597,7 +597,8 @@ const App: React.FC = () => {
             showScrollDown={showScrollDown}
             onRetryDecryption={retryDecryption}
             onScrollToBottom={scrollToBottom}
-            chatContainerRef={chatContainerRef} // Передаємо ref
+            chatContainerRef={chatContainerRef}
+            onSendMessage={sendMessage}
           />
         )}
         {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} />}
@@ -633,7 +634,7 @@ const App: React.FC = () => {
               className={`btn ms-2 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
               onClick={sendMessage} 
               disabled={!input.trim()}
-              style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background-color 0.1s ease' }}
+              style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease' }}
             >
               Send
             </button>

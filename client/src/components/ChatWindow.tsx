@@ -10,7 +10,8 @@ interface ChatWindowProps {
   showScrollDown: boolean;
   onRetryDecryption: (message: Message) => void;
   onScrollToBottom: (force?: boolean) => void;
-  chatContainerRef: React.RefObject<HTMLDivElement | null>; // Дозволяємо null у типі
+  chatContainerRef: React.RefObject<HTMLDivElement | null>;
+  onSendMessage: (text: string) => void;
 }
 
 const UnreadMessagesIndicator: React.FC<{
@@ -30,8 +31,8 @@ const UnreadMessagesIndicator: React.FC<{
         width: '40px',
         height: '40px',
         borderRadius: '50%',
-        backgroundColor: '#ff9966',
-        color: '#333',
+        background: 'linear-gradient(90deg, #00C7D4, #00C79D)', // Градієнт як у повідомлень
+        color: '#fff', // Білий текст для контрасту
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -86,16 +87,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   onRetryDecryption,
   onScrollToBottom,
   chatContainerRef,
+  onSendMessage,
 }) => {
+  const [inputText, setInputText] = React.useState<string>('');
+
   if (!selectedChatId) return null;
 
+  const handleSend = () => {
+    if (inputText.trim()) {
+      onSendMessage(inputText);
+      setInputText('');
+    }
+  };
+
   return (
-    <div style={{ position: 'relative', height: '100%' }}>
+    <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
         ref={chatContainerRef}
         className="p-3 scroll-container"
         style={{
-          height: 'calc(100% - 60px)',
+          flex: '1 1 auto',
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
@@ -113,6 +124,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 maxWidth: '75%',
                 borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                 wordBreak: 'break-word',
+                background: msg.isMine
+                  ? 'linear-gradient(90deg, #00C7D4, #00C79D)'
+                  : 'linear-gradient(90deg, rgba(0, 199, 212, 0.5), rgba(0, 199, 157, 0.5))',
+                color: '#fff',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -121,7 +136,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   <FaRedo
                     className="retry-button"
                     onClick={() => onRetryDecryption(msg)}
-                    style={{ fontSize: '0.8rem', color: '#333', cursor: 'pointer', marginLeft: '5px' }}
+                    style={{ fontSize: '0.8rem', color: '#fff', cursor: 'pointer', marginLeft: '5px' }}
                   />
                 )}
               </div>
@@ -140,6 +155,50 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         ))}
         <div style={{ height: '1px' }} />
       </div>
+
+      <div
+        style={{
+          padding: '10px',
+          background: isDarkTheme ? '#2c3e50' : '#f1f3f5',
+          borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+          placeholder="Type a message..."
+          style={{
+            flex: 1,
+            padding: '10px',
+            border: 'none',
+            borderRadius: '8px',
+            background: isDarkTheme ? '#34495e' : '#fff',
+            color: isDarkTheme ? '#fff' : '#2c3e50',
+            outline: 'none',
+          }}
+        />
+        <button
+          onClick={handleSend}
+          style={{
+            padding: '10px 20px',
+            background: 'linear-gradient(90deg, #00C7D4, #00C79D)', // Градієнт як у повідомлень
+            border: 'none',
+            borderRadius: '8px',
+            color: 'white',
+            fontSize: '16px',
+            fontWeight: 500,
+            cursor: 'pointer',
+          }}
+        >
+          Send
+        </button>
+      </div>
+
       {unreadMessagesCount > 0 && (
         <UnreadMessagesIndicator
           unreadCount={unreadMessagesCount}
