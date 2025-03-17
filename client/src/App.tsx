@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Contact, Message, TweetNaClKeyPair, IdentityKeyPair, EncryptionError } from './types';
 import ChatList from './components/ChatList';
+import ChatWindow from './components/ChatWindow';
+import VideoCallWindow from './components/CallWindow';
+import AuthForm from './components/AuthForm';
 import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
-import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaRedo, FaArrowDown, FaChevronLeft, FaChevronDown, FaAngleDown, FaAngleLeft, FaPhoneAlt } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaArrowLeft, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaPhoneAlt } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
@@ -59,118 +61,7 @@ const getSentMessage = (messageId: string, chatId: string): string | null => {
   return JSON.parse(localStorage.getItem(`sentMessages_${chatId}`) || '{}')[messageId] || null;
 };
 
-const AudioSpectrogram: React.FC<{ audioStream: MediaStream | null; style?: React.CSSProperties }> = ({ audioStream, style }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    if (!audioStream || !canvasRef.current) return;
-    const AudioContext = window.AudioContext;
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    const source = audioContext.createMediaStreamSource(audioStream);
-    source.connect(analyser);
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d')!;
-
-    const draw = () => {
-      requestAnimationFrame(draw);
-      analyser.getByteFrequencyData(dataArray);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const barWidth = (canvas.width / analyser.frequencyBinCount) * 2.5;
-      let x = 0;
-      for (let i = 0; i < analyser.frequencyBinCount; i++) {
-        const barHeight = (dataArray[i] / 255) * canvas.height;
-        const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
-        gradient.addColorStop(0, 'rgba(100, 140, 255, 1)');
-        gradient.addColorStop(0.5, 'rgba(120, 70, 255, 0.8)');
-        gradient.addColorStop(1, 'rgba(180, 100, 255, 0.6)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-        x += barWidth + 1;
-      }
-    };
-    draw();
-    return () => { source.disconnect(); audioContext.close(); };
-  }, [audioStream]);
-
-  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', ...style }} width={300} height={150} />;
-};
-
-const formatCallDuration = (durationInSeconds: number = 0): string => {
-  const hours = Math.floor(durationInSeconds / 3600);
-  const minutes = Math.floor((durationInSeconds % 3600) / 60);
-  const seconds = durationInSeconds % 60;
-  return `${hours > 0 ? `${hours.toString().padStart(2, '0')}:` : ''}${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-};
-
 const publicKeysCache = new Map<string, string>();
-
-const UnreadMessagesIndicator: React.FC<{
-  unreadCount: number;
-  onClick: () => void;
-  isDarkTheme: boolean;
-}> = ({ unreadCount, onClick, isDarkTheme }) => {
-  if (unreadCount === 0) return null;
-
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        position: 'absolute',
-        bottom: '80px',
-        left: '20px',
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
-        backgroundColor: '#ff9966',
-        color: '#333',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '14px',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        zIndex: 15,
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-      }}
-    >
-      {unreadCount}
-    </div>
-  );
-};
-
-// Новий компонент для кнопки прокрутки вниз
-const ScrollDownButton: React.FC<{
-  onClick: () => void;
-  isDarkTheme: boolean;
-}> = ({ onClick, isDarkTheme }) => {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        position: 'absolute',
-        bottom: '80px',
-        right: '20px',
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
-        backgroundColor: isDarkTheme ? '#333' : '#fff',
-        color: isDarkTheme ? '#fff' : '#333',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '24px',
-        cursor: 'pointer',
-        zIndex: 15,
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-      }}
-    >
-      <FaAngleDown />
-    </div>
-  );
-};
 
 const App: React.FC = () => {
   const { userId, setUserId, setIdentityKeyPair } = useAuth();
@@ -179,8 +70,6 @@ const App: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(localStorage.getItem('selectedChatId'));
   const [input, setInput] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
@@ -200,24 +89,16 @@ const App: React.FC = () => {
     reactions: [],
   });
   const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
-  const [showScrollDown, setShowScrollDown] = useState<boolean>(false); // Додано для стрілки вниз
+  const [showScrollDown, setShowScrollDown] = useState<boolean>(false);
   const chatRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null); // Змінено тип для уникнення помилки
   const isInitialMount = useRef<boolean>(true);
   const p2pServiceRef = useRef<P2PService | null>(null);
   const videoCallServiceRef = useRef<VideoCallService | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const sentMessageIds = useRef<Set<string>>(new Set());
   const scrollPositionRef = useRef<number>(0);
-  const shouldScrollToBottomRef = useRef<boolean>(true); // Додано для автоматичного скролінгу
-
-  useEffect(() => {
-    if (localVideoRef.current && callState.localStream) localVideoRef.current.srcObject = callState.localStream;
-    if (remoteVideoRef.current && callState.remoteStream) remoteVideoRef.current.srcObject = callState.remoteStream;
-  }, [callState.localStream, callState.remoteStream]);
+  const shouldScrollToBottomRef = useRef<boolean>(true);
 
   useEffect(() => {
     if (!userId) return;
@@ -336,13 +217,13 @@ const App: React.FC = () => {
     });
   }, [userId]);
 
-  const isAtBottom = () => {
+  const isAtBottom = useCallback(() => {
     const chatContainer = chatContainerRef.current;
     if (!chatContainer) return true;
-    return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 20; // Поріг 20px для точності
-  };
+    return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 20;
+  }, []);
 
-  const scrollToBottom = (force: boolean = false) => {
+  const scrollToBottom = useCallback((force: boolean = false) => {
     const chatContainer = chatContainerRef.current;
     if (!chatContainer) return;
     chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
@@ -350,7 +231,7 @@ const App: React.FC = () => {
       setUnreadMessagesCount(0);
       setShowScrollDown(false);
     }
-  };
+  }, []);
 
   const handleIncomingMessage = async (message: Message) => {
     if (sentMessageIds.current.has(message.id)) return;
@@ -445,7 +326,7 @@ const App: React.FC = () => {
         await updateContactsWithLastMessage(message);
       }
       setInput('');
-      shouldScrollToBottomRef.current = true; // Автоматичний скрол після відправки
+      shouldScrollToBottomRef.current = true;
     } catch (error) {
       console.error('Failed to send message:', error);
       sentMessageIds.current.delete(messageId);
@@ -529,33 +410,20 @@ const App: React.FC = () => {
 
     chatContainer.addEventListener('scroll', handleScroll);
     return () => chatContainer.removeEventListener('scroll', handleScroll);
-  }, [selectedChatId, messages, unreadMessagesCount]);
+  }, [selectedChatId, messages, unreadMessagesCount, isAtBottom]);
 
   useEffect(() => {
     if (!selectedChatId || messages.length === 0) return;
     if (shouldScrollToBottomRef.current || isAtBottom()) {
       scrollToBottom();
     }
-  }, [messages, selectedChatId]);
+  }, [messages, selectedChatId, isAtBottom, scrollToBottom]);
 
-  const handleAuth = async (isLogin: boolean) => {
-    if (!email || !password) return alert('Fill in all fields');
-    const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
-    const endpoint = isLogin ? '/login' : '/register';
-    try {
-      const res = await axios.post<{ id: string; publicKey?: string }>(`https://100.64.221.88:4000${endpoint}`, { email, password: hashedPassword });
-      if (!isLogin) {
-        const newKeyPair = nacl.box.keyPair();
-        await axios.put('https://100.64.221.88:4000/update-keys', { userId: res.data.id, publicKey: Buffer.from(newKeyPair.publicKey).toString('base64') });
-        setTweetNaclKeyPair(newKeyPair);
-        localStorage.setItem('tweetnaclKeyPair', JSON.stringify({ publicKey: Array.from(newKeyPair.publicKey), secretKey: Array.from(newKeyPair.secretKey) }));
-      }
-      localStorage.setItem('userId', res.data.id);
-      localStorage.setItem('userEmail', email);
-      setUserId(res.data.id);
-      setUserEmail(email);
-    } catch (err) {
-      alert(`Error: ${(err as AxiosError<ApiErrorResponse>).response?.data?.error || 'Unknown error'}`);
+  const handleAuthSuccess = (id: string, email: string, newTweetNaclKeyPair?: TweetNaClKeyPair) => {
+    setUserId(id);
+    setUserEmail(email);
+    if (newTweetNaclKeyPair) {
+      setTweetNaclKeyPair(newTweetNaclKeyPair);
     }
   };
 
@@ -631,15 +499,7 @@ const App: React.FC = () => {
   const headerBackground = isDarkTheme ? '#212529' : '#f8f9fa';
 
   if (!userId) {
-    return (
-      <div className={`container vh-100 d-flex flex-column justify-content-center ${themeClass} p-3`}>
-        <h3 className="text-center mb-4">My Messenger</h3>
-        <input type="email" className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`} value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
-        <input type="password" className={`form-control mb-2 ${isDarkTheme ? 'bg-dark text-light border-light' : ''}`} value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
-        <button className="btn btn-primary w-100 mb-2" onClick={() => handleAuth(true)}>Login</button>
-        <button className="btn btn-secondary w-100" onClick={() => handleAuth(false)}>Register</button>
-      </div>
-    );
+    return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
   }
 
   return (
@@ -660,25 +520,10 @@ const App: React.FC = () => {
           .message-mine { background-color: #ff9966 !important; color: #333; }
           .message-theirs { background-color: #ffccb3 !important; color: #333; }
           .retry-button { margin-left: 5px; cursor: pointer; }
-          .send-btn-active {
-            background-color: #ff9966;
-            border-color: #ff9966;
-            color: #333;
-          }
-          .send-btn-inactive {
-            background-color: #ff9966;
-            border-color: #ff9966;
-            color: #333;
-          }
-          .send-btn-active:disabled {
-            background-color: #ff9966;
-            border-color: #ff9966;
-            opacity: 1;
-            color: #333;
-          }
-          .btn {
-            transition: background-color 0.2s ease-in-out;
-          }
+          .send-btn-active { background-color: #ff9966; border-color: #ff9966; color: #333; }
+          .send-btn-inactive { background-color: #ff9966; border-color: #ff9966; color: #333; }
+          .send-btn-active:disabled { background-color: #ff9966; border-color: #ff9966; opacity: 1; color: #333; }
+          .btn { transition: background-color 0.2s ease-in-out; }
         `}
       </style>
 
@@ -700,9 +545,8 @@ const App: React.FC = () => {
         </div>
         {selectedChatId && (
           <div className="p-2 d-flex align-items-center mt-1 justify-content-between" style={{ background: headerBackground }}>
-    
             <div className="d-flex align-items-center">
-              <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setSelectedChatId(null)} style={{ border: 'none', background: 'transparent' }}><FaAngleLeft /></button>
+              <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setSelectedChatId(null)} style={{ border: 'none', background: 'transparent' }}><FaArrowLeft /></button>
               <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '25px', height: '25px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
@@ -738,61 +582,23 @@ const App: React.FC = () => {
       )}
 
       <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? '90px' : '50px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
-        {callState.isCalling && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(18, 18, 38, 0.98) 0%, rgba(9, 9, 19, 0.98) 100%)', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '16px', boxSizing: 'border-box' }}>
-            <div style={{ fontSize: '18px', fontWeight: '500', color: 'white', padding: '12px 0', width: '100%', textAlign: 'center', zIndex: 2 }}>{formatCallDuration(callState.callDuration)}</div>
-            <div style={{ width: '100%', flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'hidden', borderRadius: '12px' }}>
-              {callState.isVideoEnabled && callState.remoteStream ? (
-                <video ref={remoteVideoRef} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }} autoPlay playsInline />
-              ) : (
-                <div className="audio-spectrogram" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '12px', background: 'rgba(30, 30, 60, 0.5)', overflow: 'hidden' }}>
-                  <AudioSpectrogram audioStream={callState.remoteStream} style={{ width: '100%', height: '70%' }} />
-                </div>
-              )}
-              {callState.isVideoEnabled && callState.localStream && (
-                <div style={{ position: 'absolute', bottom: '16px', right: '16px', width: '100px', height: '150px', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', zIndex: 3, border: '2px solid rgba(255, 255, 255, 0.2)' }}>
-                  <video ref={localVideoRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} autoPlay playsInline muted />
-                </div>
-              )}
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', padding: '16px 0', width: '100%', zIndex: 2 }}>
-              <button onClick={toggleMicrophone} style={{ width: '56px', height: '56px', borderRadius: '50%', background: callState.isMicrophoneEnabled ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 80, 80, 0.7)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-                <i className={`fas fa-${callState.isMicrophoneEnabled ? 'microphone' : 'microphone-slash'}`}></i>
-              </button>
-              <button onClick={endCall} style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255, 50, 50, 0.9)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-                <i className="fas fa-phone-slash"></i>
-              </button>
-              <button onClick={toggleVideo} style={{ width: '56px', height: '56px', borderRadius: '50%', background: callState.isVideoEnabled ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-                <i className={`fas fa-${callState.isVideoEnabled ? 'video' : 'video-slash'}`}></i>
-              </button>
-            </div>
-          </div>
-        )}
+        <VideoCallWindow
+          callState={callState}
+          onToggleVideo={toggleVideo}
+          onToggleMicrophone={toggleMicrophone}
+          onEndCall={endCall}
+        />
         {selectedChatId && !callState.isCalling && (
-          <div style={{ position: 'relative', height: '100%' }}>
-            <div ref={chatContainerRef} className="p-3 scroll-container" style={{ height: 'calc(100% - 60px)', overflowY: 'auto', filter: isSearchOpen ? 'blur(5px)' : 'none', transition: 'filter 0.3s', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ flexGrow: 1 }} />
-              {messages.map(msg => (
-                <div key={`${msg.id}-${msg.timestamp}`} className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}>
-                  <div 
-                    className={`p-2 rounded-3 ${msg.isMine ? 'message-mine' : 'message-theirs'}`} 
-                    style={{ maxWidth: '75%', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', wordBreak: 'break-word' }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span>{msg.text}</span>
-                      {msg.text.startsWith('base64:') && (
-                        <FaRedo className="retry-button" onClick={() => retryDecryption(msg)} style={{ fontSize: '0.8rem', color: '#333' }} />
-                      )}
-                    </div>
-                    <div className="text-end mt-1" style={{ fontSize: '0.7rem', opacity: 0.8 }}>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}</div>
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} style={{ height: '1px' }} />
-            </div>
-            <UnreadMessagesIndicator unreadCount={unreadMessagesCount} onClick={() => scrollToBottom(true)} isDarkTheme={isDarkTheme} />
-            {showScrollDown && <ScrollDownButton onClick={() => scrollToBottom(true)} isDarkTheme={isDarkTheme} />}
-          </div>
+          <ChatWindow
+            messages={messages}
+            selectedChatId={selectedChatId}
+            isDarkTheme={isDarkTheme}
+            unreadMessagesCount={unreadMessagesCount}
+            showScrollDown={showScrollDown}
+            onRetryDecryption={retryDecryption}
+            onScrollToBottom={scrollToBottom}
+            chatContainerRef={chatContainerRef} // Передаємо ref
+          />
         )}
         {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} />}
       </div>
@@ -821,23 +627,13 @@ const App: React.FC = () => {
               onChange={e => setInput(e.target.value)} 
               onKeyPress={e => e.key === 'Enter' && sendMessage()} 
               placeholder="Message..." 
-              style={{ 
-                borderRadius: '20px', 
-                color: isDarkTheme ? '#fff' : '#000' 
-              }} 
+              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }} 
             />
             <button 
-              className={`btn ms-2 d-flex align-items-center justify-content-center ${
-                input.trim() ? 'send-btn-active' : 'send-btn-inactive'
-              }`}
+              className={`btn ms-2 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
               onClick={sendMessage} 
               disabled={!input.trim()}
-              style={{ 
-                borderRadius: '20px', 
-                minWidth: '60px', 
-                height: '38px',
-                transition: 'background-color 0.1s ease'
-              }}
+              style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background-color 0.1s ease' }}
             >
               Send
             </button>
