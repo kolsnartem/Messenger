@@ -6,10 +6,10 @@ Applying Webpack configuration...
 Updated source-map-loader rule with exclude: [ /node_modules\/@signalapp\/libsignal-client/ ]
 Webpack configuration applied successfully.
 Dev server middlewares set up.
-(node:1929) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
+(node:3119) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:1929) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(node:1929) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:3119) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:3119) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -25,4 +25,146 @@ To create a production build, use npm run build.
 webpack compiled successfully
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/App.tsx
+  Line 2:46:   'IdentityKeyPair' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 2:63:   'EncryptionError' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 9:17:   'AxiosError' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+  Line 11:10:  'FaSearch' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 11:20:  'FaSun' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+  Line 11:27:  'FaMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:57:  'FaLock' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:65:  'FaPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 11:74:  'FaVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 15:10:  'FiCamera' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 15:37:  'FiPhoneCall' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+  Line 16:10:  'BiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 16:19:  'BiVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:10:  'CiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:19:  'CiVideoOn' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+  Line 20:11:  'ApiErrorResponse' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+  Line 133:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 142:6:  React Hook useEffect has a missing dependency: 'handleP2PMessage'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has a missing dependency: 'decryptMessage'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
+  Line 176:6:  React Hook useEffect has a missing dependency: 'tweetNaclKeyPair'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 222:6:  React Hook useCallback has a missing dependency: 'decryptMessageText'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  Line 373:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 383:6:  React Hook useEffect has a missing dependency: 'handleIncomingMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/App.tsx
+  Line 2:46:   'IdentityKeyPair' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 2:63:   'EncryptionError' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 9:17:   'AxiosError' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+  Line 11:10:  'FaSearch' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 11:20:  'FaSun' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+  Line 11:27:  'FaMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:57:  'FaLock' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:65:  'FaPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 11:74:  'FaVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 15:10:  'FiCamera' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 15:37:  'FiPhoneCall' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+  Line 16:10:  'BiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 16:19:  'BiVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:10:  'CiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:19:  'CiVideoOn' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+  Line 20:11:  'ApiErrorResponse' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+  Line 133:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 142:6:  React Hook useEffect has a missing dependency: 'handleP2PMessage'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has a missing dependency: 'decryptMessage'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
+  Line 176:6:  React Hook useEffect has a missing dependency: 'tweetNaclKeyPair'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 222:6:  React Hook useCallback has a missing dependency: 'decryptMessageText'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  Line 373:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 383:6:  React Hook useEffect has a missing dependency: 'handleIncomingMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+webpack compiled with 1 warning
+Compiling...
+ERROR in src/App.test.tsx:3:17
+TS2306: File '/home/john/vscode_projects/messenger/client/src/App.tsx' is not a module.
+    1 | import React from 'react';
+    2 | import { render, screen } from '@testing-library/react';
+  > 3 | import App from './App';
+      |                 ^^^^^^^
+    4 |
+    5 | test('renders learn react link', () => {
+    6 |   render(<App />);
+
+ERROR in src/App.tsx
+TS1208: 'App.tsx' cannot be compiled under '--isolatedModules' because it is considered a global script file. Add an import, export, or an empty 'export {}' statement to make it a module.
+
+ERROR in src/index.tsx:4:17
+TS2306: File '/home/john/vscode_projects/messenger/client/src/App.tsx' is not a module.
+    2 | import ReactDOM from 'react-dom/client';
+    3 | import './index.css';
+  > 4 | import App from './App';
+      |                 ^^^^^^^
+    5 | import reportWebVitals from './reportWebVitals';
+    6 |
+    7 | const root = ReactDOM.createRoot(
+
+Compiled with warnings.
+
+[eslint] 
+src/App.tsx
+  Line 2:46:   'IdentityKeyPair' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 2:63:   'EncryptionError' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 9:17:   'AxiosError' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+  Line 11:10:  'FaSearch' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 11:20:  'FaSun' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+  Line 11:27:  'FaMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:57:  'FaLock' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:65:  'FaPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 11:74:  'FaVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 15:10:  'FiCamera' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 15:37:  'FiPhoneCall' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+  Line 16:10:  'BiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 16:19:  'BiVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:10:  'CiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:19:  'CiVideoOn' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+  Line 20:11:  'ApiErrorResponse' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+  Line 133:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 142:6:  React Hook useEffect has a missing dependency: 'handleP2PMessage'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has a missing dependency: 'decryptMessage'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
+  Line 176:6:  React Hook useEffect has a missing dependency: 'tweetNaclKeyPair'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 222:6:  React Hook useCallback has a missing dependency: 'decryptMessageText'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  Line 373:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 383:6:  React Hook useEffect has a missing dependency: 'handleIncomingMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/App.tsx
+  Line 2:46:   'IdentityKeyPair' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 2:63:   'EncryptionError' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  Line 9:17:   'AxiosError' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+  Line 11:10:  'FaSearch' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 11:20:  'FaSun' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+  Line 11:27:  'FaMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:57:  'FaLock' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  Line 11:65:  'FaPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 11:74:  'FaVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 15:10:  'FiCamera' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  Line 15:37:  'FiPhoneCall' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+  Line 16:10:  'BiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 16:19:  'BiVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:10:  'CiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  Line 17:19:  'CiVideoOn' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+  Line 20:11:  'ApiErrorResponse' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+  Line 133:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 142:6:  React Hook useEffect has a missing dependency: 'handleP2PMessage'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has a missing dependency: 'decryptMessage'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
+  Line 176:6:  React Hook useEffect has a missing dependency: 'tweetNaclKeyPair'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
+  Line 222:6:  React Hook useCallback has a missing dependency: 'decryptMessageText'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  Line 373:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
+  Line 383:6:  React Hook useEffect has a missing dependency: 'handleIncomingMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+webpack compiled with 1 warning
 No issues found.

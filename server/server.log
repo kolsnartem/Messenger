@@ -1,20 +1,88 @@
 Server running on https://100.64.221.88:4000
 Connected to SQLite database
-New Socket.IO connection for user: 221, total users: 1
-User disconnected: 221, remaining users: 0
-New Socket.IO connection for user: 221, total users: 1
-User disconnected: 221, remaining users: 0
-User logged in: jxxjdjdjsjks (ID: 221)
-New Socket.IO connection for user: 221, total users: 1
-Message saved to DB: 1742289617418-yq5w4
-Message saved to DB: 1742289619244-978lw
-Message saved to DB: 1742289626236-xe60o
-Message saved to DB: 1742289628058-tp0qj
-Message saved to DB: 1742289629919-c8blg
-Message saved to DB: 1742289631589-kk4d6
-Message saved to DB: 1742289633312-t4zes
-Message saved to DB: 1742289645588-7e5yw
-User disconnected: 221, remaining users: 0
-New Socket.IO connection for user: 221, total users: 1
-User disconnected: 221, remaining users: 0
-New Socket.IO connection for user: 221, total users: 1
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+P2P offer from 226 to 227, target online: false
+Target 227 offline, storing P2P offer
+P2P offer from 226 to 227, target online: false
+Target 227 offline, storing P2P offer
+P2P offer from 226 to 227, target online: false
+Target 227 offline, storing P2P offer
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+Message saved to DB: 1742300745536-z27lq
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+Message saved to DB: 1742301842874-9h1de
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+P2P offer from 226 to 60, target online: false
+Target 60 offline, storing P2P offer
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+Message saved to DB: 1742302136178-d6h0p
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+Message saved to DB: 1742302816210-dvk0c
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 226, total users: 1
+Message saved to DB: 1742303027631-km0fn
+Message saved to DB: 1742303029640-e2m9w
+Message saved to DB: 1742303031005-p0czp
+Message saved to DB: 1742303032229-qlr3k
+User disconnected: 226, remaining users: 0
+User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 226, total users: 1
+User registered: 4кавв (ID: 228)
+Updated keys for user ID: 228
+New Socket.IO connection for user: 228, total users: 2
+Message saved to DB: 1742303121110-i8yvq
+P2P offer from 228 to 226, target online: true
+P2P offer from 226 to 228, target online: true
+P2P offer from 228 to 226, target online: true
+User disconnected: 226, remaining users: 1
+User disconnected: 228, remaining users: 0

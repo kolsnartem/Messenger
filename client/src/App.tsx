@@ -9,7 +9,6 @@ import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import * as nacl from 'tweetnacl';
 import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaChevronLeft } from 'react-icons/fa';
-import { FaLock as FaLockSolid } from 'react-icons/fa'; // Для активного стану P2P
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
@@ -557,6 +556,11 @@ const App: React.FC = () => {
           <div className="d-flex align-items-center" style={{ gap: '12px' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               MSNGR ({userEmail})
+              {isP2PActive && (
+                <span className="ms-2" style={{ fontSize: '0.8rem', color: '#00C79D', fontWeight: 'bold' }}>
+                  P2P mode
+                </span>
+              )}
             </h5>
             {isMenuOpen && (
               <div style={{ position: 'fixed', top: '55px', left: '10px', background: headerBackground, border: '1px solid #ccc', borderRadius: '4px', zIndex: 1000, padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -601,14 +605,25 @@ const App: React.FC = () => {
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
               <h6 className="m-0 me-2">{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
-              <RiP2PFill
-
-                size={24} 
-                color={isDarkTheme ? '#fff' : '#212529'} 
-                className="icon-hover call-icon" 
-                onClick={() => isP2PActive ? p2pServiceRef.current?.disconnectP2P() : initiateP2P()} 
-                style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }} 
-              />
+              {isP2PActive ? (
+                <RiP2PFill
+                  size={24}
+                  color="#00C79D" // Зелений колір для активного P2P
+                  className="icon-hover call-icon"
+                  onClick={() => p2pServiceRef.current?.disconnectP2P()}
+                  style={{ cursor: 'pointer' }}
+                  title="P2P активний (натисніть, щоб відключити)"
+                />
+              ) : (
+                <RiP2PLine
+                  size={24}
+                  color={isDarkTheme ? '#fff' : '#212529'} // Базовий колір для неактивного P2P
+                  className="icon-hover call-icon"
+                  onClick={initiateP2P}
+                  style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }}
+                  title="Увімкнути P2P"
+                />
+              )}
             </div>
             {!p2pRequest && (
               <div className="d-flex align-items-center" style={{ gap: '20px' }}>
