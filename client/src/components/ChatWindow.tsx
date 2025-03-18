@@ -99,8 +99,27 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
+  const inputBackground = isDarkTheme ? '#343a40' : '#e9ecef';
+
   return (
     <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <style>
+        {`
+          .input-field { 
+            background: ${inputBackground}; 
+            border: none; 
+            outline: none; 
+          }
+          .input-field:focus { 
+            background: ${inputBackground}; 
+            outline: none; 
+            box-shadow: none; 
+          }
+          .input-field::placeholder {
+            color: ${isDarkTheme ? '#b0b0b0' : '#6c757d'};
+          }
+        `}
+      </style>
       <div
         ref={chatContainerRef}
         className="p-3 scroll-container"
@@ -158,7 +177,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       <div
         style={{
           padding: '10px',
-          background: isDarkTheme ? '#2c3e50' : '#f1f3f5',
+          background: isDarkTheme ? '#212529' : '#f8f9fa',
           borderTop: '1px solid rgba(0, 0, 0, 0.1)',
           display: 'flex',
           alignItems: 'center',
@@ -171,14 +190,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           onChange={(e) => setInputText(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Type a message..."
+          className="form-control input-field"
           style={{
             flex: 1,
             padding: '10px',
-            border: 'none',
-            borderRadius: '8px',
-            background: isDarkTheme ? '#34495e' : '#fff',
+            borderRadius: '20px',
             color: isDarkTheme ? '#fff' : '#2c3e50',
-            outline: 'none',
           }}
         />
         <button
@@ -187,7 +204,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             padding: '10px 20px',
             background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '20px',
             color: 'white',
             fontSize: '16px',
             fontWeight: 500,

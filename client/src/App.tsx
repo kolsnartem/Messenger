@@ -497,6 +497,7 @@ const App: React.FC = () => {
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
   const headerBackground = isDarkTheme ? '#212529' : '#f8f9fa';
+  const inputBackground = isDarkTheme ? '#343a40' : '#e9ecef';
 
   if (!userId) {
     return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
@@ -524,6 +525,16 @@ const App: React.FC = () => {
           .send-btn-inactive { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
           .send-btn-active:disabled { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; opacity: 0.5; color: #fff; }
           .btn { transition: background-color 0.2s ease-in-out; }
+          .input-field { 
+            background: ${inputBackground}; 
+            border: none; 
+            outline: none; 
+          }
+          .input-field:focus { 
+            background: ${inputBackground}; 
+            outline: none; 
+            box-shadow: none; 
+          }
         `}
       </style>
 
@@ -588,7 +599,14 @@ const App: React.FC = () => {
       {isSearchOpen && (
         <div style={{ position: 'fixed', top: selectedChatId ? '90px' : '50px', left: 0, right: 0, background: headerBackground, zIndex: 30, padding: '0' }}>
           <div className="container p-2">
-            <input type="text" className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light search-placeholder-dark' : ''}`} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search users..." />
+            <input 
+              type="text" 
+              className={`form-control input-field ${isDarkTheme ? 'text-light search-placeholder-dark' : 'text-dark'}`} 
+              value={searchQuery} 
+              onChange={e => setSearchQuery(e.target.value)} 
+              placeholder="Search users..." 
+              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }} 
+            />
           </div>
           <div style={{ overflowY: 'auto', maxHeight: selectedChatId ? 'calc(100vh - 150px)' : 'calc(100vh - 90px)' }}>
             {searchResults.map(result => <div key={result.id} className="p-2 border-bottom container" onClick={() => handleContactSelect(result)} style={{ cursor: 'pointer' }}>{result.email}</div>)}
@@ -638,7 +656,7 @@ const App: React.FC = () => {
           <div className="d-flex align-items-center w-100 px-2">
             <input 
               type="text" 
-              className={`form-control ${isDarkTheme ? 'bg-dark text-light border-light input-placeholder-dark' : ''}`} 
+              className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
               value={input} 
               onChange={e => setInput(e.target.value)} 
               onKeyPress={e => e.key === 'Enter' && sendMessage()} 
