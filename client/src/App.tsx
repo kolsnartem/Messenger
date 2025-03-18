@@ -672,7 +672,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? '90px' : '50px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
+      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? '86px' : '49px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
         <VideoCallWindow
           callState={callState}
           onToggleVideo={toggleVideo}
