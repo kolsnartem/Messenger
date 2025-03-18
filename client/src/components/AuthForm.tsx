@@ -179,7 +179,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
   };
 
   const baseFormStyle: React.CSSProperties = {
-    background: isDarkTheme ? 'rgba(44, 62, 80, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    background: isDarkTheme ? 'rgba(34, 48, 62, 0.95)' : 'rgba(255, 255, 255, 0.95)',
     padding: '20px 15px',
     borderRadius: '12px',
     boxShadow: '0 8px 20px rgba(0, 0, 0, 0.08)',
