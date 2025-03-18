@@ -99,7 +99,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
-  const inputBackground = isDarkTheme ? '#343a40' : '#e9ecef';
+  const inputBackground = isDarkTheme ? '#34495e' : '#e9ecef';
 
   return (
     <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>

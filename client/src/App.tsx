@@ -501,8 +501,8 @@ const App: React.FC = () => {
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
-  const headerBackground = isDarkTheme ? '#212529' : '#f8f9fa';
-  const inputBackground = isDarkTheme ? '#343a40' : '#e9ecef';
+  const headerBackground = isDarkTheme ? '#2c3e50' : '#f1f3f5';
+  const inputBackground = isDarkTheme ? '#34495e' : '#e9ecef';
 
   if (!userId) {
     return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
@@ -601,7 +601,7 @@ const App: React.FC = () => {
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
               <h6 className="m-0 me-2">{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
-              <RiP2PLine
+              <RiP2PFill
 
                 size={24} 
                 color={isDarkTheme ? '#fff' : '#212529'} 

@@ -160,7 +160,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
     width: '100%',
     height: '100vh',
     minHeight: '-webkit-fill-available',
-    background: isDarkTheme ? '#2c3e50' : '#ffffff',
+    background: isDarkTheme ? '#2c3e50' : '#f1f3f5',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
