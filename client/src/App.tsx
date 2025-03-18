@@ -551,7 +551,7 @@ const App: React.FC = () => {
         `}
       </style>
 
-      <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: selectedChatId ? '90px' : '50px' }}>
+      <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: selectedChatId ? '90px' : '50px', borderBottom: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef'  }}>
         <div className="d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center" style={{ gap: '12px' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -708,7 +708,7 @@ const App: React.FC = () => {
             height: '49px', 
             display: 'flex', 
             alignItems: 'center', 
-            borderTop: isDarkTheme ? '1px solid #444' : '1px solid #eee' 
+            borderTop: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef' 
           }}
         >
           <div className="d-flex align-items-center w-100 px-2">
