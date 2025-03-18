@@ -8,10 +8,15 @@ import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaPhoneAlt, FaChevronLeft } from 'react-icons/fa';
+import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaChevronLeft } from 'react-icons/fa';
+import { FaLock as FaLockSolid } from 'react-icons/fa'; // Для активного стану P2P
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
+import { FiCamera, FiMoon, FiPhone, FiPhoneCall, FiSearch, FiSun, FiVideo } from 'react-icons/fi';
+import { BiPhone, BiVideo } from 'react-icons/bi';
+import { CiPhone, CiVideoOn } from "react-icons/ci";
+import { RiP2PFill, RiP2PLine } from "react-icons/ri";
 
 interface ApiErrorResponse {
   error?: string;
@@ -535,13 +540,24 @@ const App: React.FC = () => {
             outline: none; 
             box-shadow: none; 
           }
+          .icon-hover:hover { color: ${isDarkTheme ? '#00C7D4' : '#00C79D'}; }
+          .call-icon {
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+          }
+          .call-icon:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+          }
         `}
       </style>
 
       <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: selectedChatId ? '90px' : '50px' }}>
         <div className="d-flex justify-content-between align-items-center">
-          <div style={{ position: 'relative' }}>
-            <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>MSNGR ({userEmail})</h5>
+          <div className="d-flex align-items-center" style={{ gap: '12px' }}>
+            <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              MSNGR ({userEmail})
+            </h5>
             {isMenuOpen && (
               <div style={{ position: 'fixed', top: '55px', left: '10px', background: headerBackground, border: '1px solid #ccc', borderRadius: '4px', zIndex: 1000, padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <button className="btn btn-sm btn-success mb-2" onClick={() => window.location.reload()} style={{ width: '150px', fontSize: '0.875rem' }}><FaSync /> Update</button>
@@ -549,9 +565,17 @@ const App: React.FC = () => {
               </div>
             )}
           </div>
-          <div>
-            <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => setIsSearchOpen(!isSearchOpen)}><FaSearch /></button>
-            <button className="btn btn-sm btn-outline-secondary" onClick={() => setIsDarkTheme(!isDarkTheme)}>{isDarkTheme ? <FaMoon /> : <FaSun />}</button>
+          <div className="d-flex align-items-center" style={{ gap: '12px' }}>
+            <FiSearch 
+              size={24} 
+              color={isDarkTheme ? '#fff' : '#212529'} 
+              className="icon-hover call-icon" 
+              onClick={() => setIsSearchOpen(!isSearchOpen)} 
+              style={{ cursor: 'pointer' }} 
+            />
+            <span onClick={() => setIsDarkTheme(!isDarkTheme)} style={{ cursor: 'pointer' }}>
+              {isDarkTheme ? <FiSun size={24} color="#fff" className="icon-hover call-icon" /> : <FiMoon size={24} color="#212529" className="icon-hover call-icon" />}
+            </span>
           </div>
         </div>
         {selectedChatId && (
@@ -577,12 +601,31 @@ const App: React.FC = () => {
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
               <h6 className="m-0 me-2">{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
+              <RiP2PLine
+
+                size={24} 
+                color={isDarkTheme ? '#fff' : '#212529'} 
+                className="icon-hover call-icon" 
+                onClick={() => isP2PActive ? p2pServiceRef.current?.disconnectP2P() : initiateP2P()} 
+                style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }} 
+              />
             </div>
             {!p2pRequest && (
-              <div>
-                <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(false)} disabled={callState.isCalling}><FaPhoneAlt /></button>
-                <button className="btn btn-sm btn-outline-success me-2" onClick={() => initiateCall(true)} disabled={callState.isCalling}><FaVideo /></button>
-                <button className={`btn btn-sm ${isP2PActive ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => isP2PActive ? p2pServiceRef.current?.disconnectP2P() : initiateP2P()} disabled={!tweetNaclKeyPair || !selectedChatId}><FaLock /> {isP2PActive ? 'P2P' : 'P2P'}</button>
+              <div className="d-flex align-items-center" style={{ gap: '20px' }}>
+                <FiPhone 
+                  size={23} 
+                  color={isDarkTheme ? '#fff' : '#212529'} 
+                  className="icon-hover call-icon" 
+                  onClick={() => initiateCall(false)} 
+                  style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} 
+                />
+                <FiVideo 
+                  size={28} 
+                  color={isDarkTheme ? '#fff' : '#212529'} 
+                  className="icon-hover call-icon" 
+                  onClick={() => initiateCall(true)} 
+                  style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} 
+                />
               </div>
             )}
             {p2pRequest && (

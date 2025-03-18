@@ -6,10 +6,10 @@ Applying Webpack configuration...
 Updated source-map-loader rule with exclude: [ /node_modules\/@signalapp\/libsignal-client/ ]
 Webpack configuration applied successfully.
 Dev server middlewares set up.
-(node:78033) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
+(node:1929) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:78033) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(node:78033) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:1929) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:1929) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -25,128 +25,4 @@ To create a production build, use npm run build.
 webpack compiled successfully
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
-ERROR in src/App.tsx:70:61
-TS2551: Property 'webkitAudioContext' does not exist on type 'Window & typeof globalThis'. Did you mean 'AudioContext'?
-    68 |   useEffect(() => {
-    69 |     if (!audioStream || !canvasRef.current) return;
-  > 70 |     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-       |                                                             ^^^^^^^^^^^^^^^^^^
-    71 |     const analyser = audioContext.createAnalyser();
-    72 |     analyser.fftSize = 256;
-    73 |     const source = audioContext.createMediaStreamSource(audioStream);
-
-ERROR in src/App.tsx:136:5
-TS2345: Argument of type '{ localStream: null; remoteStream: null; isCalling: false; isVideoEnabled: false; isMicrophoneEnabled: boolean; callDuration: number; reactions: never[]; }' is not assignable to parameter of type '(CallState & { callDuration?: number | undefined; reactions?: { emoji: string; timestamp: number; }[] | undefined; }) | (() => CallState & { callDuration?: number | undefined; reactions?: { ...; }[] | undefined; })'.
-  Object literal may only specify known properties, and 'isMicrophoneEnabled' does not exist in type '(CallState & { callDuration?: number | undefined; reactions?: { emoji: string; timestamp: number; }[] | undefined; }) | (() => CallState & { callDuration?: number | undefined; reactions?: { ...; }[] | undefined; })'.
-    134 |     isCalling: false,
-    135 |     isVideoEnabled: false,
-  > 136 |     isMicrophoneEnabled: true, // Додано за замовчуванням
-        |     ^^^^^^^^^^^^^^^^^^^^^^^^^
-    137 |     callDuration: 0,
-    138 |     reactions: [], // Ініціалізація за замовчуванням
-    139 |   });
-
-ERROR in src/App.tsx:198:13
-TS2345: Argument of type '() => () => HTMLStyleElement' is not assignable to parameter of type 'EffectCallback'.
-  Type '() => HTMLStyleElement' is not assignable to type 'void | Destructor'.
-    Type '() => HTMLStyleElement' is not assignable to type 'Destructor'.
-      Type 'HTMLStyleElement' is not assignable to type 'void | { [UNDEFINED_VOID_ONLY]: never; }'.
-    196 |
-    197 |   // CSS для реакцій
-  > 198 |   useEffect(() => {
-        |             ^^^^^^^
-    199 |     const style = document.createElement('style');
-    200 |     style.textContent = `
-    201 |       @keyframes float-up {
-
-ERROR in src/App.tsx:293:63
-TS2339: Property 'toggleMicrophone' does not exist on type 'VideoCallService'.
-    291 |   const endCall = () => videoCallServiceRef.current?.endCall(true);
-    292 |   const toggleVideo = () => videoCallServiceRef.current?.toggleVideo(!callState.isVideoEnabled);
-  > 293 |   const toggleMicrophone = () => videoCallServiceRef.current?.toggleMicrophone(!callState.isMicrophoneEnabled);
-        |                                                               ^^^^^^^^^^^^^^^^
-    294 |   const sendReaction = (emoji: string) => setCallState(prev => ({ ...prev, reactions: [...(prev.reactions || []), { emoji, timestamp: Date.now() }] }));
-    295 |
-    296 |   const initializeKeys = async () => {
-
-ERROR in src/App.tsx:293:91
-TS2339: Property 'isMicrophoneEnabled' does not exist on type 'CallState & { callDuration?: number | undefined; reactions?: { emoji: string; timestamp: number; }[] | undefined; }'.
-    291 |   const endCall = () => videoCallServiceRef.current?.endCall(true);
-    292 |   const toggleVideo = () => videoCallServiceRef.current?.toggleVideo(!callState.isVideoEnabled);
-  > 293 |   const toggleMicrophone = () => videoCallServiceRef.current?.toggleMicrophone(!callState.isMicrophoneEnabled);
-        |                                                                                           ^^^^^^^^^^^^^^^^^^^
-    294 |   const sendReaction = (emoji: string) => setCallState(prev => ({ ...prev, reactions: [...(prev.reactions || []), { emoji, timestamp: Date.now() }] }));
-    295 |
-    296 |   const initializeKeys = async () => {
-
-ERROR in src/App.tsx:509:133
-TS2339: Property 'isMicrophoneEnabled' does not exist on type 'CallState & { callDuration?: number | undefined; reactions?: { emoji: string; timestamp: number; }[] | undefined; }'.
-    507 |             </div>
-    508 |             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', padding: '16px 0', width: '100%', zIndex: 2 }}>
-  > 509 |               <button onClick={toggleMicrophone} style={{ width: '56px', height: '56px', borderRadius: '50%', background: callState.isMicrophoneEnabled ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 80, 80, 0.7)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-        |                                                                                                                                     ^^^^^^^^^^^^^^^^^^^
-    510 |                 <i className={`fas fa-${callState.isMicrophoneEnabled ? 'microphone' : 'microphone-slash'}`}></i>
-    511 |               </button>
-    512 |               <button onClick={endCall} style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255, 50, 50, 0.9)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-
-ERROR in src/App.tsx:510:51
-TS2339: Property 'isMicrophoneEnabled' does not exist on type 'CallState & { callDuration?: number | undefined; reactions?: { emoji: string; timestamp: number; }[] | undefined; }'.
-    508 |             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', padding: '16px 0', width: '100%', zIndex: 2 }}>
-    509 |               <button onClick={toggleMicrophone} style={{ width: '56px', height: '56px', borderRadius: '50%', background: callState.isMicrophoneEnabled ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 80, 80, 0.7)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-  > 510 |                 <i className={`fas fa-${callState.isMicrophoneEnabled ? 'microphone' : 'microphone-slash'}`}></i>
-        |                                                   ^^^^^^^^^^^^^^^^^^^
-    511 |               </button>
-    512 |               <button onClick={endCall} style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255, 50, 50, 0.9)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontSize: '24px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-    513 |                 <i className="fas fa-phone-slash"></i>
-
-ERROR in src/encryption.ts:2:10
-TS2305: Module '"./types"' has no exported member 'EncryptionError'.
-    1 | import * as nacl from 'tweetnacl';
-  > 2 | import { EncryptionError, TweetNaClKeyPair } from './types';
-      |          ^^^^^^^^^^^^^^^
-    3 | import axios from 'axios';
-    4 |
-    5 | export const logEncryptionEvent = (event: string, details?: any) => {
-
-ERROR in src/p2p.ts:314:7
-TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
-  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
-    312 |       bundlePolicy: 'max-bundle',
-    313 |       rtcpMuxPolicy: 'require',
-  > 314 |       sdpSemantics: 'unified-plan'
-        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    315 |     });
-    316 |
-    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
-
-ERROR in src/services/p2p.ts:314:7
-TS2345: Argument of type '{ iceServers: ({ urls: string; } | { urls: string; username: string; credential: string; })[]; iceCandidatePoolSize: number; iceTransportPolicy: "all"; bundlePolicy: "max-bundle"; rtcpMuxPolicy: "require"; sdpSemantics: string; }' is not assignable to parameter of type 'RTCConfiguration'.
-  Object literal may only specify known properties, and 'sdpSemantics' does not exist in type 'RTCConfiguration'.
-    312 |       bundlePolicy: 'max-bundle',
-    313 |       rtcpMuxPolicy: 'require',
-  > 314 |       sdpSemantics: 'unified-plan'
-        |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    315 |     });
-    316 |
-    317 |     // Налаштовуємо dataChannel з покращеними параметрами для мобільних мереж
-
-ERROR in src/services/VideoCallService.tsx:38:23
-TS2532: Object is possibly 'undefined'.
-    36 |       remoteStream: this.remoteStream,
-    37 |       isCalling: !!this.peerConnection,
-  > 38 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
-       |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    39 |     });
-    40 |   }
-    41 |
-
-ERROR in src/services/VideoCallService.tsx:176:23
-TS2532: Object is possibly 'undefined'.
-    174 |       remoteStream: this.remoteStream,
-    175 |       isCalling: !!this.peerConnection,
-  > 176 |       isVideoEnabled: this.localStream?.getVideoTracks().length > 0,
-        |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    177 |     };
-    178 |   }
-    179 | }
-
+No issues found.
