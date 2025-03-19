@@ -17,7 +17,7 @@ import { BiPhone, BiVideo } from 'react-icons/bi';
 import { CiPhone, CiVideoOn } from "react-icons/ci";
 import { RiP2PFill, RiP2PLine } from "react-icons/ri";
 import { MdOutlineArrowBackIos } from "react-icons/md";
-
+import { TbMenuDeep } from "react-icons/tb";
 
 interface ApiErrorResponse {
   error?: string;
@@ -593,7 +593,7 @@ const App: React.FC = () => {
             </h5>
             {isMenuOpen && (
               <div style={{ 
-                position: 'fixed', top: '55px', left: '10px',
+                position: 'fixed', top: '55px', right: '15px',
                  background: headerBackground, border: '1px solid #ccc',
                   borderRadius: '4px', 
                   zIndex: 1000, 
@@ -601,11 +601,35 @@ const App: React.FC = () => {
                   display: 'flex', 
                   flexDirection: 'column', 
                   alignItems: 'center' }}>
-                <button className="btn btn-sm btn-success mb-2" onClick={() => window.location.reload()} style={{ width: '150px', fontSize: '0.875rem' }}><FaSync /> Update</button>
+                <button className="btn btn-sm btn-success mb-2" 
+                onClick={() => window.location.reload()} 
+                style={{ width: '150px', fontSize: '0.875rem' }}><FaSync /> Update</button>
                 <button className="btn btn-sm btn-outline-danger" onClick={handleLogout} style={{ width: '150px', fontSize: '0.875rem' }}><FaSignOutAlt /> Logout</button>
               </div>
             )}
           </div>
+          
+          <button
+  className="btn btn-sm"
+  onClick={() => setIsMenuOpen(prev => !prev)}
+  style={{
+    border: 'none',
+    background: 'transparent',
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    right: '15px',
+
+  }}
+>
+  <TbMenuDeep
+    size={24}
+    color={isDarkTheme ? '#fff' : '#212529'}
+    className="icon-hover"
+  />
+</button> ​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
         </div>
 
         {!selectedChatId && (
