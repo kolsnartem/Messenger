@@ -578,7 +578,7 @@ const App: React.FC = () => {
           background: headerBackground, 
           zIndex: 20, 
           height: '96px',
-          borderBottom: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef' 
+          borderBottom: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef' 
         }}
       >
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '48px' }}>
@@ -592,7 +592,15 @@ const App: React.FC = () => {
               )}
             </h5>
             {isMenuOpen && (
-              <div style={{ position: 'fixed', top: '55px', left: '10px', background: headerBackground, border: '1px solid #ccc', borderRadius: '4px', zIndex: 1000, padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ 
+                position: 'fixed', top: '55px', left: '10px',
+                 background: headerBackground, border: '1px solid #ccc',
+                  borderRadius: '4px', 
+                  zIndex: 1000, 
+                  padding: '5px', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center' }}>
                 <button className="btn btn-sm btn-success mb-2" onClick={() => window.location.reload()} style={{ width: '150px', fontSize: '0.875rem' }}><FaSync /> Update</button>
                 <button className="btn btn-sm btn-outline-danger" onClick={handleLogout} style={{ width: '150px', fontSize: '0.875rem' }}><FaSignOutAlt /> Logout</button>
               </div>
@@ -682,7 +690,7 @@ const App: React.FC = () => {
                   title="P2P активний (натисніть, щоб відключити)"
                 />
               ) : (
-                <RiP2PLine
+                <RiP2PFill
                   size={24}
                   color={isDarkTheme ? '#fff' : '#212529'}
                   className="icon-hover call-icon"
@@ -772,7 +780,7 @@ const App: React.FC = () => {
             height: '49px', 
             display: 'flex', 
             alignItems: 'center', 
-            borderTop: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef', 
+            borderTop: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef', 
             width: '100%', 
             boxSizing: 'border-box' 
           }}
