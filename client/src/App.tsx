@@ -18,6 +18,8 @@ import { CiPhone, CiVideoOn } from "react-icons/ci";
 import { RiP2PFill, RiP2PLine } from "react-icons/ri";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { TbMenuDeep } from "react-icons/tb";
+import { IoIosAttach } from "react-icons/io";
+import { RiAttachment2 } from "react-icons/ri";
 
 interface ApiErrorResponse {
   error?: string;
@@ -583,7 +585,7 @@ const App: React.FC = () => {
       >
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '48px' }}>
           <div className="d-flex align-items-center" style={{ gap: '15px' }}>
-            <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <h5 className="m-0" style={{ cursor: 'pointer' }}>
               MSNGR ({userEmail})
               {isP2PActive && (
                 <span className="ms-2" style={{ fontSize: '0.8rem', color: '#00C7D9', fontWeight: 'bold' }}>
@@ -810,6 +812,63 @@ const App: React.FC = () => {
           }}
         >
           <div className="d-flex align-items-center w-100 px-3">
+          {selectedChatId && !callState.isCalling && (
+  <div 
+    className="p-0" 
+    style={{ 
+      position: 'fixed', 
+      bottom: 0, 
+      left: 0, 
+      right: 0, 
+      background: headerBackground, 
+      zIndex: 10, 
+      height: '49px', 
+      display: 'flex', 
+      alignItems: 'center', 
+      borderTop: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef',
+      width: '100%', 
+      boxSizing: 'border-box' 
+    }}
+  >
+    <div className="d-flex align-items-center w-100 px-3">
+      <button
+        className="btn btn-sm me-2"
+        onClick={() => console.log('Attach clicked')} // Тимчасова логіка, замініть на потрібну
+        style={{
+          border: 'none',
+          background: 'transparent',
+          padding: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <RiAttachment2
+          size={24}
+          color={isDarkTheme ? '#fff' : '#212529'}
+          className="icon-hover"
+        />
+      </button>
+      <input 
+        type="text" 
+        className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
+        value={input} 
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
+        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage()} 
+        placeholder="Message..." 
+        style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', padding: '0.375rem 15px', margin: 0 }} 
+      />
+      <button 
+        className={`btn ms-1 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
+        onClick={sendMessage} 
+        disabled={!input.trim()}
+        style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease', padding: '0.375rem 0.75rem', margin: 0 }}
+      >
+        Send
+      </button>
+    </div>
+  </div>
+)}
             <input 
               type="text" 
               className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
