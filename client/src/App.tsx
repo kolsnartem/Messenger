@@ -8,11 +8,11 @@ import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import { useAuth } from './hooks/useAuth';
 import axios, { AxiosError } from 'axios';
 import * as nacl from 'tweetnacl';
-import { FaSearch, FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaChevronLeft } from 'react-icons/fa';
+import { FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaChevronLeft } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
-import { FiCamera, FiMoon, FiPhone, FiPhoneCall, FiSearch, FiSun, FiVideo } from 'react-icons/fi';
+import { FiCamera, FiMoon, FiPhone, FiPhoneCall, FiVideo } from 'react-icons/fi';
 import { BiPhone, BiVideo } from 'react-icons/bi';
 import { CiPhone, CiVideoOn } from "react-icons/ci";
 import { RiP2PFill, RiP2PLine } from "react-icons/ri";
@@ -76,7 +76,6 @@ const App: React.FC = () => {
   const [input, setInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [tweetNaclKeyPair, setTweetNaclKeyPair] = useState<TweetNaClKeyPair | null>(null);
@@ -433,7 +432,6 @@ const App: React.FC = () => {
 
   const handleContactSelect = async (contact: Contact) => {
     setSelectedChatId(contact.id);
-    setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
     setContacts(prev => prev.some(c => c.id === contact.id) ? prev : [...prev, { ...contact, lastMessage: null }]);
@@ -548,16 +546,46 @@ const App: React.FC = () => {
             cursor: not-allowed;
             opacity: 0.5;
           }
+          .search-container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+          }
+          .search-container .form-control {
+            border-radius: 20px;
+            margin: 0;
+            padding-left: 15px;
+            padding-right: 15px;
+            width: 100%;
+            box-shadow: none;
+          }
+          .form-control:focus {
+            outline: none;
+            box-shadow: none;
+          }
         `}
       </style>
 
-      <div className="p-2" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: selectedChatId ? '90px' : '50px', borderBottom: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef'  }}>
-        <div className="d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center" style={{ gap: '12px' }}>
+      <div 
+        className="p-0" 
+        style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          background: headerBackground, 
+          zIndex: 20, 
+          height: '96px', // Збільшено до 90px для опускання нижньої грані
+          borderBottom: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef' 
+        }}
+      >
+        {/* Заголовок та меню */}
+        <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '48px' }}>
+          <div className="d-flex align-items-center" style={{ gap: '15px' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               MSNGR ({userEmail})
               {isP2PActive && (
-                <span className="ms-2" style={{ fontSize: '0.8rem', color: '#00C79D', fontWeight: 'bold' }}>
+                <span className="ms-2" style={{ fontSize: '0.8rem', color: '#00C7D9', fontWeight: 'bold' }}>
                   P2P mode
                 </span>
               )}
@@ -569,21 +597,40 @@ const App: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="d-flex align-items-center" style={{ gap: '12px' }}>
-            <FiSearch 
-              size={24} 
-              color={isDarkTheme ? '#fff' : '#212529'} 
-              className="icon-hover call-icon" 
-              onClick={() => setIsSearchOpen(!isSearchOpen)} 
-              style={{ cursor: 'pointer' }} 
-            />
-            <span onClick={() => setIsDarkTheme(!isDarkTheme)} style={{ cursor: 'pointer' }}>
-              {isDarkTheme ? <FiSun size={24} color="#fff" className="icon-hover call-icon" /> : <FiMoon size={24} color="#212529" className="icon-hover call-icon" />}
-            </span>
-          </div>
         </div>
+
+        {/* Поле пошуку */}
+        {!selectedChatId && (
+          <div 
+            className="search-container mx-0 px-3 w-100 d-flex align-items-center" 
+            style={{ 
+              boxSizing: 'border-box', 
+              height: '42px', // Збільшено до 42px для відповідності новій висоті (90px - 48px)
+              padding: '0 15px' // Відступи всередині для звуження поля
+            }}
+          >
+            <input 
+              type="text" 
+              className={`form-control input-field ${isDarkTheme ? 'text-light search-placeholder-dark' : 'text-dark'}`} 
+              value={searchQuery} 
+              onChange={e => setSearchQuery(e.target.value)} 
+              placeholder="Search users..." 
+              style={{ 
+                borderRadius: '20px', 
+                color: isDarkTheme ? '#fff' : '#000', 
+                width: '100%', 
+                boxSizing: 'border-box', 
+                margin: 0, 
+                padding: '0.375rem 15px', 
+                border: 'none', 
+                height: '100%'
+              }} 
+            />
+          </div>
+        )}
+
         {selectedChatId && (
-          <div className="p-2 d-flex align-items-center mt-1 justify-content-between" style={{ background: headerBackground }}>
+          <div className="px-3 d-flex align-items-center justify-content-between" style={{ background: headerBackground, height: '42px' }}>
             <div className="d-flex align-items-center">
               <button 
                 className="btn btn-sm btn-outline-secondary me-2" 
@@ -608,7 +655,7 @@ const App: React.FC = () => {
               {isP2PActive ? (
                 <RiP2PFill
                   size={24}
-                  color="#00C79D" // Зелений колір для активного P2P
+                  color="#00C7D9"
                   className="icon-hover call-icon"
                   onClick={() => p2pServiceRef.current?.disconnectP2P()}
                   style={{ cursor: 'pointer' }}
@@ -617,7 +664,7 @@ const App: React.FC = () => {
               ) : (
                 <RiP2PLine
                   size={24}
-                  color={isDarkTheme ? '#fff' : '#212529'} // Базовий колір для неактивного P2P
+                  color={isDarkTheme ? '#fff' : '#212529'}
                   className="icon-hover call-icon"
                   onClick={initiateP2P}
                   style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }}
@@ -654,25 +701,24 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {isSearchOpen && (
-        <div style={{ position: 'fixed', top: selectedChatId ? '90px' : '50px', left: 0, right: 0, background: headerBackground, zIndex: 30, padding: '0' }}>
-          <div className="container p-2">
-            <input 
-              type="text" 
-              className={`form-control input-field ${isDarkTheme ? 'text-light search-placeholder-dark' : 'text-dark'}`} 
-              value={searchQuery} 
-              onChange={e => setSearchQuery(e.target.value)} 
-              placeholder="Search users..." 
-              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }} 
-            />
-          </div>
-          <div style={{ overflowY: 'auto', maxHeight: selectedChatId ? 'calc(100vh - 150px)' : 'calc(100vh - 90px)' }}>
-            {searchResults.map(result => <div key={result.id} className="p-2 border-bottom container" onClick={() => handleContactSelect(result)} style={{ cursor: 'pointer' }}>{result.email}</div>)}
+      {searchResults.length > 0 && !selectedChatId && (
+        <div style={{ position: 'fixed', top: '90px', left: 0, right: 0, background: headerBackground, zIndex: 30, padding: '0' }}>
+          <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 90px)' }}>
+            {searchResults.map(result => (
+              <div 
+                key={result.id} 
+                className="p-2 border-bottom container" 
+                onClick={() => handleContactSelect(result)} 
+                style={{ cursor: 'pointer' }}
+              >
+                {result.email}
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: selectedChatId ? '86px' : '49px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
+      <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: '90px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
         <VideoCallWindow
           callState={callState}
           onToggleVideo={toggleVideo}
@@ -697,7 +743,7 @@ const App: React.FC = () => {
 
       {selectedChatId && !callState.isCalling && (
         <div 
-          className="p-2" 
+          className="p-0" 
           style={{ 
             position: 'fixed', 
             bottom: 0, 
@@ -708,10 +754,12 @@ const App: React.FC = () => {
             height: '49px', 
             display: 'flex', 
             alignItems: 'center', 
-            borderTop: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef' 
+            borderTop: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef', 
+            width: '100%', 
+            boxSizing: 'border-box' 
           }}
         >
-          <div className="d-flex align-items-center w-100 px-2">
+          <div className="d-flex align-items-center w-100 px-3">
             <input 
               type="text" 
               className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
@@ -719,13 +767,13 @@ const App: React.FC = () => {
               onChange={e => setInput(e.target.value)} 
               onKeyPress={e => e.key === 'Enter' && sendMessage()} 
               placeholder="Message..." 
-              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000' }} 
+              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', padding: '0.375rem 15px', margin: 0 }} 
             />
             <button 
-              className={`btn ms-2 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
+              className={`btn ms-1 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
               onClick={sendMessage} 
               disabled={!input.trim()}
-              style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease' }}
+              style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease', padding: '0.375rem 0.75rem', margin: 0 }}
             >
               Send
             </button>
