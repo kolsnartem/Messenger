@@ -633,7 +633,7 @@ const App: React.FC = () => {
           <div className="px-3 d-flex align-items-center justify-content-between" style={{ background: headerBackground, height: '42px' }}>
             <div className="d-flex align-items-center">
               <button 
-                className="btn btn-sm btn-outline-secondary me-2" 
+                className="btn btn-sm" 
                 onClick={() => setSelectedChatId(null)} 
                 style={{ 
                   border: 'none', 
@@ -643,7 +643,10 @@ const App: React.FC = () => {
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
-                  padding: 0 
+                  padding: 0,
+                  margin: 0,
+                  position: 'relative',
+                  left: '-7px'
                 }}
               >
                 <FaChevronLeft style={{ width: '95px', height: '95px', transform: 'scale(0.4)', color: isDarkTheme ? '#fff' : '#212529' }} />
