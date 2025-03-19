@@ -16,6 +16,8 @@ import { FiCamera, FiMoon, FiPhone, FiPhoneCall, FiVideo } from 'react-icons/fi'
 import { BiPhone, BiVideo } from 'react-icons/bi';
 import { CiPhone, CiVideoOn } from "react-icons/ci";
 import { RiP2PFill, RiP2PLine } from "react-icons/ri";
+import { MdOutlineArrowBackIos } from "react-icons/md";
+
 
 interface ApiErrorResponse {
   error?: string;
@@ -575,11 +577,10 @@ const App: React.FC = () => {
           right: 0, 
           background: headerBackground, 
           zIndex: 20, 
-          height: '96px', // Збільшено до 90px для опускання нижньої грані
+          height: '96px',
           borderBottom: isDarkTheme ? '1px solid #34495e' : '1px solid #e8ecef' 
         }}
       >
-        {/* Заголовок та меню */}
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '48px' }}>
           <div className="d-flex align-items-center" style={{ gap: '15px' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -599,38 +600,41 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Поле пошуку */}
         {!selectedChatId && (
           <div 
             className="search-container mx-0 px-3 w-100 d-flex align-items-center" 
             style={{ 
               boxSizing: 'border-box', 
-              height: '42px', // Збільшено до 42px для відповідності новій висоті (90px - 48px)
-              padding: '0 15px' // Відступи всередині для звуження поля
+              height: '38px', 
+              padding: '0 15px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center' 
             }}
           >
             <input 
               type="text" 
               className={`form-control input-field ${isDarkTheme ? 'text-light search-placeholder-dark' : 'text-dark'}`} 
               value={searchQuery} 
-              onChange={e => setSearchQuery(e.target.value)} 
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)} 
               placeholder="Search users..." 
               style={{ 
                 borderRadius: '20px', 
                 color: isDarkTheme ? '#fff' : '#000', 
-                width: '100%', 
+                width: '100%', // Віднімаємо ширину фіктивного простору, як у кнопки "Send"
                 boxSizing: 'border-box', 
                 margin: 0, 
-                padding: '0.375rem 15px', 
+                padding: '0 15px', 
                 border: 'none', 
-                height: '100%'
+                height: '38px' // Фіксована висота, як у кнопки "Send"
               }} 
             />
           </div>
         )}
 
         {selectedChatId && (
-          <div className="px-3 d-flex align-items-center justify-content-between" style={{ background: headerBackground, height: '42px' }}>
+          <div className="px-3 d-flex align-items-center justify-content-between" 
+          style={{ background: headerBackground, height: '42px' }}>
             <div className="d-flex align-items-center">
               <button 
                 className="btn btn-sm" 
@@ -649,13 +653,26 @@ const App: React.FC = () => {
                   left: '-7px'
                 }}
               >
-                <FaChevronLeft style={{ width: '95px', height: '95px', transform: 'scale(0.4)', color: isDarkTheme ? '#fff' : '#212529' }} />
+                <MdOutlineArrowBackIos
+                size={24}
+                style={{ color: isDarkTheme ? '#fff' : '#212529' }} />
               </button>
-              <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '25px', height: '25px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
+              <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
-              <h6 className="m-0 me-2">{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
-              {isP2PActive ? (
+              <h6 
+              className="m-0 me-2"
+              style={{
+                fontSize: '18px',
+                fontWeight: 'bold'
+              }}
+              >{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
+              
+            </div>
+            {!p2pRequest && (
+              <div className="d-flex align-items-center" style={{ gap: '20px' }}>
+                
+                {isP2PActive ? (
                 <RiP2PFill
                   size={24}
                   color="#00C7D9"
@@ -673,22 +690,20 @@ const App: React.FC = () => {
                   style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }}
                   title="Увімкнути P2P"
                 />
+                
               )}
-            </div>
-            {!p2pRequest && (
-              <div className="d-flex align-items-center" style={{ gap: '20px' }}>
+              <FiVideo 
+                  size={28} 
+                  color={isDarkTheme ? '#fff' : '#212529'} 
+                  className="icon-hover call-icon" 
+                  onClick={() => initiateCall(true)} 
+                  style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} 
+                />
                 <FiPhone 
                   size={23} 
                   color={isDarkTheme ? '#fff' : '#212529'} 
                   className="icon-hover call-icon" 
                   onClick={() => initiateCall(false)} 
-                  style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} 
-                />
-                <FiVideo 
-                  size={28} 
-                  color={isDarkTheme ? '#fff' : '#212529'} 
-                  className="icon-hover call-icon" 
-                  onClick={() => initiateCall(true)} 
                   style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} 
                 />
               </div>
@@ -767,8 +782,8 @@ const App: React.FC = () => {
               type="text" 
               className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
               value={input} 
-              onChange={e => setInput(e.target.value)} 
-              onKeyPress={e => e.key === 'Enter' && sendMessage()} 
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
+              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage()} 
               placeholder="Message..." 
               style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', padding: '0.375rem 15px', margin: 0 }} 
             />

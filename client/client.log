@@ -6,70 +6,23 @@ Applying Webpack configuration...
 Updated source-map-loader rule with exclude: [ /node_modules\/@signalapp\/libsignal-client/ ]
 Webpack configuration applied successfully.
 Dev server middlewares set up.
-(node:16007) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
+(node:3326) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:16007) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(node:16007) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:3326) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:3326) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
-Compiled with warnings.
+Compiled successfully!
 
-[eslint] 
-src/App.tsx
-  Line 2:46:   'IdentityKeyPair' is defined but never used                                                                               @typescript-eslint/no-unused-vars
-  Line 2:63:   'EncryptionError' is defined but never used                                                                               @typescript-eslint/no-unused-vars
-  Line 9:17:   'AxiosError' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
-  Line 11:10:  'FaSun' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
-  Line 11:17:  'FaMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
-  Line 11:47:  'FaLock' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
-  Line 11:55:  'FaPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 11:64:  'FaVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 15:10:  'FiCamera' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
-  Line 15:20:  'FiMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
-  Line 15:37:  'FiPhoneCall' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
-  Line 16:10:  'BiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 16:19:  'BiVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 17:10:  'CiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 17:19:  'CiVideoOn' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
-  Line 20:11:  'ApiErrorResponse' is defined but never used                                                                              @typescript-eslint/no-unused-vars
-  Line 79:23:  'setIsDarkTheme' is assigned a value but never used                                                                       @typescript-eslint/no-unused-vars
-  Line 132:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
-  Line 141:6:  React Hook useEffect has a missing dependency: 'handleP2PMessage'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
-  Line 148:6:  React Hook useEffect has a missing dependency: 'decryptMessage'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
-  Line 175:6:  React Hook useEffect has a missing dependency: 'tweetNaclKeyPair'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
-  Line 221:6:  React Hook useCallback has a missing dependency: 'decryptMessageText'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
-  Line 372:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
-  Line 382:6:  React Hook useEffect has a missing dependency: 'handleIncomingMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+You can now view client in the browser.
 
-Search for the keywords to learn more about each warning.
-To ignore, add // eslint-disable-next-line to the line before.
+  Local:            https://localhost:3000
+  On Your Network:  https://192.168.31.185:3000
 
-WARNING in [eslint] 
-src/App.tsx
-  Line 2:46:   'IdentityKeyPair' is defined but never used                                                                               @typescript-eslint/no-unused-vars
-  Line 2:63:   'EncryptionError' is defined but never used                                                                               @typescript-eslint/no-unused-vars
-  Line 9:17:   'AxiosError' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
-  Line 11:10:  'FaSun' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
-  Line 11:17:  'FaMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
-  Line 11:47:  'FaLock' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
-  Line 11:55:  'FaPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 11:64:  'FaVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 15:10:  'FiCamera' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
-  Line 15:20:  'FiMoon' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
-  Line 15:37:  'FiPhoneCall' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
-  Line 16:10:  'BiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 16:19:  'BiVideo' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 17:10:  'CiPhone' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  Line 17:19:  'CiVideoOn' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
-  Line 20:11:  'ApiErrorResponse' is defined but never used                                                                              @typescript-eslint/no-unused-vars
-  Line 79:23:  'setIsDarkTheme' is assigned a value but never used                                                                       @typescript-eslint/no-unused-vars
-  Line 132:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
-  Line 141:6:  React Hook useEffect has a missing dependency: 'handleP2PMessage'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
-  Line 148:6:  React Hook useEffect has a missing dependency: 'decryptMessage'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
-  Line 175:6:  React Hook useEffect has a missing dependency: 'tweetNaclKeyPair'. Either include it or remove the dependency array       react-hooks/exhaustive-deps
-  Line 221:6:  React Hook useCallback has a missing dependency: 'decryptMessageText'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
-  Line 372:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array              react-hooks/exhaustive-deps
-  Line 382:6:  React Hook useEffect has a missing dependency: 'handleIncomingMessage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+Note that the development build is not optimized.
+To create a production build, use npm run build.
 
-webpack compiled with 1 warning
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
 No issues found.
