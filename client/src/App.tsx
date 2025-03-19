@@ -727,7 +727,7 @@ const App: React.FC = () => {
                 
               )}
               <FiVideo 
-                  size={28} 
+                  size={26} 
                   color={isDarkTheme ? '#fff' : '#212529'} 
                   className="icon-hover call-icon" 
                   onClick={() => initiateCall(true)} 
