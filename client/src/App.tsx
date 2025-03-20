@@ -308,8 +308,8 @@ const App: React.FC = () => {
     await updateContactsWithLastMessage(updatedMessage);
   };
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  const sendMessage = async (text: string) => { // Updated to accept a text parameter
+    if (!text.trim()) return;
     if (!userId || !selectedChatId || !tweetNaclKeyPair) {
       console.error('Cannot send message: missing prerequisites', { userId, selectedChatId, tweetNaclKeyPair });
       return;
@@ -320,7 +320,7 @@ const App: React.FC = () => {
       id: messageId, 
       userId: userId!, 
       contactId: selectedChatId, 
-      text: input.trim(), 
+      text: text.trim(), 
       timestamp: Date.now(), 
       isRead: 0, 
       isMine: true, 
@@ -333,23 +333,23 @@ const App: React.FC = () => {
         storeSentMessage(message.id, message.text, selectedChatId);
         await p2pServiceRef.current.sendP2PMessage({ ...message, lastMessage: undefined });
         setMessages(prev => {
-          const updatedMessages = [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp);
+          const updatedMessages = [...prev, { ...message, text: text.trim() }].sort((a, b) => a.timestamp - b.timestamp);
           localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
           return updatedMessages;
         });
         await updateContactsWithLastMessage(message);
       } else {
         message.text = encryptMessage(message.text, contact.publicKey || '', tweetNaclKeyPair);
-        storeSentMessage(message.id, input.trim(), selectedChatId);
+        storeSentMessage(message.id, text.trim(), selectedChatId);
         socketRef.current?.emit('message', message);
         setMessages(prev => {
-          const updatedMessages = [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp);
+          const updatedMessages = [...prev, { ...message, text: text.trim() }].sort((a, b) => a.timestamp - b.timestamp);
           localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
           return updatedMessages;
         });
         await updateContactsWithLastMessage(message);
       }
-      setInput('');
+      setInput(''); // Clear the input in App.tsx
       shouldScrollToBottomRef.current = true;
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -462,7 +462,6 @@ const App: React.FC = () => {
     }
     isInitialMount.current = true;
 
-    // Завантажуємо повідомлення з кешу або API
     const cachedMessages = localStorage.getItem(`chat_${contact.id}`);
     if (cachedMessages) {
       setMessages(JSON.parse(cachedMessages));
@@ -860,13 +859,13 @@ const App: React.FC = () => {
               className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
               value={input} 
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
-              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage()} 
+              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage(input)} 
               placeholder="Message..." 
               style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', padding: '0.375rem 15px', margin: 0 }} 
             />
             <button 
               className={`btn ms-1 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
-              onClick={sendMessage} 
+              onClick={() => sendMessage(input)} 
               disabled={!input.trim()}
               style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease', padding: '0.375rem 0.75rem', margin: 0 }}
             >

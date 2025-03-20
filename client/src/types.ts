@@ -8,7 +8,6 @@ export interface TweetNaClKeyPair {
   secretKey: Uint8Array;
 }
 
-// Додано інтерфейс EncryptionError
 export interface EncryptionError {
   message: string;
   details?: string;
@@ -41,4 +40,16 @@ export interface ChatListProps {
   selectedChatId: string | null;
   isDarkTheme: boolean;
   onSelectChat: (contact: Contact) => void;
+}
+
+export interface ChatWindowProps {
+  messages: Message[];
+  selectedChatId: string | null;
+  isDarkTheme: boolean;
+  unreadMessagesCount: number; // Added to fix the error
+  showScrollDown: boolean;    // Added to fix the error
+  onRetryDecryption: (message: Message) => void;
+  onScrollToBottom: (force?: boolean) => void;
+  chatContainerRef: React.RefObject<HTMLDivElement | null>;
+  onSendMessage: (text: string) => void; // Updated to accept a text parameter
 }

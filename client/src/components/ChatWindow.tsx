@@ -1,112 +1,58 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Message } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { Message, ChatWindowProps } from '../types';
 import { FaRedo, FaAngleDown } from 'react-icons/fa';
-
-interface ChatWindowProps {
-  messages: Message[];
-  selectedChatId: string | null;
-  isDarkTheme: boolean;
-  onRetryDecryption: (message: Message) => void;
-  onScrollToBottom: (force?: boolean) => void;
-  chatContainerRef: React.RefObject<HTMLDivElement | null>;
-  onSendMessage: (text: string) => void;
-}
-
-const UnreadMessagesIndicator: React.FC<{ unreadCount: number; onClick: () => void }> = ({ unreadCount, onClick }) => {
-  if (unreadCount === 0) return null;
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        position: 'absolute',
-        bottom: '80px',
-        left: '20px',
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
-        background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
-        color: '#fff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '14px',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        zIndex: 15,
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-      }}
-    >
-      {unreadCount}
-    </div>
-  );
-};
-
-const ScrollDownButton: React.FC<{ onClick: () => void; isDarkTheme: boolean }> = ({ onClick, isDarkTheme }) => {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        position: 'absolute',
-        bottom: '80px',
-        right: '20px',
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
-        backgroundColor: isDarkTheme ? '#333' : '#fff',
-        color: isDarkTheme ? '#fff' : '#333',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        zIndex: 15,
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-      }}
-    >
-      <FaAngleDown style={{ width: '20px', height: '20px' }} />
-    </div>
-  );
-};
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
   messages,
   selectedChatId,
   isDarkTheme,
+  unreadMessagesCount,
+  showScrollDown,
   onRetryDecryption,
   onScrollToBottom,
   chatContainerRef,
   onSendMessage,
 }) => {
   const [inputText, setInputText] = useState('');
-  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
-  const [showScrollDown, setShowScrollDown] = useState(false);
+  const [isFirstLoad, setIsFirstLoad] = useState(() => {
+    return !localStorage.getItem(`chatLoaded-${selectedChatId}`);
+  });
   const prevMessageCount = useRef(messages.length);
 
   useEffect(() => {
-    const container = chatContainerRef.current;
-    if (!container) return;
+    if (!chatContainerRef.current) return;
+
+    const savedScrollPos = localStorage.getItem(`chatScrollPos-${selectedChatId}`);
+
+    if (savedScrollPos) {
+      chatContainerRef.current.scrollTop = parseInt(savedScrollPos, 10);
+    } else {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+
+    if (isFirstLoad) {
+      setTimeout(() => {
+        setIsFirstLoad(false);
+        localStorage.setItem(`chatLoaded-${selectedChatId}`, 'true');
+      }, 300);
+    }
+  }, [messages, selectedChatId, isFirstLoad]);
+
+  useEffect(() => {
+    if (!chatContainerRef.current) return;
 
     const handleScroll = () => {
-      const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
-      setShowScrollDown(!isAtBottom);
-      if (isAtBottom) {
-        setUnreadMessagesCount(0);
+      if (chatContainerRef.current) {
+        localStorage.setItem(
+          `chatScrollPos-${selectedChatId}`,
+          chatContainerRef.current.scrollTop.toString()
+        );
       }
     };
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [chatContainerRef]);
-
-  useEffect(() => {
-    const container = chatContainerRef.current;
-    if (!container) return;
-
-    const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
-    if (!isAtBottom && messages.length > prevMessageCount.current) {
-      setUnreadMessagesCount((prev) => prev + (messages.length - prevMessageCount.current));
-    }
-    prevMessageCount.current = messages.length;
-  }, [messages]);
+    chatContainerRef.current.addEventListener('scroll', handleScroll);
+    return () => chatContainerRef.current?.removeEventListener('scroll', handleScroll);
+  }, [selectedChatId]);
 
   const handleSend = () => {
     if (inputText.trim()) {
@@ -119,6 +65,35 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   return (
     <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {isFirstLoad && (
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            background: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="spinner-border"
+            style={{
+              width: '50px',
+              height: '50px',
+              borderWidth: '5px',
+              borderColor: isDarkTheme ? '#00C79D' : '#00C7D4',
+              borderRightColor: 'transparent',
+            }}
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      )}
+
       <div
         ref={chatContainerRef}
         style={{
@@ -203,8 +178,55 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         </button>
       </div>
 
-      {unreadMessagesCount > 0 && <UnreadMessagesIndicator unreadCount={unreadMessagesCount} onClick={() => onScrollToBottom(true)} />}
-      {showScrollDown && <ScrollDownButton onClick={() => onScrollToBottom(true)} isDarkTheme={isDarkTheme} />}
+      {unreadMessagesCount > 0 && (
+        <div
+          onClick={() => onScrollToBottom(true)}
+          style={{
+            position: 'absolute',
+            bottom: '80px',
+            left: '20px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            zIndex: 15,
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          {unreadMessagesCount}
+        </div>
+      )}
+
+      {showScrollDown && (
+        <div
+          onClick={() => onScrollToBottom(true)}
+          style={{
+            position: 'absolute',
+            bottom: '80px',
+            right: '20px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: isDarkTheme ? '#333' : '#fff',
+            color: isDarkTheme ? '#fff' : '#333',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 15,
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          <FaAngleDown style={{ width: '20px', height: '20px' }} />
+        </div>
+      )}
     </div>
   );
 };

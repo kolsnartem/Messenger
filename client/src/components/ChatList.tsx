@@ -11,16 +11,13 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
     const container = chatListRef.current;
     if (!container) return;
 
-    // Зберігаємо поточну позицію перед входом у чат
     if (selectedChatId) {
       previousScrollPosition.current = container.scrollTop;
       return;
     }
 
-    // Відновлюємо позицію без анімації
     const savedPosition = localStorage.getItem('chatListScrollPosition');
     if (!selectedChatId) {
-      // Тимчасово вимикаємо плавний скрол
       container.style.scrollBehavior = 'auto';
       
       if (previousScrollPosition.current) {
@@ -29,14 +26,12 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
         container.scrollTop = parseFloat(savedPosition);
       }
       
-      // Відновлюємо плавний скрол після встановлення позиції
       requestAnimationFrame(() => {
         container.style.scrollBehavior = 'smooth';
       });
     }
 
     const handleScroll = () => {
-      // Зберігаємо позицію в localStorage тільки коли ми не в чаті
       if (!selectedChatId) {
         localStorage.setItem('chatListScrollPosition', container.scrollTop.toString());
       }
