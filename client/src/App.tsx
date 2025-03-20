@@ -251,7 +251,6 @@ const App: React.FC = () => {
         if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
           setUnreadMessagesCount(prev => prev + 1);
         }
-        // Оновлюємо кеш при отриманні нового повідомлення
         if (selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
           localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
         }
@@ -281,7 +280,6 @@ const App: React.FC = () => {
           if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
             setUnreadMessagesCount(prev => prev + 1);
           }
-          // Оновлюємо кеш при отриманні нового P2P повідомлення
           if (selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
             localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
           }
@@ -302,7 +300,6 @@ const App: React.FC = () => {
       if (!isAtBottom() && selectedChatId === message.userId) {
         setUnreadMessagesCount(prev => prev + 1);
       }
-      // Оновлюємо кеш при отриманні нового P2P повідомлення
       if (selectedChatId === message.userId) {
         localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
       }
@@ -337,7 +334,7 @@ const App: React.FC = () => {
         await p2pServiceRef.current.sendP2PMessage({ ...message, lastMessage: undefined });
         setMessages(prev => {
           const updatedMessages = [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp);
-          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages)); // Оновлюємо кеш
+          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
           return updatedMessages;
         });
         await updateContactsWithLastMessage(message);
@@ -347,7 +344,7 @@ const App: React.FC = () => {
         socketRef.current?.emit('message', message);
         setMessages(prev => {
           const updatedMessages = [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp);
-          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages)); // Оновлюємо кеш
+          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
           return updatedMessages;
         });
         await updateContactsWithLastMessage(message);
@@ -465,7 +462,7 @@ const App: React.FC = () => {
     }
     isInitialMount.current = true;
 
-    // Завантажуємо кешовані повідомлення, якщо вони є
+    // Завантажуємо повідомлення з кешу або API
     const cachedMessages = localStorage.getItem(`chat_${contact.id}`);
     if (cachedMessages) {
       setMessages(JSON.parse(cachedMessages));
@@ -559,7 +556,7 @@ const App: React.FC = () => {
           .message-mine { background-color: #ff9966 !important; color: #333; }
           .message-theirs { background-color: #ffccb3 !important; color: #333; }
           .retry-button { margin-left: 5px; cursor: pointer; }
-          .send-btn-active { background: linear-gradient(90deg, #00C7D4, Loader#00C79D); border: none; color: #fff; }
+          .send-btn-active { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
           .send-btn-inactive { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
           .send-btn-active:disabled { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; opacity: 0.5; color: #fff; }
           .btn { transition: background-color 0.2s ease-in-out; }
