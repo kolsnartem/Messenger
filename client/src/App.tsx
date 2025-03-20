@@ -251,6 +251,10 @@ const App: React.FC = () => {
         if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
           setUnreadMessagesCount(prev => prev + 1);
         }
+        // Оновлюємо кеш при отриманні нового повідомлення
+        if (selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
+          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
+        }
         return updatedMessages;
       });
       await updateContactsWithLastMessage(updatedMessage);
@@ -277,6 +281,10 @@ const App: React.FC = () => {
           if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
             setUnreadMessagesCount(prev => prev + 1);
           }
+          // Оновлюємо кеш при отриманні нового P2P повідомлення
+          if (selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
+            localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
+          }
           return updatedMessages;
         });
         await updateContactsWithLastMessage(updatedMessage);
@@ -293,6 +301,10 @@ const App: React.FC = () => {
       const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
       if (!isAtBottom() && selectedChatId === message.userId) {
         setUnreadMessagesCount(prev => prev + 1);
+      }
+      // Оновлюємо кеш при отриманні нового P2P повідомлення
+      if (selectedChatId === message.userId) {
+        localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
       }
       return updatedMessages;
     });
@@ -323,13 +335,21 @@ const App: React.FC = () => {
       if (isP2PActive && p2pServiceRef.current?.isP2PActive()) {
         storeSentMessage(message.id, message.text, selectedChatId);
         await p2pServiceRef.current.sendP2PMessage({ ...message, lastMessage: undefined });
-        setMessages(prev => [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp));
+        setMessages(prev => {
+          const updatedMessages = [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp);
+          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages)); // Оновлюємо кеш
+          return updatedMessages;
+        });
         await updateContactsWithLastMessage(message);
       } else {
         message.text = encryptMessage(message.text, contact.publicKey || '', tweetNaclKeyPair);
         storeSentMessage(message.id, input.trim(), selectedChatId);
         socketRef.current?.emit('message', message);
-        setMessages(prev => [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp));
+        setMessages(prev => {
+          const updatedMessages = [...prev, { ...message, text: input.trim() }].sort((a, b) => a.timestamp - b.timestamp);
+          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages)); // Оновлюємо кеш
+          return updatedMessages;
+        });
         await updateContactsWithLastMessage(message);
       }
       setInput('');
@@ -444,6 +464,18 @@ const App: React.FC = () => {
       await initializeKeys();
     }
     isInitialMount.current = true;
+
+    // Завантажуємо кешовані повідомлення, якщо вони є
+    const cachedMessages = localStorage.getItem(`chat_${contact.id}`);
+    if (cachedMessages) {
+      setMessages(JSON.parse(cachedMessages));
+    } else {
+      const fetchedMessages = (await fetchMessages(userId!, contact.id)).data;
+      const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({ ...msg, isMine: msg.userId === userId, text: await decryptMessageText(msg) })));
+      setMessages(decryptedMessages);
+      localStorage.setItem(`chat_${contact.id}`, JSON.stringify(decryptedMessages));
+    }
+    await markAsRead(userId!, contact.id);
   };
 
   const handleLogout = () => {
@@ -527,7 +559,7 @@ const App: React.FC = () => {
           .message-mine { background-color: #ff9966 !important; color: #333; }
           .message-theirs { background-color: #ffccb3 !important; color: #333; }
           .retry-button { margin-left: 5px; cursor: pointer; }
-          .send-btn-active { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
+          .send-btn-active { background: linear-gradient(90deg, #00C7D4, Loader#00C79D); border: none; color: #fff; }
           .send-btn-inactive { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
           .send-btn-active:disabled { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; opacity: 0.5; color: #fff; }
           .btn { transition: background-color 0.2s ease-in-out; }
@@ -612,26 +644,25 @@ const App: React.FC = () => {
           </div>
           
           <button
-  className="btn btn-sm"
-  onClick={() => setIsMenuOpen(prev => !prev)}
-  style={{
-    border: 'none',
-    background: 'transparent',
-    padding: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    right: '15px',
-
-  }}
->
-  <TbMenuDeep
-    size={24}
-    color={isDarkTheme ? '#fff' : '#212529'}
-    className="icon-hover"
-  />
-</button> ​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+            className="btn btn-sm"
+            onClick={() => setIsMenuOpen(prev => !prev)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'absolute',
+              right: '15px',
+            }}
+          >
+            <TbMenuDeep
+              size={24}
+              color={isDarkTheme ? '#fff' : '#212529'}
+              className="icon-hover"
+            />
+          </button>
         </div>
 
         {!selectedChatId && (
@@ -655,12 +686,12 @@ const App: React.FC = () => {
               style={{ 
                 borderRadius: '20px', 
                 color: isDarkTheme ? '#fff' : '#000', 
-                width: '100%', // Віднімаємо ширину фіктивного простору, як у кнопки "Send"
+                width: '100%',
                 boxSizing: 'border-box', 
                 margin: 0, 
                 padding: '0 15px', 
                 border: 'none', 
-                height: '38px' // Фіксована висота, як у кнопки "Send"
+                height: '38px'
               }} 
             />
           </div>
@@ -701,32 +732,29 @@ const App: React.FC = () => {
                 fontWeight: 'bold'
               }}
               >{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
-              
             </div>
             {!p2pRequest && (
               <div className="d-flex align-items-center" style={{ gap: '20px' }}>
-                
                 {isP2PActive ? (
-                <RiP2PFill
-                  size={24}
-                  color="#00C7D9"
-                  className="icon-hover call-icon"
-                  onClick={() => p2pServiceRef.current?.disconnectP2P()}
-                  style={{ cursor: 'pointer' }}
-                  title="P2P активний (натисніть, щоб відключити)"
-                />
-              ) : (
-                <RiP2PFill
-                  size={24}
-                  color={isDarkTheme ? '#fff' : '#212529'}
-                  className="icon-hover call-icon"
-                  onClick={initiateP2P}
-                  style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }}
-                  title="Увімкнути P2P"
-                />
-                
-              )}
-              <FiVideo 
+                  <RiP2PFill
+                    size={24}
+                    color="#00C7D9"
+                    className="icon-hover call-icon"
+                    onClick={() => p2pServiceRef.current?.disconnectP2P()}
+                    style={{ cursor: 'pointer' }}
+                    title="P2P активний (натисніть, щоб відключити)"
+                  />
+                ) : (
+                  <RiP2PFill
+                    size={24}
+                    color={isDarkTheme ? '#fff' : '#212529'}
+                    className="icon-hover call-icon"
+                    onClick={initiateP2P}
+                    style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }}
+                    title="Увімкнути P2P"
+                  />
+                )}
+                <FiVideo 
                   size={26} 
                   color={isDarkTheme ? '#fff' : '#212529'} 
                   className="icon-hover call-icon" 
@@ -812,63 +840,24 @@ const App: React.FC = () => {
           }}
         >
           <div className="d-flex align-items-center w-100 px-3">
-          {selectedChatId && !callState.isCalling && (
-  <div 
-    className="p-0" 
-    style={{ 
-      position: 'fixed', 
-      bottom: 0, 
-      left: 0, 
-      right: 0, 
-      background: headerBackground, 
-      zIndex: 10, 
-      height: '49px', 
-      display: 'flex', 
-      alignItems: 'center', 
-      borderTop: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef',
-      width: '100%', 
-      boxSizing: 'border-box' 
-    }}
-  >
-    <div className="d-flex align-items-center w-100 px-3">
-      <button
-        className="btn btn-sm me-2"
-        onClick={() => console.log('Attach clicked')} // Тимчасова логіка, замініть на потрібну
-        style={{
-          border: 'none',
-          background: 'transparent',
-          padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <RiAttachment2
-          size={24}
-          color={isDarkTheme ? '#fff' : '#212529'}
-          className="icon-hover"
-        />
-      </button>
-      <input 
-        type="text" 
-        className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
-        value={input} 
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
-        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage()} 
-        placeholder="Message..." 
-        style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', padding: '0.375rem 15px', margin: 0 }} 
-      />
-      <button 
-        className={`btn ms-1 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
-        onClick={sendMessage} 
-        disabled={!input.trim()}
-        style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease', padding: '0.375rem 0.75rem', margin: 0 }}
-      >
-        Send
-      </button>
-    </div>
-  </div>
-)}
+            <button
+              className="btn btn-sm me-2"
+              onClick={() => console.log('Attach clicked')}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <RiAttachment2
+                size={24}
+                color={isDarkTheme ? '#fff' : '#212529'}
+                className="icon-hover"
+              />
+            </button>
             <input 
               type="text" 
               className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 

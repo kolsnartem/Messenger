@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Message } from '../types';
 import { FaRedo, FaAngleDown } from 'react-icons/fa';
 
@@ -88,7 +88,42 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   chatContainerRef,
   onSendMessage,
 }) => {
-  const [inputText, setInputText] = React.useState<string>('');
+  const [inputText, setInputText] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const initialLoadRef = useRef(true);
+
+  useEffect(() => {
+    if (!selectedChatId) return;
+
+    setIsLoading(true);
+    const cachedMessages = localStorage.getItem(`chat_${selectedChatId}`);
+
+    const loadMessages = async () => {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Мінімальна затримка для плавності
+
+      if (cachedMessages) {
+        const parsedMessages = JSON.parse(cachedMessages);
+        chatContainerRef.current?.scrollTo({ top: chatContainerRef.current.scrollHeight });
+        setIsLoading(false);
+      } else {
+        localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(messages));
+        chatContainerRef.current?.scrollTo({ top: chatContainerRef.current.scrollHeight });
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+
+    return () => {
+      initialLoadRef.current = false;
+    };
+  }, [selectedChatId, chatContainerRef]);
+
+  useEffect(() => {
+    if (!isLoading && messages.length > 0) {
+      chatContainerRef.current?.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [messages, isLoading, chatContainerRef]);
 
   if (!selectedChatId) return null;
 
@@ -118,115 +153,148 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           .input-field::placeholder {
             color: ${isDarkTheme ? '#b0b0b0' : '#6c757d'};
           }
+          .loading-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: ${isDarkTheme ? '#212529' : '#f8f9fa'};
+            display: flex;
+            alignItems: 'center',
+            justifyContent: 'center',
+            z-index: 20;
+            opacity: ${isLoading ? 1 : 0};
+            transition: opacity 0.3s ease-out;
+            pointer-events: ${isLoading ? 'auto' : 'none'};
+          }
+          .loading-bar::after {
+            content: '';
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, #00C7D4, #00C79D);
+            animation: loading 1s infinite;
+          }
+          @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+          }
         `}
       </style>
-      <div
-        ref={chatContainerRef}
-        className="p-3 scroll-container"
-        style={{
-          flex: '1 1 auto',
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div style={{ flexGrow: 1 }} />
-        {messages.map((msg) => (
+
+      <div className="loading-bar" />
+
+      {!isLoading && (
+        <>
           <div
-            key={`${msg.id}-${msg.timestamp}`}
-            className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2 message-enter`}
+            ref={chatContainerRef}
+            className="p-3 scroll-container"
+            style={{
+              flex: '1 1 auto',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
           >
-            <div
-              className={`p-2 rounded-3 ${msg.isMine ? 'message-mine' : 'message-theirs'}`}
+            <div style={{ flexGrow: 1 }} />
+            {messages.map((msg) => (
+              <div
+                key={`${msg.id}-${msg.timestamp}`}
+                className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2`}
+              >
+                <div
+                  className={`p-2 rounded-3 ${msg.isMine ? 'message-mine' : 'message-theirs'}`}
+                  style={{
+                    maxWidth: '75%',
+                    borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                    wordBreak: 'break-word',
+                    background: msg.isMine
+                      ? 'linear-gradient(90deg, #00C7D4, #00C79D)'
+                      : 'linear-gradient(90deg, rgba(0, 199, 212, 0.5), rgba(0, 199, 157, 0.5))',
+                    color: '#fff',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span>{msg.text}</span>
+                    {msg.text.startsWith('base64:') && (
+                      <FaRedo
+                        className="retry-button"
+                        onClick={() => onRetryDecryption(msg)}
+                        style={{ fontSize: '0.8rem', color: '#fff', cursor: 'pointer', marginLeft: '5px' }}
+                      />
+                    )}
+                  </div>
+                  <div
+                    className="text-end mt-1"
+                    style={{ fontSize: '0.7rem', opacity: 0.8 }}
+                  >
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}{' '}
+                    {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div style={{ height: '1px' }} />
+          </div>
+
+          <div
+            style={{
+              padding: '10px',
+              background: isDarkTheme ? '#212529' : '#f8f9fa',
+              borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Type a message..."
+              className="form-control input-field"
               style={{
-                maxWidth: '75%',
-                borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                wordBreak: 'break-word',
-                background: msg.isMine
-                  ? 'linear-gradient(90deg, #00C7D4, #00C79D)'
-                  : 'linear-gradient(90deg, rgba(0, 199, 212, 0.5), rgba(0, 199, 157, 0.5))',
-                color: '#fff',
+                flex: 1,
+                padding: '10px',
+                borderRadius: '20px',
+                color: isDarkTheme ? '#fff' : '#2c3e50',
+              }}
+            />
+            <button
+              onClick={handleSend}
+              style={{
+                padding: '10px 20px',
+                background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
+                border: 'none',
+                borderRadius: '20px',
+                color: 'white',
+                fontSize: '16px',
+                fontWeight: 500,
+                cursor: 'pointer',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>{msg.text}</span>
-                {msg.text.startsWith('base64:') && (
-                  <FaRedo
-                    className="retry-button"
-                    onClick={() => onRetryDecryption(msg)}
-                    style={{ fontSize: '0.8rem', color: '#fff', cursor: 'pointer', marginLeft: '5px' }}
-                  />
-                )}
-              </div>
-              <div
-                className="text-end mt-1"
-                style={{ fontSize: '0.7rem', opacity: 0.8 }}
-              >
-                {new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-                {msg.isMine && (msg.isRead === 1 ? '✓✓' : '✓')}
-              </div>
-            </div>
+              Send
+            </button>
           </div>
-        ))}
-        <div style={{ height: '1px' }} />
-      </div>
 
-      <div
-        style={{
-          padding: '10px',
-          background: isDarkTheme ? '#212529' : '#f8f9fa',
-          borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-        }}
-      >
-        <input
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Type a message..."
-          className="form-control input-field"
-          style={{
-            flex: 1,
-            padding: '10px',
-            borderRadius: '20px',
-            color: isDarkTheme ? '#fff' : '#2c3e50',
-          }}
-        />
-        <button
-          onClick={handleSend}
-          style={{
-            padding: '10px 20px',
-            background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
-            border: 'none',
-            borderRadius: '20px',
-            color: 'white',
-            fontSize: '16px',
-            fontWeight: 500,
-            cursor: 'pointer',
-          }}
-        >
-          Send
-        </button>
-      </div>
-
-      {unreadMessagesCount > 0 && (
-        <UnreadMessagesIndicator
-          unreadCount={unreadMessagesCount}
-          onClick={() => onScrollToBottom(true)}
-          isDarkTheme={isDarkTheme}
-        />
-      )}
-      {showScrollDown && (
-        <ScrollDownButton
-          onClick={() => onScrollToBottom(true)}
-          isDarkTheme={isDarkTheme}
-        />
+          {unreadMessagesCount > 0 && (
+            <UnreadMessagesIndicator
+              unreadCount={unreadMessagesCount}
+              onClick={() => onScrollToBottom(true)}
+              isDarkTheme={isDarkTheme}
+            />
+          )}
+          {showScrollDown && (
+            <ScrollDownButton
+              onClick={() => onScrollToBottom(true)}
+              isDarkTheme={isDarkTheme}
+            />
+          )}
+        </>
       )}
     </div>
   );
