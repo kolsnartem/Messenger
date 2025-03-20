@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Message } from '../types';
-import { FaRedo } from 'react-icons/fa';
+import { FaRedo, FaAngleDown } from 'react-icons/fa';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -12,51 +12,101 @@ interface ChatWindowProps {
   onSendMessage: (text: string) => void;
 }
 
+const UnreadMessagesIndicator: React.FC<{ unreadCount: number; onClick: () => void }> = ({ unreadCount, onClick }) => {
+  if (unreadCount === 0) return null;
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        position: 'absolute',
+        bottom: '80px',
+        left: '20px',
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        background: 'linear-gradient(90deg, #00C7D4, #00C79D)',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        zIndex: 15,
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+      }}
+    >
+      {unreadCount}
+    </div>
+  );
+};
+
+const ScrollDownButton: React.FC<{ onClick: () => void; isDarkTheme: boolean }> = ({ onClick, isDarkTheme }) => {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        position: 'absolute',
+        bottom: '80px',
+        right: '20px',
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        backgroundColor: isDarkTheme ? '#333' : '#fff',
+        color: isDarkTheme ? '#fff' : '#333',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        zIndex: 15,
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+      }}
+    >
+      <FaAngleDown style={{ width: '20px', height: '20px' }} />
+    </div>
+  );
+};
+
 const ChatWindow: React.FC<ChatWindowProps> = ({
   messages,
   selectedChatId,
   isDarkTheme,
   onRetryDecryption,
+  onScrollToBottom,
   chatContainerRef,
   onSendMessage,
 }) => {
-  const [inputText, setInputText] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [hasLoadedBefore, setHasLoadedBefore] = useState<boolean>(false);
-  const initialLoadRef = useRef(true);
+  const [inputText, setInputText] = useState('');
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  const [showScrollDown, setShowScrollDown] = useState(false);
+  const prevMessageCount = useRef(messages.length);
 
   useEffect(() => {
-    if (!selectedChatId) return;
+    const container = chatContainerRef.current;
+    if (!container) return;
 
-    const cachedMessages = localStorage.getItem(`chat_${selectedChatId}`);
-    const scrollPosition = localStorage.getItem(`scrollPosition_${selectedChatId}`);
-
-    if (cachedMessages || messages.length > 0) {
-      setHasLoadedBefore(true); // Позначаємо, що чат уже завантажувався
-
-      const container = chatContainerRef.current;
-      if (container) {
-        if (scrollPosition) {
-          container.scrollTop = parseFloat(scrollPosition);
-        } else if (messages.length > 0) {
-          container.scrollTop = container.scrollHeight;
-        }
+    const handleScroll = () => {
+      const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
+      setShowScrollDown(!isAtBottom);
+      if (isAtBottom) {
+        setUnreadMessagesCount(0);
       }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [chatContainerRef]);
+
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
+    if (!isAtBottom && messages.length > prevMessageCount.current) {
+      setUnreadMessagesCount((prev) => prev + (messages.length - prevMessageCount.current));
     }
-
-    // Якщо це перше відкриття, показуємо спінер
-    if (!hasLoadedBefore) {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
-    } else {
-      setIsLoading(false);
-    }
-
-    initialLoadRef.current = false;
-  }, [selectedChatId, chatContainerRef, messages]);
-
-  if (!selectedChatId) return null;
+    prevMessageCount.current = messages.length;
+  }, [messages]);
 
   const handleSend = () => {
     if (inputText.trim()) {
@@ -65,46 +115,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
+  if (!selectedChatId) return null;
+
   return (
     <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Білий фон тільки при першому завантаженні */}
-      {isLoading && !hasLoadedBefore && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 20,
-          }}
-        >
-          <div className="spinner"></div>
-        </div>
-      )}
-
-      {/* CSS для спінера */}
-      <style>
-        {`
-          .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #ddd;
-            border-top: 5px solid #00C79D;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-          }
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
-
       <div
         ref={chatContainerRef}
         style={{
@@ -188,6 +202,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           Send
         </button>
       </div>
+
+      {unreadMessagesCount > 0 && <UnreadMessagesIndicator unreadCount={unreadMessagesCount} onClick={() => onScrollToBottom(true)} />}
+      {showScrollDown && <ScrollDownButton onClick={() => onScrollToBottom(true)} isDarkTheme={isDarkTheme} />}
     </div>
   );
 };
