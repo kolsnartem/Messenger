@@ -1,4 +1,3 @@
-// index.js
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -162,7 +161,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Відеодзвінки
   socket.on('call-offer', (data) => {
     const targetSocketId = users.get(data.target);
     if (targetSocketId) {
@@ -241,6 +239,7 @@ app.put('/update-keys', (req, res) => {
     (err) => {
       if (err) return res.status(500).json({ error: 'Update failed' });
       console.log(`Updated keys for user ID: ${userId}`);
+      io.emit('key-updated', { userId, publicKey });
       res.json({ success: true });
     }
   );
@@ -279,7 +278,6 @@ app.get('/search', (req, res) => {
 
 app.get('/chats', (req, res) => {
   const { userId } = req.query;
-
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
   db.all(
@@ -352,20 +350,54 @@ app.get('/messages', (req, res) => {
 
 app.post('/mark-as-read', (req, res) => {
   const { userId, contactId } = req.body;
-  db.run(
-    `UPDATE messages SET isRead = 1 WHERE contactId = ? AND userId = ? AND isRead = 0`,
+  db.all(
+    `SELECT id FROM messages WHERE contactId = ? AND userId = ? AND isRead = 0`,
     [userId, contactId],
-    (err) => {
+    (err, rows) => {
       if (err) {
-        console.error('Error marking messages as read:', err);
+        console.error('Error fetching unread messages:', err);
         return res.status(500).json({ error: 'Database error' });
       }
-      const readUpdate = { userId, contactId };
-      const senderSocketId = users.get(contactId);
-      if (senderSocketId) {
-        io.to(senderSocketId).emit('read', readUpdate);
+      const messageIds = rows.map(row => row.id);
+      if (messageIds.length === 0) {
+        console.log(`No unread messages to mark as read for user ${userId} from contact ${contactId}`);
+        return res.json({ success: true });
       }
-      res.json({ success: true });
+
+      db.run(
+        `UPDATE messages SET isRead = 1 WHERE contactId = ? AND userId = ? AND isRead = 0`,
+        [userId, contactId],
+        (updateErr) => {
+          if (updateErr) {
+            console.error('Error marking messages as read:', updateErr);
+            return res.status(500).json({ error: 'Database error' });
+          }
+          console.log(`Marked ${messageIds.length} messages as read for user ${userId} from contact ${contactId}`);
+          
+          db.run(
+            `DELETE FROM messages WHERE contactId = ? AND userId = ? AND isRead = 1`,
+            [userId, contactId],
+            (deleteErr) => {
+              if (deleteErr) {
+                console.error('Error deleting read messages:', deleteErr);
+                return res.status(500).json({ error: 'Database error' });
+              }
+              console.log(`Deleted ${messageIds.length} read messages from DB for user ${userId} from contact ${contactId}`);
+              messageIds.forEach(messageId => {
+                const senderSocketId = users.get(contactId);
+                if (senderSocketId) {
+                  io.to(senderSocketId).emit('message-read', { messageId, contactId: userId });
+                }
+              });
+              const senderSocketId = users.get(contactId);
+              if (senderSocketId) {
+                io.to(senderSocketId).emit('read', { userId, contactId });
+              }
+              res.json({ success: true });
+            }
+          );
+        }
+      );
     }
   );
 });

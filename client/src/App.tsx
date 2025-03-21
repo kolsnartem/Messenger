@@ -1,24 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Contact, Message, TweetNaClKeyPair, IdentityKeyPair, EncryptionError } from './types';
+import { Contact, Message, TweetNaClKeyPair } from './types';
 import ChatList from './components/ChatList';
 import ChatWindow from './components/ChatWindow';
 import VideoCallWindow from './components/CallWindow';
 import AuthForm from './components/AuthForm';
 import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import { useAuth } from './hooks/useAuth';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import * as nacl from 'tweetnacl';
 import { FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaChevronLeft } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
-import { FiCamera, FiMoon, FiPhone, FiPhoneCall, FiVideo } from 'react-icons/fi';
-import { BiPhone, BiVideo } from 'react-icons/bi';
-import { CiPhone, CiVideoOn } from "react-icons/ci";
-import { RiP2PFill, RiP2PLine } from "react-icons/ri";
+import { FiCamera, FiMoon, FiPhone, FiVideo } from 'react-icons/fi';
+import { RiP2PFill } from "react-icons/ri";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { TbMenuDeep } from "react-icons/tb";
-import { IoIosAttach } from "react-icons/io";
 import { RiAttachment2 } from "react-icons/ri";
 
 interface ApiErrorResponse {
@@ -120,6 +117,16 @@ const App: React.FC = () => {
     socketRef.current.on('connect', () => {
       console.log('Socket connected');
       fetchData();
+      updatePublicKey();
+    });
+    socketRef.current.on('message-read', ({ messageId, contactId }) => {
+      if (selectedChatId === contactId) {
+        setMessages(prev => {
+          const updatedMessages = prev.map(m => m.id === messageId ? { ...m, isRead: 1 } : m);
+          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
+          return updatedMessages;
+        });
+      }
     });
     videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
       setCallState(prev => ({
@@ -178,15 +185,38 @@ const App: React.FC = () => {
     initializeKeys();
   }, [userId]);
 
+  const updatePublicKey = async () => {
+    if (!userId || !tweetNaclKeyPair) return;
+    const publicKeyBase64 = Buffer.from(tweetNaclKeyPair.publicKey).toString('base64');
+    try {
+      await axios.put('https://100.64.221.88:4000/update-keys', { userId, publicKey: publicKeyBase64 });
+      console.log('Public key updated on server:', publicKeyBase64);
+      localStorage.setItem(`publicKey_${userId}`, publicKeyBase64);
+      publicKeysCache.set(userId, publicKeyBase64);
+    } catch (error) {
+      console.error('Failed to update public key:', error);
+    }
+  };
+
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
-    if (publicKeysCache.has(senderId)) return publicKeysCache.get(senderId)!;
-    let key = cleanBase64(contacts.find(c => c.id === senderId)?.publicKey || localStorage.getItem(`publicKey_${senderId}`) || '');
-    if (!key && socketRef.current?.connected) {
-      const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${senderId}`);
-      key = cleanBase64(res.data.publicKey || '');
-      publicKeysCache.set(senderId, key);
-      localStorage.setItem(`publicKey_${senderId}`, key);
-      setContacts(prev => prev.some(c => c.id === senderId) ? prev : [...prev, { id: senderId, email: res.data.email || '', publicKey: key, lastMessage: null }]);
+    let key = '';
+    if (socketRef.current?.connected) {
+      try {
+        const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${senderId}`);
+        key = cleanBase64(res.data.publicKey || '');
+        publicKeysCache.set(senderId, key);
+        localStorage.setItem(`publicKey_${senderId}`, key);
+        setContacts(prev => 
+          prev.some(c => c.id === senderId) 
+            ? prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c)
+            : [...prev, { id: senderId, email: res.data.email || '', publicKey: key, lastMessage: null }]
+        );
+      } catch (error) {
+        console.error(`Failed to fetch public key for ${senderId}:`, error);
+      }
+    }
+    if (!key) {
+      key = cleanBase64(publicKeysCache.get(senderId) || localStorage.getItem(`publicKey_${senderId}`) || '');
     }
     return key || '';
   };
@@ -210,7 +240,11 @@ const App: React.FC = () => {
 
   const retryDecryption = async (message: Message) => {
     const decryptedText = await decryptMessageText(message);
-    setMessages(prev => prev.map(m => m.id === message.id ? { ...m, text: decryptedText } : m));
+    setMessages(prev => {
+      const updatedMessages = prev.map(m => m.id === message.id ? { ...m, text: decryptedText } : m);
+      if (selectedChatId) localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
+      return updatedMessages;
+    });
   };
 
   const updateContactsWithLastMessage = useCallback(async (newMessage: Message) => {
@@ -218,9 +252,11 @@ const App: React.FC = () => {
     setContacts(prev => {
       const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
       const updatedMessage = { ...newMessage, text: decryptedText, isMine: newMessage.userId === userId };
-      return prev.some(c => c.id === contactId)
+      const updatedContacts = prev.some(c => c.id === contactId)
         ? prev.map(c => c.id === contactId ? { ...c, lastMessage: updatedMessage } : c)
         : [...prev, { id: contactId, email: '', publicKey: '', lastMessage: updatedMessage }];
+      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+      return updatedContacts;
     });
   }, [userId]);
 
@@ -308,13 +344,9 @@ const App: React.FC = () => {
     await updateContactsWithLastMessage(updatedMessage);
   };
 
-  const sendMessage = async (text: string) => { // Updated to accept a text parameter
-    if (!text.trim()) return;
-    if (!userId || !selectedChatId || !tweetNaclKeyPair) {
-      console.error('Cannot send message: missing prerequisites', { userId, selectedChatId, tweetNaclKeyPair });
-      return;
-    }
-    const contact = contacts.find(c => c.id === selectedChatId) || (socketRef.current?.connected ? (await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${selectedChatId}`)).data : { id: selectedChatId, publicKey: '', email: '', lastMessage: null });
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || !userId || !selectedChatId || !tweetNaclKeyPair) return;
+    const contact = contacts.find(c => c.id === selectedChatId) || await fetchContact(selectedChatId);
     const messageId = `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const message: Message = { 
       id: messageId, 
@@ -349,14 +381,12 @@ const App: React.FC = () => {
         });
         await updateContactsWithLastMessage(message);
       }
-      setInput(''); // Clear the input in App.tsx
+      setInput('');
       shouldScrollToBottomRef.current = true;
     } catch (error) {
       console.error('Failed to send message:', error);
       sentMessageIds.current.delete(messageId);
-      if (isP2PActive) {
-        p2pServiceRef.current?.requestIceRestart();
-      }
+      if (isP2PActive) p2pServiceRef.current?.requestIceRestart();
     }
   };
 
@@ -369,15 +399,30 @@ const App: React.FC = () => {
     const keyPair = initializeTweetNaclKeys();
     setTweetNaclKeyPair(keyPair);
     setIsKeysLoaded(true);
+    await updatePublicKey();
   };
 
   const fetchData = async () => {
     if (!userId || !socketRef.current?.connected) return;
-    const chats = (await fetchChats(userId)).data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
-    setContacts(await Promise.all(chats.map(async chat => ({ ...chat, lastMessage: chat.lastMessage ? { ...chat.lastMessage, text: await decryptMessageText(chat.lastMessage) } : null }))));
+    const cachedContacts = localStorage.getItem('contacts');
+    if (cachedContacts) {
+      setContacts(JSON.parse(cachedContacts));
+    } else {
+      const chats = (await fetchChats(userId)).data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
+      const updatedContacts = await Promise.all(chats.map(async chat => ({ ...chat, lastMessage: chat.lastMessage ? { ...chat.lastMessage, text: await decryptMessageText(chat.lastMessage) } : null })));
+      setContacts(updatedContacts);
+      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+    }
     if (selectedChatId) {
-      const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data;
-      setMessages(await Promise.all(fetchedMessages.map(async msg => ({ ...msg, isMine: msg.userId === userId, text: await decryptMessageText(msg) }))));
+      const cachedMessages = localStorage.getItem(`chat_${selectedChatId}`);
+      if (cachedMessages) {
+        setMessages(JSON.parse(cachedMessages));
+      } else {
+        const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data;
+        const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({ ...msg, isMine: msg.userId === userId, text: await decryptMessageText(msg) })));
+        setMessages(decryptedMessages);
+        localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(decryptedMessages));
+      }
       await markAsRead(userId, selectedChatId);
     }
   };
@@ -396,9 +441,19 @@ const App: React.FC = () => {
     if (!userId || !tweetNaclKeyPair || !socketRef.current) return;
     socketRef.current.on('message', handleIncomingMessage);
     socketRef.current.on('p2p-offer-notify', (data: { message: Message }) => data.message.contactId === userId && !isP2PActive && setP2PRequest(data.message));
+    socketRef.current.on('key-updated', ({ userId: updatedUserId, publicKey }: { userId: string, publicKey: string }) => {
+      const cleanedKey = cleanBase64(publicKey);
+      publicKeysCache.set(updatedUserId, cleanedKey);
+      localStorage.setItem(`publicKey_${updatedUserId}`, cleanedKey);
+      setContacts(prev =>
+        prev.map(c => c.id === updatedUserId ? { ...c, publicKey: cleanedKey } : c)
+      );
+      console.log(`Updated public key for user ${updatedUserId}`);
+    });
     return () => { 
       socketRef.current?.off('message'); 
-      socketRef.current?.off('p2p-offer-notify'); 
+      socketRef.current?.off('p2p-offer-notify');
+      socketRef.current?.off('key-updated');
     };
   }, [userId, selectedChatId, tweetNaclKeyPair, isP2PActive]);
 
@@ -443,23 +498,35 @@ const App: React.FC = () => {
     }
   }, [messages, selectedChatId, isAtBottom, scrollToBottom]);
 
-  const handleAuthSuccess = (id: string, email: string, newTweetNaclKeyPair?: TweetNaClKeyPair) => {
+  const handleAuthSuccess = async (id: string, email: string, newTweetNaclKeyPair?: TweetNaClKeyPair) => {
     setUserId(id);
     setUserEmail(email);
-    if (newTweetNaclKeyPair) {
-      setTweetNaclKeyPair(newTweetNaclKeyPair);
+    localStorage.setItem('userEmail', email);
+    let keyPair = newTweetNaclKeyPair;
+    if (!keyPair) {
+      keyPair = initializeTweetNaclKeys();
+      setTweetNaclKeyPair(keyPair);
     }
+    await updatePublicKey();
+  };
+
+  const fetchContact = async (contactId: string): Promise<Contact> => {
+    const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${contactId}`);
+    return res.data;
   };
 
   const handleContactSelect = async (contact: Contact) => {
     setSelectedChatId(contact.id);
+    localStorage.setItem('selectedChatId', contact.id);
     setSearchQuery('');
     setSearchResults([]);
-    setContacts(prev => prev.some(c => c.id === contact.id) ? prev : [...prev, { ...contact, lastMessage: null }]);
+    setContacts(prev => {
+      const updatedContacts = prev.some(c => c.id === contact.id) ? prev : [...prev, { ...contact, lastMessage: null }];
+      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+      return updatedContacts;
+    });
     setUnreadMessagesCount(0);
-    if (!tweetNaclKeyPair) {
-      await initializeKeys();
-    }
+    if (!tweetNaclKeyPair) await initializeKeys();
     isInitialMount.current = true;
 
     const cachedMessages = localStorage.getItem(`chat_${contact.id}`);
@@ -491,10 +558,7 @@ const App: React.FC = () => {
 
   const initiateP2P = async () => {
     const contact = contacts.find(c => c.id === selectedChatId);
-    if (!selectedChatId || !p2pServiceRef.current || !contact?.publicKey) {
-      console.error('Cannot initiate P2P: missing required data');
-      return;
-    }
+    if (!selectedChatId || !p2pServiceRef.current || !contact?.publicKey) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach(track => track.stop());
@@ -559,211 +623,69 @@ const App: React.FC = () => {
           .send-btn-inactive { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
           .send-btn-active:disabled { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; opacity: 0.5; color: #fff; }
           .btn { transition: background-color 0.2s ease-in-out; }
-          .input-field { 
-            background: ${inputBackground}; 
-            border: none; 
-            outline: none; 
-          }
-          .input-field:focus { 
-            background: ${inputBackground}; 
-            outline: none; 
-            box-shadow: none; 
-          }
+          .input-field { background: ${inputBackground}; border: none; outline: none; }
+          .input-field:focus { background: ${inputBackground}; outline: none; box-shadow: none; }
           .icon-hover:hover { color: ${isDarkTheme ? '#00C7D4' : '#00C79D'}; }
-          .call-icon {
-            cursor: pointer;
-            transition: color 0.2s ease-in-out;
-          }
-          .call-icon:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-          }
-          .search-container {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-          }
-          .search-container .form-control {
-            border-radius: 20px;
-            margin: 0;
-            padding-left: 15px;
-            padding-right: 15px;
-            width: 100%;
-            box-shadow: none;
-          }
-          .form-control:focus {
-            outline: none;
-            box-shadow: none;
-          }
+          .call-icon { cursor: pointer; transition: color 0.2s ease-in-out; }
+          .call-icon:disabled { cursor: not-allowed; opacity: 0.5; }
+          .search-container { margin: 0; padding: 0; width: 100%; }
+          .search-container .form-control { border-radius: 20px; margin: 0; padding-left: 15px; padding-right: 15px; width: 100%; box-shadow: none; }
+          .form-control:focus { outline: none; box-shadow: none; }
         `}
       </style>
 
-      <div 
-        className="p-0" 
-        style={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          background: headerBackground, 
-          zIndex: 20, 
-          height: '96px',
-          borderBottom: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef' 
-        }}
-      >
+      <div className="p-0" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: '96px', borderBottom: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef' }}>
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '48px' }}>
           <div className="d-flex align-items-center" style={{ gap: '15px' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }}>
               MSNGR ({userEmail})
-              {isP2PActive && (
-                <span className="ms-2" style={{ fontSize: '0.8rem', color: '#00C7D9', fontWeight: 'bold' }}>
-                  P2P mode
-                </span>
-              )}
+              {isP2PActive && <span className="ms-2" style={{ fontSize: '0.8rem', color: '#00C7D9', fontWeight: 'bold' }}>P2P mode</span>}
             </h5>
             {isMenuOpen && (
-              <div style={{ 
-                position: 'fixed', top: '55px', right: '15px',
-                 background: headerBackground, border: '1px solid #ccc',
-                  borderRadius: '4px', 
-                  zIndex: 1000, 
-                  padding: '5px', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center' }}>
-                <button className="btn btn-sm btn-success mb-2" 
-                onClick={() => window.location.reload()} 
-                style={{ width: '150px', fontSize: '0.875rem' }}><FaSync /> Update</button>
+              <div style={{ position: 'fixed', top: '55px', right: '15px', background: headerBackground, border: '1px solid #ccc', borderRadius: '4px', zIndex: 1000, padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <button className="btn btn-sm btn-success mb-2" onClick={() => window.location.reload()} style={{ width: '150px', fontSize: '0.875rem' }}><FaSync /> Update</button>
                 <button className="btn btn-sm btn-outline-danger" onClick={handleLogout} style={{ width: '150px', fontSize: '0.875rem' }}><FaSignOutAlt /> Logout</button>
               </div>
             )}
           </div>
-          
-          <button
-            className="btn btn-sm"
-            onClick={() => setIsMenuOpen(prev => !prev)}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              padding: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'absolute',
-              right: '15px',
-            }}
-          >
-            <TbMenuDeep
-              size={24}
-              color={isDarkTheme ? '#fff' : '#212529'}
-              className="icon-hover"
-            />
+          <button className="btn btn-sm" onClick={() => setIsMenuOpen(prev => !prev)} style={{ border: 'none', background: 'transparent', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', right: '15px' }}>
+            <TbMenuDeep size={24} color={isDarkTheme ? '#fff' : '#212529'} className="icon-hover" />
           </button>
         </div>
 
         {!selectedChatId && (
-          <div 
-            className="search-container mx-0 px-3 w-100 d-flex align-items-center" 
-            style={{ 
-              boxSizing: 'border-box', 
-              height: '38px', 
-              padding: '0 15px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center' 
-            }}
-          >
+          <div className="search-container mx-0 px-3 w-100 d-flex align-items-center" style={{ boxSizing: 'border-box', height: '38px', padding: '0 15px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <input 
               type="text" 
               className={`form-control input-field ${isDarkTheme ? 'text-light search-placeholder-dark' : 'text-dark'}`} 
               value={searchQuery} 
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)} 
               placeholder="Search users..." 
-              style={{ 
-                borderRadius: '20px', 
-                color: isDarkTheme ? '#fff' : '#000', 
-                width: '100%',
-                boxSizing: 'border-box', 
-                margin: 0, 
-                padding: '0 15px', 
-                border: 'none', 
-                height: '38px'
-              }} 
+              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', width: '100%', boxSizing: 'border-box', margin: 0, padding: '0 15px', border: 'none', height: '38px' }} 
             />
           </div>
         )}
 
         {selectedChatId && (
-          <div className="px-3 d-flex align-items-center justify-content-between" 
-          style={{ background: headerBackground, height: '42px' }}>
+          <div className="px-3 d-flex align-items-center justify-content-between" style={{ background: headerBackground, height: '42px' }}>
             <div className="d-flex align-items-center">
-              <button 
-                className="btn btn-sm" 
-                onClick={() => setSelectedChatId(null)} 
-                style={{ 
-                  border: 'none', 
-                  background: 'transparent', 
-                  width: '25px', 
-                  height: '25px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  padding: 0,
-                  margin: 0,
-                  position: 'relative',
-                  left: '-7px'
-                }}
-              >
-                <MdOutlineArrowBackIos
-                size={24}
-                style={{ color: isDarkTheme ? '#fff' : '#212529' }} />
+              <button className="btn btn-sm" onClick={() => setSelectedChatId(null)} style={{ border: 'none', background: 'transparent', width: '25px', height: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, margin: 0, position: 'relative', left: '-7px' }}>
+                <MdOutlineArrowBackIos size={24} style={{ color: isDarkTheme ? '#fff' : '#212529' }} />
               </button>
               <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
                 {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
               </div>
-              <h6 
-              className="m-0 me-2"
-              style={{
-                fontSize: '18px',
-                fontWeight: 'bold'
-              }}
-              >{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
+              <h6 className="m-0 me-2" style={{ fontSize: '18px', fontWeight: 'bold' }}>{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
             </div>
             {!p2pRequest && (
               <div className="d-flex align-items-center" style={{ gap: '20px' }}>
                 {isP2PActive ? (
-                  <RiP2PFill
-                    size={24}
-                    color="#00C7D9"
-                    className="icon-hover call-icon"
-                    onClick={() => p2pServiceRef.current?.disconnectP2P()}
-                    style={{ cursor: 'pointer' }}
-                    title="P2P активний (натисніть, щоб відключити)"
-                  />
+                  <RiP2PFill size={24} color="#00C7D9" className="icon-hover call-icon" onClick={() => p2pServiceRef.current?.disconnectP2P()} style={{ cursor: 'pointer' }} title="P2P активний (натисніть, щоб відключити)" />
                 ) : (
-                  <RiP2PFill
-                    size={24}
-                    color={isDarkTheme ? '#fff' : '#212529'}
-                    className="icon-hover call-icon"
-                    onClick={initiateP2P}
-                    style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }}
-                    title="Увімкнути P2P"
-                  />
+                  <RiP2PFill size={24} color={isDarkTheme ? '#fff' : '#212529'} className="icon-hover call-icon" onClick={initiateP2P} style={{ cursor: tweetNaclKeyPair && selectedChatId ? 'pointer' : 'not-allowed' }} title="Увімкнути P2P" />
                 )}
-                <FiVideo 
-                  size={26} 
-                  color={isDarkTheme ? '#fff' : '#212529'} 
-                  className="icon-hover call-icon" 
-                  onClick={() => initiateCall(true)} 
-                  style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} 
-                />
-                <FiPhone 
-                  size={23} 
-                  color={isDarkTheme ? '#fff' : '#212529'} 
-                  className="icon-hover call-icon" 
-                  onClick={() => initiateCall(false)} 
-                  style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} 
-                />
+                <FiVideo size={26} color={isDarkTheme ? '#fff' : '#212529'} className="icon-hover call-icon" onClick={() => initiateCall(true)} style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} />
+                <FiPhone size={23} color={isDarkTheme ? '#fff' : '#212529'} className="icon-hover call-icon" onClick={() => initiateCall(false)} style={{ cursor: callState.isCalling ? 'not-allowed' : 'pointer' }} />
               </div>
             )}
             {p2pRequest && (
@@ -781,12 +703,7 @@ const App: React.FC = () => {
         <div style={{ position: 'fixed', top: '90px', left: 0, right: 0, background: headerBackground, zIndex: 30, padding: '0' }}>
           <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 90px)' }}>
             {searchResults.map(result => (
-              <div 
-                key={result.id} 
-                className="p-2 border-bottom container" 
-                onClick={() => handleContactSelect(result)} 
-                style={{ cursor: 'pointer' }}
-              >
+              <div key={result.id} className="p-2 border-bottom container" onClick={() => handleContactSelect(result)} style={{ cursor: 'pointer' }}>
                 {result.email}
               </div>
             ))}
@@ -795,12 +712,7 @@ const App: React.FC = () => {
       )}
 
       <div ref={chatRef} className="flex-grow-1" style={{ position: 'absolute', top: '90px', bottom: selectedChatId ? '60px' : '0', left: 0, right: 0, overflow: 'hidden' }}>
-        <VideoCallWindow
-          callState={callState}
-          onToggleVideo={toggleVideo}
-          onToggleMicrophone={toggleMicrophone}
-          onEndCall={endCall}
-        />
+        <VideoCallWindow callState={callState} onToggleVideo={toggleVideo} onToggleMicrophone={toggleMicrophone} onEndCall={endCall} />
         {selectedChatId && !callState.isCalling && (
           <ChatWindow
             messages={messages}
@@ -818,41 +730,10 @@ const App: React.FC = () => {
       </div>
 
       {selectedChatId && !callState.isCalling && (
-        <div 
-          className="p-0" 
-          style={{ 
-            position: 'fixed', 
-            bottom: 0, 
-            left: 0, 
-            right: 0, 
-            background: headerBackground, 
-            zIndex: 10, 
-            height: '49px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            borderTop: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef', 
-            width: '100%', 
-            boxSizing: 'border-box' 
-          }}
-        >
+        <div className="p-0" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: headerBackground, zIndex: 10, height: '49px', display: 'flex', alignItems: 'center', borderTop: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef', width: '100%', boxSizing: 'border-box' }}>
           <div className="d-flex align-items-center w-100 px-3">
-            <button
-              className="btn btn-sm me-2"
-              onClick={() => console.log('Attach clicked')}
-              style={{
-                border: 'none',
-                background: 'transparent',
-                padding: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <RiAttachment2
-                size={24}
-                color={isDarkTheme ? '#fff' : '#212529'}
-                className="icon-hover"
-              />
+            <button className="btn btn-sm me-2" onClick={() => console.log('Attach clicked')} style={{ border: 'none', background: 'transparent', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <RiAttachment2 size={24} color={isDarkTheme ? '#fff' : '#212529'} className="icon-hover" />
             </button>
             <input 
               type="text" 
