@@ -22,7 +22,6 @@ interface ApiErrorResponse {
   error?: string;
 }
 
-const logEncryptionEvent = (event: string, details?: any) => console.log(`[Encryption] ${event}`, details || '');
 const cleanBase64 = (base64Str: string): string => base64Str.replace(/[^A-Za-z0-9+/=]/g, '').replace(/=+$/, '');
 const fixPublicKey = (key: Uint8Array): Uint8Array => {
   if (key.length === 33 && (key[0] === 0x00 || key[0] === 0x01)) return key.slice(1);
@@ -36,9 +35,7 @@ const initializeTweetNaclKeys = (): TweetNaClKeyPair => {
     try {
       const { publicKey, secretKey } = JSON.parse(stored);
       return { publicKey: new Uint8Array(publicKey), secretKey: new Uint8Array(secretKey) };
-    } catch {
-      logEncryptionEvent('Failed to load stored keys, generating new');
-    }
+    } catch {}
   }
   const newKeyPair = nacl.box.keyPair();
   localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
@@ -72,7 +69,7 @@ const App: React.FC = () => {
   const { userId, setUserId, setIdentityKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('userEmail'));
   const [messages, setMessages] = useState<Message[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>(JSON.parse(localStorage.getItem('contacts') || '[]')); // Ініціалізація з localStorage
   const [selectedChatId, setSelectedChatId] = useState<string | null>(localStorage.getItem('selectedChatId'));
   const [input, setInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -103,6 +100,7 @@ const App: React.FC = () => {
   const sentMessageIds = useRef<Set<string>>(new Set());
   const scrollPositionRef = useRef<number>(0);
   const shouldScrollToBottomRef = useRef<boolean>(true);
+  const isSendingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -118,27 +116,30 @@ const App: React.FC = () => {
       console.log('Socket connected');
       fetchData();
       updatePublicKey();
+      if (selectedChatId) reDecryptMessages(selectedChatId);
     });
     socketRef.current.on('message-read', ({ messageId, contactId }) => {
       if (selectedChatId === contactId) {
-        setMessages(prev => {
-          const updatedMessages = prev.map(m => m.id === messageId ? { ...m, isRead: 1 } : m);
-          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
-          return updatedMessages;
-        });
+        setMessages(prev => prev.map(m => m.id === messageId ? { ...m, isRead: 1 } : m));
       }
     });
-    videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
-      setCallState(prev => ({
-        ...prev,
-        ...state,
-        callDuration: prev.callDuration || 0,
-        reactions: prev.reactions || [],
-      }));
+    socketRef.current.on('disconnect', () => {
+      console.log('Socket disconnected');
     });
+    videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
+      setCallState(prev => ({ ...prev, ...state, callDuration: prev.callDuration || 0, reactions: prev.reactions || [] }));
+    });
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) socketRef.current?.disconnect();
+      else if (!socketRef.current?.connected) socketRef.current?.connect();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       socketRef.current?.disconnect();
       videoCallServiceRef.current?.endCall(false);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [userId]);
 
@@ -146,9 +147,7 @@ const App: React.FC = () => {
     if (userId && !p2pServiceRef.current && socketRef.current) {
       p2pServiceRef.current = new P2PService(userId, socketRef.current, handleP2PMessage, setIsP2PActive);
     }
-    return () => {
-      p2pServiceRef.current?.disconnectP2P();
-    };
+    return () => p2pServiceRef.current?.disconnectP2P();
   }, [userId]);
 
   useEffect(() => {
@@ -177,7 +176,9 @@ const App: React.FC = () => {
       .reaction-emoji { animation: float-up 2s ease-out forwards; }
     `;
     document.head.appendChild(style);
-    return () => { document.head.removeChild(style); };
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   useEffect(() => {
@@ -190,7 +191,6 @@ const App: React.FC = () => {
     const publicKeyBase64 = Buffer.from(tweetNaclKeyPair.publicKey).toString('base64');
     try {
       await axios.put('https://100.64.221.88:4000/update-keys', { userId, publicKey: publicKeyBase64 });
-      console.log('Public key updated on server:', publicKeyBase64);
       localStorage.setItem(`publicKey_${userId}`, publicKeyBase64);
       publicKeysCache.set(userId, publicKeyBase64);
     } catch (error) {
@@ -199,8 +199,8 @@ const App: React.FC = () => {
   };
 
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
-    let key = '';
-    if (socketRef.current?.connected) {
+    let key = publicKeysCache.get(senderId) || localStorage.getItem(`publicKey_${senderId}`) || '';
+    if (!key) {
       try {
         const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${senderId}`);
         key = cleanBase64(res.data.publicKey || '');
@@ -208,17 +208,14 @@ const App: React.FC = () => {
         localStorage.setItem(`publicKey_${senderId}`, key);
         setContacts(prev => 
           prev.some(c => c.id === senderId) 
-            ? prev.map(c => c.id === senderId ? { ...c, publicKey: key } : c)
+            ? prev.map(c => c.id === senderId ? { ...c, publicKey: key, email: res.data.email } : c)
             : [...prev, { id: senderId, email: res.data.email || '', publicKey: key, lastMessage: null }]
         );
       } catch (error) {
-        console.error(`Failed to fetch public key for ${senderId}:`, error);
+        console.error('Failed to fetch sender public key:', error);
       }
     }
-    if (!key) {
-      key = cleanBase64(publicKeysCache.get(senderId) || localStorage.getItem(`publicKey_${senderId}`) || '');
-    }
-    return key || '';
+    return key;
   };
 
   const decryptMessage = async (encryptedText: string, senderId: string): Promise<string> => {
@@ -238,6 +235,17 @@ const App: React.FC = () => {
     return message.text.startsWith('base64:') ? await decryptMessage(message.text, message.userId) : message.text;
   };
 
+  const reDecryptMessages = async (chatId: string) => {
+    const cachedMessages = JSON.parse(localStorage.getItem(`chat_${chatId}`) || '[]');
+    const decryptedMessages = await Promise.all(cachedMessages.map(async (msg: Message) => ({
+      ...msg,
+      text: await decryptMessageText(msg),
+      isMine: msg.userId === userId
+    })));
+    setMessages(decryptedMessages);
+    localStorage.setItem(`chat_${chatId}`, JSON.stringify(decryptedMessages));
+  };
+
   const retryDecryption = async (message: Message) => {
     const decryptedText = await decryptMessageText(message);
     setMessages(prev => {
@@ -249,16 +257,32 @@ const App: React.FC = () => {
 
   const updateContactsWithLastMessage = useCallback(async (newMessage: Message) => {
     const decryptedText = await decryptMessageText(newMessage);
+    const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
+    let contactEmail = contacts.find(c => c.id === contactId)?.email || localStorage.getItem(`contactEmail_${contactId}`) || '';
+    if (!contactEmail) {
+      try {
+        const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${contactId}`);
+        contactEmail = res.data.email || '';
+        localStorage.setItem(`contactEmail_${contactId}`, contactEmail);
+      } catch {}
+    }
     setContacts(prev => {
-      const contactId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
       const updatedMessage = { ...newMessage, text: decryptedText, isMine: newMessage.userId === userId };
       const updatedContacts = prev.some(c => c.id === contactId)
-        ? prev.map(c => c.id === contactId ? { ...c, lastMessage: updatedMessage } : c)
-        : [...prev, { id: contactId, email: '', publicKey: '', lastMessage: updatedMessage }];
+        ? prev.map(c => c.id === contactId ? { ...c, lastMessage: updatedMessage, email: contactEmail || c.email } : c)
+        : [...prev, { id: contactId, email: contactEmail, publicKey: '', lastMessage: updatedMessage }];
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+      console.log('Updated contacts with last message:', updatedContacts);
       return updatedContacts;
     });
-  }, [userId]);
+    const chatId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
+    const cachedMessages = JSON.parse(localStorage.getItem(`chat_${chatId}`) || '[]');
+    const updatedMessages = [...cachedMessages, { ...newMessage, text: decryptedText, isMine: newMessage.userId === userId }]
+      .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
+      .sort((a, b) => a.timestamp - b.timestamp);
+    localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
+    if (selectedChatId === chatId) setMessages(updatedMessages);
+  }, [userId, selectedChatId]);
 
   const isAtBottom = useCallback(() => {
     const chatContainer = chatContainerRef.current;
@@ -281,49 +305,26 @@ const App: React.FC = () => {
     if (!message.isP2P) {
       const decryptedText = await decryptMessageText(message);
       const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
-      setMessages(prev => {
-        if (prev.some(m => m.id === message.id)) return prev;
-        const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
-        if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
-          setUnreadMessagesCount(prev => prev + 1);
-        }
-        if (selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
-          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
-        }
-        return updatedMessages;
-      });
+      const chatId = message.userId === userId ? message.contactId : message.userId;
+      const cachedMessages = JSON.parse(localStorage.getItem(`chat_${chatId}`) || '[]');
+      const updatedMessages = [...cachedMessages, updatedMessage]
+        .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
+        .sort((a, b) => a.timestamp - b.timestamp);
+      localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
+      if (selectedChatId === chatId) {
+        setMessages(updatedMessages);
+      } else {
+        setUnreadMessagesCount(prev => prev + 1);
+      }
       await updateContactsWithLastMessage(updatedMessage);
-      return;
     }
 
     try {
       const signalData = JSON.parse(message.text);
-      if (signalData.type === 'offer' && message.contactId === userId && !isP2PActive) {
-        setP2PRequest(message);
-      } else if (signalData.type === 'answer') {
-        await p2pServiceRef.current?.handleP2PAnswer({ ...message, lastMessage: undefined });
-      } else if (signalData.candidate) {
-        await p2pServiceRef.current?.handleP2PCandidate({ ...message, lastMessage: undefined });
-      }
-    } catch (error) {
-      console.error('Failed to parse P2P signaling message:', error);
-      if (message.text.startsWith('base64:')) {
-        const decryptedText = await decryptMessageText(message);
-        const updatedMessage = { ...message, text: decryptedText, isMine: message.userId === userId };
-        setMessages(prev => {
-          if (prev.some(m => m.id === message.id)) return prev;
-          const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
-          if (!isAtBottom() && selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
-            setUnreadMessagesCount(prev => prev + 1);
-          }
-          if (selectedChatId === (message.userId === userId ? message.contactId : message.userId)) {
-            localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
-          }
-          return updatedMessages;
-        });
-        await updateContactsWithLastMessage(updatedMessage);
-      }
-    }
+      if (signalData.type === 'offer' && message.contactId === userId && !isP2PActive) setP2PRequest(message);
+      else if (signalData.type === 'answer') await p2pServiceRef.current?.handleP2PAnswer({ ...message, lastMessage: undefined });
+      else if (signalData.candidate) await p2pServiceRef.current?.handleP2PCandidate({ ...message, lastMessage: undefined });
+    } catch {}
   };
 
   const handleP2PMessage = async (message: Message) => {
@@ -333,19 +334,38 @@ const App: React.FC = () => {
     setMessages(prev => {
       if (prev.some(m => m.id === message.id)) return prev;
       const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
-      if (!isAtBottom() && selectedChatId === message.userId) {
-        setUnreadMessagesCount(prev => prev + 1);
-      }
-      if (selectedChatId === message.userId) {
-        localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
-      }
+      if (!isAtBottom() && selectedChatId === message.userId) setUnreadMessagesCount(prev => prev + 1);
+      if (selectedChatId === message.userId) localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
       return updatedMessages;
     });
     await updateContactsWithLastMessage(updatedMessage);
   };
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim() || !userId || !selectedChatId || !tweetNaclKeyPair) return;
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim() || !userId || !selectedChatId || !tweetNaclKeyPair || !socketRef.current || isSendingRef.current) {
+      console.error('Cannot send message:', { 
+        textEmpty: !text.trim(), 
+        userId, 
+        selectedChatId, 
+        keysLoaded: !!tweetNaclKeyPair, 
+        socketExists: !!socketRef.current, 
+        socketConnected: socketRef.current?.connected, 
+        isSending: isSendingRef.current 
+      });
+      return;
+    }
+
+    if (!socketRef.current.connected) {
+      console.log('Socket not connected, attempting to reconnect...');
+      socketRef.current.connect();
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Чекаємо 1 секунду на перепідключення
+      if (!socketRef.current.connected) {
+        console.error('Socket reconnection failed');
+        return;
+      }
+    }
+
+    isSendingRef.current = true;
     const contact = contacts.find(c => c.id === selectedChatId) || await fetchContact(selectedChatId);
     const messageId = `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const message: Message = { 
@@ -371,15 +391,17 @@ const App: React.FC = () => {
         });
         await updateContactsWithLastMessage(message);
       } else {
-        message.text = encryptMessage(message.text, contact.publicKey || '', tweetNaclKeyPair);
+        const encryptedText = encryptMessage(message.text, contact.publicKey || '', tweetNaclKeyPair);
         storeSentMessage(message.id, text.trim(), selectedChatId);
-        socketRef.current?.emit('message', message);
+        socketRef.current.emit('message', { ...message, text: encryptedText });
         setMessages(prev => {
           const updatedMessages = [...prev, { ...message, text: text.trim() }].sort((a, b) => a.timestamp - b.timestamp);
           localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
           return updatedMessages;
         });
         await updateContactsWithLastMessage(message);
+        // Додаємо чат на сервер
+        await axios.post('https://100.64.221.88:4000/add-chat', { userId, contactId: selectedChatId });
       }
       setInput('');
       shouldScrollToBottomRef.current = true;
@@ -387,8 +409,10 @@ const App: React.FC = () => {
       console.error('Failed to send message:', error);
       sentMessageIds.current.delete(messageId);
       if (isP2PActive) p2pServiceRef.current?.requestIceRestart();
+    } finally {
+      isSendingRef.current = false;
     }
-  };
+  }, [userId, selectedChatId, tweetNaclKeyPair, isP2PActive]);
 
   const initiateCall = (videoEnabled: boolean) => videoCallServiceRef.current?.initiateCall(selectedChatId!, videoEnabled);
   const endCall = () => videoCallServiceRef.current?.endCall(true);
@@ -403,27 +427,44 @@ const App: React.FC = () => {
   };
 
   const fetchData = async () => {
-    if (!userId || !socketRef.current?.connected) return;
-    const cachedContacts = localStorage.getItem('contacts');
-    if (cachedContacts) {
-      setContacts(JSON.parse(cachedContacts));
-    } else {
-      const chats = (await fetchChats(userId)).data.sort((a, b) => (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0));
-      const updatedContacts = await Promise.all(chats.map(async chat => ({ ...chat, lastMessage: chat.lastMessage ? { ...chat.lastMessage, text: await decryptMessageText(chat.lastMessage) } : null })));
-      setContacts(updatedContacts);
+    if (!userId || !socketRef.current?.connected || !tweetNaclKeyPair) return;
+    
+    const fetchedChats = (await fetchChats(userId)).data;
+    console.log('Fetched chats from server:', fetchedChats);
+    const decryptedChats = await Promise.all(fetchedChats.map(async (contact: Contact) => ({
+      ...contact,
+      lastMessage: contact.lastMessage ? { ...contact.lastMessage, text: await decryptMessageText(contact.lastMessage) } : null
+    })));
+
+    setContacts(prev => {
+      const updatedContacts = [...prev];
+      decryptedChats.forEach(serverContact => {
+        const existingIndex = updatedContacts.findIndex(c => c.id === serverContact.id);
+        if (existingIndex >= 0) {
+          updatedContacts[existingIndex] = { ...updatedContacts[existingIndex], ...serverContact };
+        } else {
+          updatedContacts.push(serverContact);
+        }
+      });
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-    }
+      console.log('Updated contacts after fetch:', updatedContacts);
+      return updatedContacts;
+    });
+
     if (selectedChatId) {
-      const cachedMessages = localStorage.getItem(`chat_${selectedChatId}`);
-      if (cachedMessages) {
-        setMessages(JSON.parse(cachedMessages));
-      } else {
-        const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data;
-        const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({ ...msg, isMine: msg.userId === userId, text: await decryptMessageText(msg) })));
-        setMessages(decryptedMessages);
-        localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(decryptedMessages));
-      }
-      await markAsRead(userId, selectedChatId);
+      const cachedMessages = JSON.parse(localStorage.getItem(`chat_${selectedChatId}`) || '[]');
+      const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data;
+      const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({
+        ...msg,
+        isMine: msg.userId === userId,
+        text: await decryptMessageText(msg)
+      })));
+      const combinedMessages = [...cachedMessages.filter((m: Message) => !m.text.startsWith('base64:')), ...decryptedMessages]
+        .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
+        .sort((a, b) => a.timestamp - b.timestamp);
+      setMessages(combinedMessages);
+      localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(combinedMessages));
+      if (fetchedMessages.length > 0) await markAsRead(userId, selectedChatId);
     }
   };
 
@@ -445,10 +486,8 @@ const App: React.FC = () => {
       const cleanedKey = cleanBase64(publicKey);
       publicKeysCache.set(updatedUserId, cleanedKey);
       localStorage.setItem(`publicKey_${updatedUserId}`, cleanedKey);
-      setContacts(prev =>
-        prev.map(c => c.id === updatedUserId ? { ...c, publicKey: cleanedKey } : c)
-      );
-      console.log(`Updated public key for user ${updatedUserId}`);
+      setContacts(prev => prev.map(c => c.id === updatedUserId ? { ...c, publicKey: cleanedKey } : c));
+      if (selectedChatId) reDecryptMessages(selectedChatId);
     });
     return () => { 
       socketRef.current?.off('message'); 
@@ -467,13 +506,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
     if (!chatContainer || !selectedChatId) return;
-
     const savedPosition = localStorage.getItem(`scrollPosition_${selectedChatId}`);
-    if (savedPosition && isInitialMount.current) {
-      chatContainer.scrollTop = parseFloat(savedPosition);
-    } else if (isInitialMount.current) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
+    if (savedPosition && isInitialMount.current) chatContainer.scrollTop = parseFloat(savedPosition);
+    else if (isInitialMount.current) chatContainer.scrollTop = chatContainer.scrollHeight;
     isInitialMount.current = false;
 
     const handleScroll = () => {
@@ -481,21 +516,16 @@ const App: React.FC = () => {
       localStorage.setItem(`scrollPosition_${selectedChatId}`, scrollPositionRef.current.toString());
       const atBottom = isAtBottom();
       setShowScrollDown(!atBottom);
-      if (atBottom && unreadMessagesCount > 0) {
-        setUnreadMessagesCount(0);
-      }
+      if (atBottom && unreadMessagesCount > 0) setUnreadMessagesCount(0);
       shouldScrollToBottomRef.current = atBottom;
     };
-
     chatContainer.addEventListener('scroll', handleScroll);
     return () => chatContainer.removeEventListener('scroll', handleScroll);
   }, [selectedChatId, messages, unreadMessagesCount, isAtBottom]);
 
   useEffect(() => {
     if (!selectedChatId || messages.length === 0) return;
-    if (shouldScrollToBottomRef.current || isAtBottom()) {
-      scrollToBottom();
-    }
+    if (shouldScrollToBottomRef.current || isAtBottom()) scrollToBottom();
   }, [messages, selectedChatId, isAtBottom, scrollToBottom]);
 
   const handleAuthSuccess = async (id: string, email: string, newTweetNaclKeyPair?: TweetNaClKeyPair) => {
@@ -512,6 +542,7 @@ const App: React.FC = () => {
 
   const fetchContact = async (contactId: string): Promise<Contact> => {
     const res = await axios.get<Contact>(`https://100.64.221.88:4000/users?id=${contactId}`);
+    localStorage.setItem(`contactEmail_${contactId}`, res.data.email || '');
     return res.data;
   };
 
@@ -520,8 +551,18 @@ const App: React.FC = () => {
     localStorage.setItem('selectedChatId', contact.id);
     setSearchQuery('');
     setSearchResults([]);
+    let updatedContact = contact;
+    if (!contact.email) {
+      try {
+        updatedContact = await fetchContact(contact.id);
+      } catch (error) {
+        console.error('Failed to fetch contact:', error);
+      }
+    }
     setContacts(prev => {
-      const updatedContacts = prev.some(c => c.id === contact.id) ? prev : [...prev, { ...contact, lastMessage: null }];
+      const updatedContacts = prev.some(c => c.id === contact.id)
+        ? prev.map(c => c.id === contact.id ? { ...c, email: updatedContact.email } : c)
+        : [...prev, { ...updatedContact, lastMessage: null }];
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
       return updatedContacts;
     });
@@ -529,16 +570,19 @@ const App: React.FC = () => {
     if (!tweetNaclKeyPair) await initializeKeys();
     isInitialMount.current = true;
 
-    const cachedMessages = localStorage.getItem(`chat_${contact.id}`);
-    if (cachedMessages) {
-      setMessages(JSON.parse(cachedMessages));
-    } else {
-      const fetchedMessages = (await fetchMessages(userId!, contact.id)).data;
-      const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({ ...msg, isMine: msg.userId === userId, text: await decryptMessageText(msg) })));
-      setMessages(decryptedMessages);
-      localStorage.setItem(`chat_${contact.id}`, JSON.stringify(decryptedMessages));
-    }
-    await markAsRead(userId!, contact.id);
+    const cachedMessages = JSON.parse(localStorage.getItem(`chat_${contact.id}`) || '[]');
+    const fetchedMessages = (await fetchMessages(userId!, contact.id)).data;
+    const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({
+      ...msg,
+      isMine: msg.userId === userId,
+      text: await decryptMessageText(msg)
+    })));
+    const combinedMessages = [...cachedMessages.filter((m: Message) => !m.text.startsWith('base64:')), ...decryptedMessages]
+      .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
+      .sort((a, b) => a.timestamp - b.timestamp);
+    setMessages(combinedMessages);
+    localStorage.setItem(`chat_${contact.id}`, JSON.stringify(combinedMessages));
+    if (fetchedMessages.length > 0) await markAsRead(userId!, contact.id);
   };
 
   const handleLogout = () => {
@@ -565,8 +609,7 @@ const App: React.FC = () => {
       p2pServiceRef.current.setContactPublicKey(contact.publicKey);
       await p2pServiceRef.current.initiateP2P(selectedChatId);
       setIsP2PActive(true);
-    } catch (error) {
-      console.error('Failed to initiate P2P:', error);
+    } catch {
       setIsP2PActive(false);
       alert('Не вдалося отримати доступ до медіа для P2P з\'єднання');
     }
@@ -582,8 +625,7 @@ const App: React.FC = () => {
         p2pServiceRef.current.setContactPublicKey(contact.publicKey);
         await p2pServiceRef.current.handleP2PRequest({ ...p2pRequest, lastMessage: undefined }, true);
         setIsP2PActive(true);
-      } catch (error) {
-        console.error('Failed to accept P2P request:', error);
+      } catch {
         setIsP2PActive(false);
         alert('Не вдалося отримати доступ до медіа для P2P з\'єднання');
       }
@@ -597,9 +639,7 @@ const App: React.FC = () => {
   const headerBackground = isDarkTheme ? '#2c3e50' : '#f1f3f5';
   const inputBackground = isDarkTheme ? '#34495e' : '#e9ecef';
 
-  if (!userId) {
-    return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
-  }
+  if (!userId) return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
 
   return (
     <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
@@ -673,9 +713,11 @@ const App: React.FC = () => {
                 <MdOutlineArrowBackIos size={24} style={{ color: isDarkTheme ? '#fff' : '#212529' }} />
               </button>
               <div className="rounded-circle me-2 d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px', background: isDarkTheme ? '#6c757d' : '#e9ecef', color: isDarkTheme ? '#fff' : '#212529' }}>
-                {(contacts.find(c => c.id === selectedChatId)?.email || '')[0]?.toUpperCase() || '?'}
+                {(contacts.find(c => c.id === selectedChatId)?.email || localStorage.getItem(`contactEmail_${selectedChatId}`) || '')[0]?.toUpperCase() || '?'}
               </div>
-              <h6 className="m-0 me-2" style={{ fontSize: '18px', fontWeight: 'bold' }}>{contacts.find(c => c.id === selectedChatId)?.email || 'Loading...'}</h6>
+              <h6 className="m-0 me-2" style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                {contacts.find(c => c.id === selectedChatId)?.email || localStorage.getItem(`contactEmail_${selectedChatId}`) || 'Loading...'}
+              </h6>
             </div>
             {!p2pRequest && (
               <div className="d-flex align-items-center" style={{ gap: '20px' }}>
@@ -745,9 +787,9 @@ const App: React.FC = () => {
               style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', padding: '0.375rem 15px', margin: 0 }} 
             />
             <button 
-              className={`btn ms-1 d-flex align-items-center justify-content-center ${input.trim() ? 'send-btn-active' : 'send-btn-inactive'}`}
+              className={`btn ms-1 d-flex align-items-center justify-content-center ${input.trim() && !isSendingRef.current ? 'send-btn-active' : 'send-btn-inactive'}`}
               onClick={() => sendMessage(input)} 
-              disabled={!input.trim()}
+              disabled={!input.trim() || !socketRef.current?.connected || isSendingRef.current}
               style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease', padding: '0.375rem 0.75rem', margin: 0 }}
             >
               Send
