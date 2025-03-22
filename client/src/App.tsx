@@ -29,20 +29,43 @@ const fixPublicKey = (key: Uint8Array): Uint8Array => {
   return key;
 };
 
-const initializeTweetNaclKeys = (): TweetNaClKeyPair => {
+const initializeTweetNaclKeys = async (userId: string | null): Promise<TweetNaClKeyPair> => {
   const stored = localStorage.getItem('tweetnaclKeyPair');
-  if (stored) {
+  if (stored && userId) {
     try {
       const { publicKey, secretKey } = JSON.parse(stored);
-      return { publicKey: new Uint8Array(publicKey), secretKey: new Uint8Array(secretKey) };
-    } catch {}
+      const keyPair = { publicKey: new Uint8Array(publicKey), secretKey: new Uint8Array(secretKey) };
+      const serverKey = await fetchSenderPublicKey(userId);
+      if (serverKey && serverKey === Buffer.from(keyPair.publicKey).toString('base64')) {
+        console.log('Using existing key pair from localStorage as it matches server key');
+        return keyPair;
+      }
+    } catch (error) {
+      console.error('Error validating stored key pair:', error);
+    }
   }
+
   const newKeyPair = nacl.box.keyPair();
   localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
     publicKey: Array.from(newKeyPair.publicKey),
     secretKey: Array.from(newKeyPair.secretKey),
   }));
+  if (userId) {
+    await updatePublicKeyForUser(newKeyPair, userId);
+  }
   return newKeyPair;
+};
+
+const updatePublicKeyForUser = async (keyPair: TweetNaClKeyPair, userId: string) => {
+  const publicKeyBase64 = Buffer.from(keyPair.publicKey).toString('base64');
+  try {
+    await axios.put('https://100.64.221.88:4000/update-keys', { userId, publicKey: publicKeyBase64 });
+    localStorage.setItem(`publicKey_${userId}`, publicKeyBase64);
+    publicKeysCache.set(userId, publicKeyBase64);
+    console.log(`Updated public key for user ${userId} on server`);
+  } catch (error) {
+    console.error('Failed to update public key:', error);
+  }
 };
 
 const encryptMessage = (text: string, contactPublicKey: string, keyPair: TweetNaClKeyPair): string => {
@@ -69,7 +92,7 @@ const App: React.FC = () => {
   const { userId, setUserId, setIdentityKeyPair } = useAuth();
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem('userEmail'));
   const [messages, setMessages] = useState<Message[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>(JSON.parse(localStorage.getItem('contacts') || '[]')); // Ініціалізація з localStorage
+  const [contacts, setContacts] = useState<Contact[]>(JSON.parse(localStorage.getItem('contacts') || '[]'));
   const [selectedChatId, setSelectedChatId] = useState<string | null>(localStorage.getItem('selectedChatId'));
   const [input, setInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -115,7 +138,6 @@ const App: React.FC = () => {
     socketRef.current.on('connect', () => {
       console.log('Socket connected');
       fetchData();
-      updatePublicKey();
       if (selectedChatId) reDecryptMessages(selectedChatId);
     });
     socketRef.current.on('message-read', ({ messageId, contactId }) => {
@@ -186,18 +208,6 @@ const App: React.FC = () => {
     initializeKeys();
   }, [userId]);
 
-  const updatePublicKey = async () => {
-    if (!userId || !tweetNaclKeyPair) return;
-    const publicKeyBase64 = Buffer.from(tweetNaclKeyPair.publicKey).toString('base64');
-    try {
-      await axios.put('https://100.64.221.88:4000/update-keys', { userId, publicKey: publicKeyBase64 });
-      localStorage.setItem(`publicKey_${userId}`, publicKeyBase64);
-      publicKeysCache.set(userId, publicKeyBase64);
-    } catch (error) {
-      console.error('Failed to update public key:', error);
-    }
-  };
-
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
     let key = publicKeysCache.get(senderId) || localStorage.getItem(`publicKey_${senderId}`) || '';
     if (!key) {
@@ -224,10 +234,10 @@ const App: React.FC = () => {
     const nonce = data.subarray(0, nacl.box.nonceLength);
     const cipher = data.subarray(nacl.box.nonceLength);
     const senderPublicKey = await fetchSenderPublicKey(senderId);
-    if (!senderPublicKey) return encryptedText;
+    if (!senderPublicKey) return "[Unable to decrypt: missing public key]";
     const theirPublicKey = fixPublicKey(new Uint8Array(Buffer.from(senderPublicKey, 'base64')));
     const decrypted = nacl.box.open(new Uint8Array(cipher), new Uint8Array(nonce), theirPublicKey, tweetNaclKeyPair.secretKey);
-    return decrypted ? new TextDecoder().decode(decrypted) : encryptedText;
+    return decrypted ? new TextDecoder().decode(decrypted) : "[Encrypted with old key]";
   };
 
   const decryptMessageText = async (message: Message): Promise<string> => {
@@ -272,7 +282,6 @@ const App: React.FC = () => {
         ? prev.map(c => c.id === contactId ? { ...c, lastMessage: updatedMessage, email: contactEmail || c.email } : c)
         : [...prev, { id: contactId, email: contactEmail, publicKey: '', lastMessage: updatedMessage }];
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-      console.log('Updated contacts with last message:', updatedContacts);
       return updatedContacts;
     });
     const chatId = newMessage.userId === userId ? newMessage.contactId : newMessage.userId;
@@ -358,7 +367,7 @@ const App: React.FC = () => {
     if (!socketRef.current.connected) {
       console.log('Socket not connected, attempting to reconnect...');
       socketRef.current.connect();
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Чекаємо 1 секунду на перепідключення
+      await new Promise(resolve => setTimeout(resolve, 1000));
       if (!socketRef.current.connected) {
         console.error('Socket reconnection failed');
         return;
@@ -366,7 +375,7 @@ const App: React.FC = () => {
     }
 
     isSendingRef.current = true;
-    const contact = contacts.find(c => c.id === selectedChatId) || await fetchContact(selectedChatId);
+    const contactPublicKey = publicKeysCache.get(selectedChatId) || await fetchSenderPublicKey(selectedChatId);
     const messageId = `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const message: Message = { 
       id: messageId, 
@@ -391,7 +400,7 @@ const App: React.FC = () => {
         });
         await updateContactsWithLastMessage(message);
       } else {
-        const encryptedText = encryptMessage(message.text, contact.publicKey || '', tweetNaclKeyPair);
+        const encryptedText = encryptMessage(message.text, contactPublicKey || '', tweetNaclKeyPair);
         storeSentMessage(message.id, text.trim(), selectedChatId);
         socketRef.current.emit('message', { ...message, text: encryptedText });
         setMessages(prev => {
@@ -400,7 +409,6 @@ const App: React.FC = () => {
           return updatedMessages;
         });
         await updateContactsWithLastMessage(message);
-        // Додаємо чат на сервер
         await axios.post('https://100.64.221.88:4000/add-chat', { userId, contactId: selectedChatId });
       }
       setInput('');
@@ -420,17 +428,15 @@ const App: React.FC = () => {
   const toggleMicrophone = () => videoCallServiceRef.current?.toggleMicrophone(!callState.isMicrophoneEnabled);
 
   const initializeKeys = async () => {
-    const keyPair = initializeTweetNaclKeys();
+    const keyPair = await initializeTweetNaclKeys(userId);
     setTweetNaclKeyPair(keyPair);
     setIsKeysLoaded(true);
-    await updatePublicKey();
   };
 
   const fetchData = async () => {
     if (!userId || !socketRef.current?.connected || !tweetNaclKeyPair) return;
     
     const fetchedChats = (await fetchChats(userId)).data;
-    console.log('Fetched chats from server:', fetchedChats);
     const decryptedChats = await Promise.all(fetchedChats.map(async (contact: Contact) => ({
       ...contact,
       lastMessage: contact.lastMessage ? { ...contact.lastMessage, text: await decryptMessageText(contact.lastMessage) } : null
@@ -447,7 +453,6 @@ const App: React.FC = () => {
         }
       });
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-      console.log('Updated contacts after fetch:', updatedContacts);
       return updatedContacts;
     });
 
@@ -480,17 +485,37 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!userId || !tweetNaclKeyPair || !socketRef.current) return;
+
     socketRef.current.on('message', handleIncomingMessage);
-    socketRef.current.on('p2p-offer-notify', (data: { message: Message }) => data.message.contactId === userId && !isP2PActive && setP2PRequest(data.message));
-    socketRef.current.on('key-updated', ({ userId: updatedUserId, publicKey }: { userId: string, publicKey: string }) => {
+    socketRef.current.on('p2p-offer-notify', (data: { message: Message }) => 
+      data.message.contactId === userId && !isP2PActive && setP2PRequest(data.message)
+    );
+    socketRef.current.on('key-updated', async ({ userId: updatedUserId, publicKey }: { userId: string, publicKey: string }) => {
       const cleanedKey = cleanBase64(publicKey);
+      console.log(`Received key update for user ${updatedUserId}: ${cleanedKey}`);
       publicKeysCache.set(updatedUserId, cleanedKey);
       localStorage.setItem(`publicKey_${updatedUserId}`, cleanedKey);
-      setContacts(prev => prev.map(c => c.id === updatedUserId ? { ...c, publicKey: cleanedKey } : c));
-      if (selectedChatId) reDecryptMessages(selectedChatId);
+      
+      // Оновлюємо ключ у контактах
+      setContacts(prev => 
+        prev.map(c => 
+          c.id === updatedUserId ? { 
+            ...c, 
+            publicKey: cleanedKey, 
+            lastMessage: c.lastMessage ? { ...c.lastMessage, text: c.lastMessage.text.startsWith('base64:') ? '[Encrypted with old key]' : c.lastMessage.text } : null 
+          } : c
+        )
+      );
+
+      // Якщо це поточний чат, повторно дешифруємо повідомлення
+      if (selectedChatId === updatedUserId) {
+        console.log(`Re-decrypting messages for chat with ${updatedUserId} due to key update`);
+        await reDecryptMessages(selectedChatId);
+      }
     });
-    return () => { 
-      socketRef.current?.off('message'); 
+
+    return () => {
+      socketRef.current?.off('message');
       socketRef.current?.off('p2p-offer-notify');
       socketRef.current?.off('key-updated');
     };
@@ -499,7 +524,9 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!searchQuery || !userId) setSearchResults([]);
     else if (socketRef.current?.connected) {
-      axios.get<Contact[]>(`https://100.64.221.88:4000/search?query=${searchQuery}`).then(res => setSearchResults(res.data.filter(c => c.id !== userId)));
+      axios.get<Contact[]>(`https://100.64.221.88:4000/search?query=${searchQuery}`).then(res => 
+        setSearchResults(res.data.filter(c => c.id !== userId))
+      );
     }
   }, [searchQuery, userId]);
 
@@ -534,10 +561,9 @@ const App: React.FC = () => {
     localStorage.setItem('userEmail', email);
     let keyPair = newTweetNaclKeyPair;
     if (!keyPair) {
-      keyPair = initializeTweetNaclKeys();
+      keyPair = await initializeTweetNaclKeys(id);
       setTweetNaclKeyPair(keyPair);
     }
-    await updatePublicKey();
   };
 
   const fetchContact = async (contactId: string): Promise<Contact> => {

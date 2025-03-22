@@ -1,270 +1,70 @@
 Server running on https://100.64.221.88:4000
 Connected to SQLite database
-New Socket.IO connection for user: 242, total users: 1
-Marked 1 messages as read for user 242 from contact 241
-Deleted 1 read messages from DB for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-User disconnected: 242, remaining users: 0
-No unread messages to mark as read for user 242 from contact 241
-New Socket.IO connection for user: 242, total users: 1
-No unread messages to mark as read for user 242 from contact 241
-User disconnected: 242, remaining users: 0
-New Socket.IO connection for user: 242, total users: 1
-No unread messages to mark as read for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-User disconnected: 242, remaining users: 0
-New Socket.IO connection for user: 242, total users: 1
-No unread messages to mark as read for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-User disconnected: 242, remaining users: 0
-New Socket.IO connection for user: 242, total users: 1
-No unread messages to mark as read for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-No unread messages to mark as read for user 242 from contact 241
-Message saved to DB: 1742577525085-c0m1y
-Message saved to DB: 1742577526736-pbs4s
-Message saved to DB: 1742577527651-ivlik
-Message saved to DB: 1742577527823-wgt0o
-Message saved to DB: 1742577528006-5skxt
-Message saved to DB: 1742577531235-eqlbt
-Message saved to DB: 1742577531496-knc1e
-Message saved to DB: 1742577531739-xigmo
-Message saved to DB: 1742577531922-0yr0j
-Message saved to DB: 1742577532106-69dol
-Message saved to DB: 1742577532288-bcmr6
-Message saved to DB: 1742577532472-e5g0o
-Message saved to DB: 1742577532638-s0p59
-No unread messages to mark as read for user 242 from contact 241
-Message saved to DB: 1742577532837-rfzmh
-Message saved to DB: 1742577536562-75ihy
-No unread messages to mark as read for user 242 from contact 241
-User disconnected: 242, remaining users: 0
-User logged in: kolsnartem (ID: 226)
+New Socket.IO connection for user: 256, total users: 1
+User disconnected: 256, remaining users: 0
+New Socket.IO connection for user: 256, total users: 1
+User disconnected: 256, remaining users: 0
+New Socket.IO connection for user: 256, total users: 1
+User disconnected: 256, remaining users: 0
+New Socket.IO connection for user: 256, total users: 1
+User disconnected: 256, remaining users: 0
+New Socket.IO connection for user: 256, total users: 1
+User disconnected: 256, remaining users: 0
 New Socket.IO connection for user: 226, total users: 1
-Updated keys for user ID: 226
-No unread messages to mark as read for user 226 from contact 50
 User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+Message 1742603011387-pkb4y temporarily stored for offline user 19
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+Message 1742603055372-lejz2 temporarily stored for offline user 19
+Message 1742603062720-3bkr7 temporarily stored for offline user 19
+Message 1742603071235-f0vtc temporarily stored for offline user 19
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+Message 1742603628651-jagjx temporarily stored for offline user 19
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+Message 1742603820662-fy2v9 temporarily stored for offline user 19
+Message 1742603823166-s1wqa temporarily stored for offline user 19
+Message 1742603826216-rqfbg temporarily stored for offline user 19
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+Message 1742604034374-drkz8 temporarily stored for offline user 19
+Message 1742604048164-nwrys temporarily stored for offline user 105
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
+New Socket.IO connection for user: 260, total users: 1
+User disconnected: 260, remaining users: 0
 New Socket.IO connection for user: 226, total users: 1
-Updated keys for user ID: 226
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-Message saved to DB: 1742578286686-1v7tc
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 34
-No unread messages to mark as read for user 226 from contact 34
-Message saved to DB: 1742578340016-1biyb
 User disconnected: 226, remaining users: 0
 New Socket.IO connection for user: 226, total users: 1
 User disconnected: 226, remaining users: 0
 New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 34
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 34
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 70
-No unread messages to mark as read for user 226 from contact 70
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 70
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 106
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 228
-User disconnected: 226, remaining users: 0
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 228
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 228
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 106
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 106
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 154
-No unread messages to mark as read for user 226 from contact 154
-Message saved to DB: 1742579695236-a7k14
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 154
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 154
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 13
-No unread messages to mark as read for user 226 from contact 13
-No unread messages to mark as read for user 226 from contact 34
-No unread messages to mark as read for user 226 from contact 34
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-Message saved to DB: 1742580229447-qerip
-Message saved to DB: 1742580230966-7ktv7
-No unread messages to mark as read for user 226 from contact 143
-Message saved to DB: 1742580232717-sg12d
-Message saved to DB: 1742580233895-l5h2y
-Message saved to DB: 1742580235194-69dqk
-Message saved to DB: 1742580236273-4iuwy
-Message saved to DB: 1742580240606-azgye
-Message saved to DB: 1742580241942-fx2rn
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-User disconnected: 226, remaining users: 0
-No unread messages to mark as read for user 226 from contact 143
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 60
-No unread messages to mark as read for user 226 from contact 60
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
 User disconnected: 226, remaining users: 0
 New Socket.IO connection for user: 226, total users: 1
 User disconnected: 226, remaining users: 0
 New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 106
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 227
-No unread messages to mark as read for user 226 from contact 227
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 227
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 227
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-Message saved to DB: 1742580771811-pogc3
-Message saved to DB: 1742580773499-b9a3r
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-Message saved to DB: 1742581455904-k0uqf
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 106
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 50
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 143
-User disconnected: 226, remaining users: 0
-User logged in: kolsnartem (ID: 226)
-New Socket.IO connection for user: 226, total users: 1
-Updated keys for user ID: 226
-No unread messages to mark as read for user 226 from contact 154
-Message saved to DB: 1742584149703-0otna
-Message saved to DB: 1742584151132-qyp71
-Message saved to DB: 1742584152276-soj7a
-Message saved to DB: 1742584153823-gewl2
-Message saved to DB: 1742584155206-yqpdx
-Message saved to DB: 1742584156675-whvyh
-Message saved to DB: 1742584157634-wt3z2
-Message saved to DB: 1742584158636-xgnx6
-Message saved to DB: 1742584159451-hvf4b
-Message saved to DB: 1742584160281-66cyt
-Message saved to DB: 1742584161216-s485z
-Message saved to DB: 1742584162248-lp96p
-Message saved to DB: 1742584163281-p7m2a
-No unread messages to mark as read for user 226 from contact 154
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 154
-No unread messages to mark as read for user 226 from contact 154
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 154
-No unread messages to mark as read for user 226 from contact 154
-No unread messages to mark as read for user 226 from contact 154
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 100
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 100
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 100
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 50
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 100
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 50
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 50
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 50
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 50
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 50
-No unread messages to mark as read for user 226 from contact 58
-No unread messages to mark as read for user 226 from contact 58
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 228
-No unread messages to mark as read for user 226 from contact 143
-No unread messages to mark as read for user 226 from contact 143
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 50
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-No unread messages to mark as read for user 226 from contact 143
 User disconnected: 226, remaining users: 0

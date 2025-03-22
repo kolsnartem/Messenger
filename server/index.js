@@ -21,6 +21,15 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 
+// ANSI-коди для кольорів
+const colors = {
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  cyan: '\x1b[36m',
+  red: '\x1b[31m',
+  reset: '\x1b[0m'
+};
+
 const db = new sqlite3.Database('./messenger.db', (err) => {
   if (err) console.error('SQLite connection error:', err);
   console.log('Connected to SQLite database');
@@ -41,6 +50,14 @@ db.serialize(() => {
     timestamp INTEGER NOT NULL,
     isRead INTEGER DEFAULT 0,
     isP2P INTEGER DEFAULT 0
+  )`);
+  db.run(`CREATE TABLE IF NOT EXISTS deleted_messages_log (
+    log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message_id TEXT NOT NULL,
+    sender_id TEXT NOT NULL,
+    receiver_id TEXT NOT NULL,
+    message_text TEXT NOT NULL,
+    deleted_at INTEGER NOT NULL
   )`);
 });
 
@@ -64,7 +81,7 @@ io.on('connection', (socket) => {
     if (targetSocketId && senderSocketId) {
       io.to(targetSocketId).emit('message', msg);
       io.to(senderSocketId).emit('message', msg);
-      console.log(`Message ${msg.id} transmitted directly to ${msg.contactId}, not stored`);
+      console.log(`${colors.green}📩 ${msg.userId} → ${msg.contactId}:${colors.reset} "${msg.text}"`);
     } else {
       db.get('SELECT id FROM messages WHERE id = ?', [msg.id], (err, row) => {
         if (err) return console.error('Error checking message existence:', err);
@@ -76,7 +93,7 @@ io.on('connection', (socket) => {
           (err) => {
             if (err) console.error('Failed to save message to DB:', err);
             else {
-              console.log(`Message ${msg.id} temporarily stored for offline user ${msg.contactId}`);
+              console.log(`${colors.green}📩 ${msg.userId} → ${msg.contactId}:${colors.reset} "${msg.text}"\n${colors.yellow}Message ${msg.id} stored for offline user ${msg.contactId}${colors.reset}`);
               if (targetSocketId) io.to(targetSocketId).emit('message', msg);
               if (senderSocketId) io.to(senderSocketId).emit('message', msg);
             }
@@ -184,7 +201,8 @@ app.put('/update-keys', (req, res) => {
   if (!publicKey || publicKey.length !== 44) return res.status(400).json({ error: 'Invalid public key format' });
   db.run('UPDATE users SET publicKey = ? WHERE id = ?', [publicKey, userId], (err) => {
     if (err) return res.status(500).json({ error: 'Update failed' });
-    io.emit('key-updated', { userId, publicKey });
+    console.log(`${colors.cyan}🔑 ${userId}:${colors.reset} "${publicKey}"`);
+    io.emit('key-updated', { userId, publicKey }); // Сповіщення всіх клієнтів про оновлення ключа
     res.json({ success: true });
   });
 });
@@ -261,12 +279,24 @@ app.get('/messages', (req, res) => {
 app.post('/mark-as-read', (req, res) => {
   const { userId, contactId } = req.body;
   db.all(
-    `SELECT id FROM messages WHERE contactId = ? AND userId = ? AND isRead = 0`,
+    `SELECT id, userId, contactId, text FROM messages WHERE contactId = ? AND userId = ? AND isRead = 0`,
     [userId, contactId],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Database error' });
-      const messageIds = rows.map(row => row.id);
-      if (messageIds.length === 0) return res.json({ success: true });
+      const messagesToDelete = rows;
+      if (messagesToDelete.length === 0) return res.json({ success: true });
+
+      messagesToDelete.forEach(msg => {
+        db.run(
+          `INSERT INTO deleted_messages_log (message_id, sender_id, receiver_id, message_text, deleted_at) 
+           VALUES (?, ?, ?, ?, ?)`,
+          [msg.id, msg.userId, msg.contactId, msg.text, Date.now()],
+          (logErr) => {
+            if (logErr) console.error('Failed to log deleted message:', logErr);
+          }
+        );
+        console.log(`${colors.red}🗑️ ${msg.userId} → ${msg.contactId}:${colors.reset} "${msg.text}"`);
+      });
 
       db.run(
         `UPDATE messages SET isRead = 1 WHERE contactId = ? AND userId = ? AND isRead = 0`,
@@ -278,9 +308,9 @@ app.post('/mark-as-read', (req, res) => {
             [userId, contactId],
             (deleteErr) => {
               if (deleteErr) return res.status(500).json({ error: 'Database error' });
-              messageIds.forEach(messageId => {
+              messagesToDelete.forEach(msg => {
                 const senderSocketId = users.get(contactId);
-                if (senderSocketId) io.to(senderSocketId).emit('message-read', { messageId, contactId: userId });
+                if (senderSocketId) io.to(senderSocketId).emit('message-read', { messageId: msg.id, contactId: userId });
               });
               res.json({ success: true });
             }
