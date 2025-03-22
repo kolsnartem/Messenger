@@ -35,11 +35,7 @@ const initializeTweetNaclKeys = async (userId: string | null): Promise<TweetNaCl
     try {
       const { publicKey, secretKey } = JSON.parse(stored);
       const keyPair = { publicKey: new Uint8Array(publicKey), secretKey: new Uint8Array(secretKey) };
-      const serverKey = await fetchSenderPublicKey(userId);
-      if (serverKey && serverKey === Buffer.from(keyPair.publicKey).toString('base64')) {
-        console.log('Using existing key pair from localStorage as it matches server key');
-        return keyPair;
-      }
+      return keyPair;
     } catch (error) {
       console.error('Error validating stored key pair:', error);
     }
@@ -112,7 +108,7 @@ const App: React.FC = () => {
     callDuration: 0,
     reactions: [],
   });
-  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
+  const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
   const [showScrollDown, setShowScrollDown] = useState<boolean>(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -144,6 +140,12 @@ const App: React.FC = () => {
       if (selectedChatId === contactId) {
         setMessages(prev => prev.map(m => m.id === messageId ? { ...m, isRead: 1 } : m));
       }
+      setUnreadMessages(prev => {
+        const newMap = new Map(prev);
+        const count = newMap.get(contactId) || 0;
+        if (count > 0) newMap.set(contactId, count - 1);
+        return newMap;
+      });
     });
     socketRef.current.on('disconnect', () => {
       console.log('Socket disconnected');
@@ -304,10 +306,14 @@ const App: React.FC = () => {
     if (!chatContainer) return;
     chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
     if (force) {
-      setUnreadMessagesCount(0);
+      setUnreadMessages(prev => {
+        const newMap = new Map(prev);
+        newMap.set(selectedChatId!, 0);
+        return newMap;
+      });
       setShowScrollDown(false);
     }
-  }, []);
+  }, [selectedChatId]);
 
   const handleIncomingMessage = async (message: Message) => {
     if (sentMessageIds.current.has(message.id)) return;
@@ -322,8 +328,16 @@ const App: React.FC = () => {
       localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
       if (selectedChatId === chatId) {
         setMessages(updatedMessages);
+        if (isAtBottom()) {
+          await markAsRead(userId!, chatId);
+        }
       } else {
-        setUnreadMessagesCount(prev => prev + 1);
+        setUnreadMessages(prev => {
+          const newMap = new Map(prev);
+          const count = (newMap.get(chatId) || 0) + 1;
+          newMap.set(chatId, count);
+          return newMap;
+        });
       }
       await updateContactsWithLastMessage(updatedMessage);
     }
@@ -343,7 +357,14 @@ const App: React.FC = () => {
     setMessages(prev => {
       if (prev.some(m => m.id === message.id)) return prev;
       const updatedMessages = [...prev, updatedMessage].sort((a, b) => a.timestamp - b.timestamp);
-      if (!isAtBottom() && selectedChatId === message.userId) setUnreadMessagesCount(prev => prev + 1);
+      if (!isAtBottom() && selectedChatId === message.userId) {
+        setUnreadMessages(prev => {
+          const newMap = new Map(prev);
+          const count = (newMap.get(message.userId) || 0) + 1;
+          newMap.set(message.userId, count);
+          return newMap;
+        });
+      }
       if (selectedChatId === message.userId) localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
       return updatedMessages;
     });
@@ -411,7 +432,7 @@ const App: React.FC = () => {
         await updateContactsWithLastMessage(message);
         await axios.post('https://100.64.221.88:4000/add-chat', { userId, contactId: selectedChatId });
       }
-      setInput('');
+      setInput(''); // Очищаємо поле вводу після успішної відправки
       shouldScrollToBottomRef.current = true;
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -434,49 +455,79 @@ const App: React.FC = () => {
   };
 
   const fetchData = async () => {
-    if (!userId || !socketRef.current?.connected || !tweetNaclKeyPair) return;
-    
-    const fetchedChats = (await fetchChats(userId)).data;
-    const decryptedChats = await Promise.all(fetchedChats.map(async (contact: Contact) => ({
-      ...contact,
-      lastMessage: contact.lastMessage ? { ...contact.lastMessage, text: await decryptMessageText(contact.lastMessage) } : null
-    })));
-
-    setContacts(prev => {
-      const updatedContacts = [...prev];
-      decryptedChats.forEach(serverContact => {
-        const existingIndex = updatedContacts.findIndex(c => c.id === serverContact.id);
-        if (existingIndex >= 0) {
-          updatedContacts[existingIndex] = { ...updatedContacts[existingIndex], ...serverContact };
-        } else {
-          updatedContacts.push(serverContact);
-        }
-      });
-      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-      return updatedContacts;
-    });
+    // Завантажуємо локальні дані завжди, незалежно від стану сервера
+    const localContacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+    setContacts(localContacts);
 
     if (selectedChatId) {
       const cachedMessages = JSON.parse(localStorage.getItem(`chat_${selectedChatId}`) || '[]');
-      const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data;
-      const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({
-        ...msg,
-        isMine: msg.userId === userId,
-        text: await decryptMessageText(msg)
+      setMessages(cachedMessages);
+    }
+
+    // Якщо немає підключення до сервера або ключів, зупиняємося тут
+    if (!userId || !socketRef.current?.connected || !tweetNaclKeyPair) {
+      console.log('Server unavailable or keys not loaded, using local data only');
+      return;
+    }
+
+    try {
+      // Отримуємо чати з сервера
+      const fetchedChats = (await fetchChats(userId)).data;
+      const decryptedChats = await Promise.all(fetchedChats.map(async (contact: Contact) => ({
+        ...contact,
+        lastMessage: contact.lastMessage ? { ...contact.lastMessage, text: await decryptMessageText(contact.lastMessage) } : null
       })));
-      const combinedMessages = [...cachedMessages.filter((m: Message) => !m.text.startsWith('base64:')), ...decryptedMessages]
-        .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
-        .sort((a, b) => a.timestamp - b.timestamp);
-      setMessages(combinedMessages);
-      localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(combinedMessages));
-      if (fetchedMessages.length > 0) await markAsRead(userId, selectedChatId);
+
+      setContacts(prev => {
+        const updatedContacts = [...prev];
+        decryptedChats.forEach(serverContact => {
+          const existingIndex = updatedContacts.findIndex(c => c.id === serverContact.id);
+          if (existingIndex >= 0) {
+            updatedContacts[existingIndex] = { ...updatedContacts[existingIndex], ...serverContact };
+          } else {
+            updatedContacts.push(serverContact);
+          }
+        });
+        localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+        return updatedContacts;
+      });
+
+      const newUnread = new Map<string, number>();
+      for (const contact of decryptedChats) {
+        const messages = (await fetchMessages(userId, contact.id)).data;
+        const unreadCount = messages.filter(m => m.contactId === userId && m.isRead === 0).length;
+        if (unreadCount > 0) newUnread.set(contact.id, unreadCount);
+      }
+      setUnreadMessages(newUnread);
+
+      if (selectedChatId) {
+        const cachedMessages = JSON.parse(localStorage.getItem(`chat_${selectedChatId}`) || '[]');
+        const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data; // Лише непрочитані з сервера
+        const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({
+          ...msg,
+          isMine: msg.userId === userId,
+          text: await decryptMessageText(msg)
+        })));
+        const combinedMessages = [...cachedMessages, ...decryptedMessages]
+          .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
+          .sort((a, b) => a.timestamp - b.timestamp);
+        setMessages(combinedMessages);
+        localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(combinedMessages));
+        if (isAtBottom() && fetchedMessages.length > 0) await markAsRead(userId, selectedChatId); // Видаляємо з сервера
+      }
+    } catch (error) {
+      console.error('Failed to fetch data from server:', error);
+      console.log('Falling back to local storage data');
     }
   };
 
   useEffect(() => {
     if (!userId) return;
-    if (!tweetNaclKeyPair) initializeKeys().then(fetchData);
-    else if (isKeysLoaded) {
+    if (!tweetNaclKeyPair) {
+      initializeKeys().then(() => {
+        fetchData(); // Завантажуємо локальні дані навіть без сервера
+      });
+    } else if (isKeysLoaded) {
       fetchData();
       const interval = setInterval(fetchData, 5000);
       return () => clearInterval(interval);
@@ -496,7 +547,6 @@ const App: React.FC = () => {
       publicKeysCache.set(updatedUserId, cleanedKey);
       localStorage.setItem(`publicKey_${updatedUserId}`, cleanedKey);
       
-      // Оновлюємо ключ у контактах
       setContacts(prev => 
         prev.map(c => 
           c.id === updatedUserId ? { 
@@ -507,7 +557,6 @@ const App: React.FC = () => {
         )
       );
 
-      // Якщо це поточний чат, повторно дешифруємо повідомлення
       if (selectedChatId === updatedUserId) {
         console.log(`Re-decrypting messages for chat with ${updatedUserId} due to key update`);
         await reDecryptMessages(selectedChatId);
@@ -543,12 +592,18 @@ const App: React.FC = () => {
       localStorage.setItem(`scrollPosition_${selectedChatId}`, scrollPositionRef.current.toString());
       const atBottom = isAtBottom();
       setShowScrollDown(!atBottom);
-      if (atBottom && unreadMessagesCount > 0) setUnreadMessagesCount(0);
+      if (atBottom && unreadMessages.get(selectedChatId!) > 0) {
+        setUnreadMessages(prev => {
+          const newMap = new Map(prev);
+          newMap.set(selectedChatId!, 0);
+          return newMap;
+        });
+      }
       shouldScrollToBottomRef.current = atBottom;
     };
     chatContainer.addEventListener('scroll', handleScroll);
     return () => chatContainer.removeEventListener('scroll', handleScroll);
-  }, [selectedChatId, messages, unreadMessagesCount, isAtBottom]);
+  }, [selectedChatId, messages, unreadMessages, isAtBottom]);
 
   useEffect(() => {
     if (!selectedChatId || messages.length === 0) return;
@@ -592,23 +647,32 @@ const App: React.FC = () => {
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
       return updatedContacts;
     });
-    setUnreadMessagesCount(0);
+    setUnreadMessages(prev => {
+      const newMap = new Map(prev);
+      newMap.set(contact.id, 0);
+      return newMap;
+    });
     if (!tweetNaclKeyPair) await initializeKeys();
     isInitialMount.current = true;
 
     const cachedMessages = JSON.parse(localStorage.getItem(`chat_${contact.id}`) || '[]');
-    const fetchedMessages = (await fetchMessages(userId!, contact.id)).data;
-    const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({
-      ...msg,
-      isMine: msg.userId === userId,
-      text: await decryptMessageText(msg)
-    })));
-    const combinedMessages = [...cachedMessages.filter((m: Message) => !m.text.startsWith('base64:')), ...decryptedMessages]
-      .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
-      .sort((a, b) => a.timestamp - b.timestamp);
-    setMessages(combinedMessages);
-    localStorage.setItem(`chat_${contact.id}`, JSON.stringify(combinedMessages));
-    if (fetchedMessages.length > 0) await markAsRead(userId!, contact.id);
+    try {
+      const fetchedMessages = (await fetchMessages(userId!, contact.id)).data;
+      const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({
+        ...msg,
+        isMine: msg.userId === userId,
+        text: await decryptMessageText(msg)
+      })));
+      const combinedMessages = [...cachedMessages, ...decryptedMessages]
+        .filter((m, i, self) => self.findIndex(t => t.id === m.id) === i)
+        .sort((a, b) => a.timestamp - b.timestamp);
+      setMessages(combinedMessages);
+      localStorage.setItem(`chat_${contact.id}`, JSON.stringify(combinedMessages));
+      if (fetchedMessages.length > 0) await markAsRead(userId!, contact.id);
+    } catch (error) {
+      console.error('Failed to fetch messages from server:', error);
+      setMessages(cachedMessages); // Використовуємо локальні дані, якщо сервер недоступний
+    }
   };
 
   const handleLogout = () => {
@@ -786,7 +850,7 @@ const App: React.FC = () => {
             messages={messages}
             selectedChatId={selectedChatId}
             isDarkTheme={isDarkTheme}
-            unreadMessagesCount={unreadMessagesCount}
+            unreadMessagesCount={unreadMessages.get(selectedChatId) || 0}
             showScrollDown={showScrollDown}
             onRetryDecryption={retryDecryption}
             onScrollToBottom={scrollToBottom}
@@ -794,7 +858,7 @@ const App: React.FC = () => {
             onSendMessage={sendMessage}
           />
         )}
-        {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} />}
+        {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} unreadMessages={unreadMessages} />}
       </div>
 
       {selectedChatId && !callState.isCalling && (

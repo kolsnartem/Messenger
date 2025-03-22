@@ -1,7 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { Contact, ChatListProps } from '../types';
 
-const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkTheme, onSelectChat }) => {
+interface ChatListPropsExtended extends ChatListProps {
+  unreadMessages: Map<string, number>;
+}
+
+const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, isDarkTheme, onSelectChat, unreadMessages }) => {
   const chatListRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number | null>(null);
   const touchStartTime = useRef<number | null>(null);
@@ -88,7 +92,8 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
       }}
     >
       {contacts.map((contact) => {
-        const hasUnread = contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id;
+        const unreadCount = unreadMessages.get(contact.id) || 0;
+        const hasUnread = unreadCount > 0 || (contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id);
         const isSelected = selectedChatId === contact.id;
 
         return (
@@ -159,14 +164,21 @@ const ChatList: React.FC<ChatListProps> = ({ contacts, selectedChatId, isDarkThe
             {hasUnread && (
               <div
                 style={{
-                  width: '10px',
-                  height: '10px',
+                  width: '20px',
+                  height: '20px',
                   backgroundColor: '#007bff',
                   borderRadius: '50%',
                   marginLeft: '10px',
                   flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '12px',
                 }}
-              />
+              >
+                {unreadCount > 0 ? unreadCount : ''}
+              </div>
             )}
           </div>
         );

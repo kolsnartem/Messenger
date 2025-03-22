@@ -69,6 +69,25 @@ io.on('connection', (socket) => {
   users.set(userId, socket.id);
   console.log(`New Socket.IO connection for user: ${userId}, total users: ${users.size}`);
 
+  // Надсилаємо всі тимчасово збережені непрочитані повідомлення при підключенні
+  db.all(
+    `SELECT id, userId, contactId, text, timestamp, isRead, isP2P 
+     FROM messages 
+     WHERE contactId = ? AND isRead = 0 
+     ORDER BY timestamp`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Error fetching unread messages:', err);
+        return;
+      }
+      rows.forEach((msg) => {
+        socket.emit('message', msg);
+      });
+      console.log(`${colors.yellow}Sent ${rows.length} unread messages to user ${userId}${colors.reset}`);
+    }
+  );
+
   socket.on('message', (msg) => {
     const targetSocketId = users.get(msg.contactId);
     const senderSocketId = users.get(msg.userId);
@@ -78,28 +97,24 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (targetSocketId && senderSocketId) {
+    // Якщо отримувач онлайн, перенаправляємо без збереження
+    if (targetSocketId) {
       io.to(targetSocketId).emit('message', msg);
-      io.to(senderSocketId).emit('message', msg);
-      console.log(`${colors.green}📩 ${msg.userId} → ${msg.contactId}:${colors.reset} "${msg.text}"`);
+      if (senderSocketId) io.to(senderSocketId).emit('message', msg); // Підтвердження відправнику
+      console.log(`${colors.green}📩 ${msg.userId} → ${msg.contactId} (online, no save):${colors.reset} "${msg.text}"`);
     } else {
-      db.get('SELECT id FROM messages WHERE id = ?', [msg.id], (err, row) => {
-        if (err) return console.error('Error checking message existence:', err);
-        if (row) return console.log(`Message ${msg.id} already exists, skipping`);
-
-        db.run(
-          'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead, isP2P) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0, msg.isP2P || 0],
-          (err) => {
-            if (err) console.error('Failed to save message to DB:', err);
-            else {
-              console.log(`${colors.green}📩 ${msg.userId} → ${msg.contactId}:${colors.reset} "${msg.text}"\n${colors.yellow}Message ${msg.id} stored for offline user ${msg.contactId}${colors.reset}`);
-              if (targetSocketId) io.to(targetSocketId).emit('message', msg);
-              if (senderSocketId) io.to(senderSocketId).emit('message', msg);
-            }
+      // Якщо отримувач офлайн, зберігаємо тимчасово
+      db.run(
+        'INSERT INTO messages (id, userId, contactId, text, timestamp, isRead, isP2P) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [msg.id, msg.userId, msg.contactId, msg.text, msg.timestamp, 0, msg.isP2P || 0],
+        (err) => {
+          if (err) {
+            console.error('Failed to save message to DB:', err);
+            return;
           }
-        );
-      });
+          console.log(`${colors.green}📩 ${msg.userId} → ${msg.contactId} (offline, saved):${colors.reset} "${msg.text}"`);
+        }
+      );
     }
   });
 
@@ -202,7 +217,7 @@ app.put('/update-keys', (req, res) => {
   db.run('UPDATE users SET publicKey = ? WHERE id = ?', [publicKey, userId], (err) => {
     if (err) return res.status(500).json({ error: 'Update failed' });
     console.log(`${colors.cyan}🔑 ${userId}:${colors.reset} "${publicKey}"`);
-    io.emit('key-updated', { userId, publicKey }); // Сповіщення всіх клієнтів про оновлення ключа
+    io.emit('key-updated', { userId, publicKey });
     res.json({ success: true });
   });
 });
@@ -271,7 +286,7 @@ app.get('/messages', (req, res) => {
     [userId, contactId, contactId, userId],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Database error' });
-      res.json(rows);
+      res.json(rows); // Повертає лише тимчасово збережені повідомлення
     }
   );
 });
@@ -286,35 +301,20 @@ app.post('/mark-as-read', (req, res) => {
       const messagesToDelete = rows;
       if (messagesToDelete.length === 0) return res.json({ success: true });
 
-      messagesToDelete.forEach(msg => {
-        db.run(
-          `INSERT INTO deleted_messages_log (message_id, sender_id, receiver_id, message_text, deleted_at) 
-           VALUES (?, ?, ?, ?, ?)`,
-          [msg.id, msg.userId, msg.contactId, msg.text, Date.now()],
-          (logErr) => {
-            if (logErr) console.error('Failed to log deleted message:', logErr);
-          }
-        );
-        console.log(`${colors.red}🗑️ ${msg.userId} → ${msg.contactId}:${colors.reset} "${msg.text}"`);
-      });
-
+      // Видаляємо повідомлення після прочитання
       db.run(
-        `UPDATE messages SET isRead = 1 WHERE contactId = ? AND userId = ? AND isRead = 0`,
+        `DELETE FROM messages WHERE contactId = ? AND userId = ? AND isRead = 0`,
         [userId, contactId],
-        (updateErr) => {
-          if (updateErr) return res.status(500).json({ error: 'Database error' });
-          db.run(
-            `DELETE FROM messages WHERE contactId = ? AND userId = ? AND isRead = 1`,
-            [userId, contactId],
-            (deleteErr) => {
-              if (deleteErr) return res.status(500).json({ error: 'Database error' });
-              messagesToDelete.forEach(msg => {
-                const senderSocketId = users.get(contactId);
-                if (senderSocketId) io.to(senderSocketId).emit('message-read', { messageId: msg.id, contactId: userId });
-              });
-              res.json({ success: true });
+        (deleteErr) => {
+          if (deleteErr) return res.status(500).json({ error: 'Database error' });
+          messagesToDelete.forEach(msg => {
+            const senderSocketId = users.get(contactId);
+            if (senderSocketId) {
+              io.to(senderSocketId).emit('message-read', { messageId: msg.id, contactId: userId });
             }
-          );
+            console.log(`${colors.cyan}🗑️ Deleted after read: ${msg.userId} → ${msg.contactId}:${colors.reset} "${msg.text}"`);
+          });
+          res.json({ success: true });
         }
       );
     }
