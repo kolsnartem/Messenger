@@ -144,6 +144,7 @@ const App: React.FC = () => {
         const newMap = new Map(prev);
         const count = newMap.get(contactId) || 0;
         if (count > 0) newMap.set(contactId, count - 1);
+        if (count <= 1) newMap.delete(contactId); // Видаляємо, якщо більше немає непрочитаних
         return newMap;
       });
     });
@@ -305,10 +306,10 @@ const App: React.FC = () => {
     const chatContainer = chatContainerRef.current;
     if (!chatContainer) return;
     chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
-    if (force) {
+    if (force && selectedChatId) {
       setUnreadMessages(prev => {
         const newMap = new Map(prev);
-        newMap.set(selectedChatId!, 0);
+        newMap.set(selectedChatId, 0);
         return newMap;
       });
       setShowScrollDown(false);
@@ -432,14 +433,15 @@ const App: React.FC = () => {
         await updateContactsWithLastMessage(message);
         await axios.post('https://100.64.221.88:4000/add-chat', { userId, contactId: selectedChatId });
       }
-      setInput(''); // Очищаємо поле вводу після успішної відправки
-      shouldScrollToBottomRef.current = true;
     } catch (error) {
       console.error('Failed to send message:', error);
       sentMessageIds.current.delete(messageId);
       if (isP2PActive) p2pServiceRef.current?.requestIceRestart();
     } finally {
+      setInput(''); // Завжди очищаємо поле вводу після завершення
+      console.log('Input cleared');
       isSendingRef.current = false;
+      shouldScrollToBottomRef.current = true;
     }
   }, [userId, selectedChatId, tweetNaclKeyPair, isP2PActive]);
 
@@ -491,14 +493,6 @@ const App: React.FC = () => {
         localStorage.setItem('contacts', JSON.stringify(updatedContacts));
         return updatedContacts;
       });
-
-      const newUnread = new Map<string, number>();
-      for (const contact of decryptedChats) {
-        const messages = (await fetchMessages(userId, contact.id)).data;
-        const unreadCount = messages.filter(m => m.contactId === userId && m.isRead === 0).length;
-        if (unreadCount > 0) newUnread.set(contact.id, unreadCount);
-      }
-      setUnreadMessages(newUnread);
 
       if (selectedChatId) {
         const cachedMessages = JSON.parse(localStorage.getItem(`chat_${selectedChatId}`) || '[]');
@@ -592,10 +586,10 @@ const App: React.FC = () => {
       localStorage.setItem(`scrollPosition_${selectedChatId}`, scrollPositionRef.current.toString());
       const atBottom = isAtBottom();
       setShowScrollDown(!atBottom);
-      if (atBottom && unreadMessages.get(selectedChatId!) > 0) {
+      if (atBottom && selectedChatId && (unreadMessages.get(selectedChatId) || 0) > 0) {
         setUnreadMessages(prev => {
           const newMap = new Map(prev);
-          newMap.set(selectedChatId!, 0);
+          newMap.set(selectedChatId, 0);
           return newMap;
         });
       }
@@ -647,11 +641,6 @@ const App: React.FC = () => {
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
       return updatedContacts;
     });
-    setUnreadMessages(prev => {
-      const newMap = new Map(prev);
-      newMap.set(contact.id, 0);
-      return newMap;
-    });
     if (!tweetNaclKeyPair) await initializeKeys();
     isInitialMount.current = true;
 
@@ -668,7 +657,14 @@ const App: React.FC = () => {
         .sort((a, b) => a.timestamp - b.timestamp);
       setMessages(combinedMessages);
       localStorage.setItem(`chat_${contact.id}`, JSON.stringify(combinedMessages));
-      if (fetchedMessages.length > 0) await markAsRead(userId!, contact.id);
+      if (isAtBottom() && fetchedMessages.length > 0) {
+        await markAsRead(userId!, contact.id);
+        setUnreadMessages(prev => {
+          const newMap = new Map(prev);
+          newMap.set(contact.id, 0);
+          return newMap;
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch messages from server:', error);
       setMessages(cachedMessages); // Використовуємо локальні дані, якщо сервер недоступний
