@@ -8,7 +8,7 @@ import { fetchChats, fetchMessages, markAsRead } from './services/api';
 import { useAuth } from './hooks/useAuth';
 import axios from 'axios';
 import * as nacl from 'tweetnacl';
-import { FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes, FaChevronLeft } from 'react-icons/fa';
+import { FaSun, FaMoon, FaSignOutAlt, FaSync, FaLock, FaPhone, FaVideo, FaCheck, FaTimes } from 'react-icons/fa';
 import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
@@ -16,7 +16,6 @@ import { FiCamera, FiMoon, FiPhone, FiVideo } from 'react-icons/fi';
 import { RiP2PFill } from "react-icons/ri";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { TbMenuDeep } from "react-icons/tb";
-import { RiAttachment2 } from "react-icons/ri";
 
 interface ApiErrorResponse {
   error?: string;
@@ -90,7 +89,6 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [contacts, setContacts] = useState<Contact[]>(JSON.parse(localStorage.getItem('contacts') || '[]'));
   const [selectedChatId, setSelectedChatId] = useState<string | null>(localStorage.getItem('selectedChatId'));
-  const [input, setInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -119,7 +117,6 @@ const App: React.FC = () => {
   const sentMessageIds = useRef<Set<string>>(new Set());
   const scrollPositionRef = useRef<number>(0);
   const shouldScrollToBottomRef = useRef<boolean>(true);
-  const isSendingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -144,7 +141,7 @@ const App: React.FC = () => {
         const newMap = new Map(prev);
         const count = newMap.get(contactId) || 0;
         if (count > 0) newMap.set(contactId, count - 1);
-        if (count <= 1) newMap.delete(contactId); // Видаляємо, якщо більше немає непрочитаних
+        if (count <= 1) newMap.delete(contactId);
         return newMap;
       });
     });
@@ -373,15 +370,14 @@ const App: React.FC = () => {
   };
 
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || !userId || !selectedChatId || !tweetNaclKeyPair || !socketRef.current || isSendingRef.current) {
+    if (!text.trim() || !userId || !selectedChatId || !tweetNaclKeyPair || !socketRef.current) {
       console.error('Cannot send message:', { 
         textEmpty: !text.trim(), 
         userId, 
         selectedChatId, 
         keysLoaded: !!tweetNaclKeyPair, 
         socketExists: !!socketRef.current, 
-        socketConnected: socketRef.current?.connected, 
-        isSending: isSendingRef.current 
+        socketConnected: socketRef.current?.connected 
       });
       return;
     }
@@ -396,7 +392,6 @@ const App: React.FC = () => {
       }
     }
 
-    isSendingRef.current = true;
     const contactPublicKey = publicKeysCache.get(selectedChatId) || await fetchSenderPublicKey(selectedChatId);
     const messageId = `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const message: Message = { 
@@ -438,9 +433,6 @@ const App: React.FC = () => {
       sentMessageIds.current.delete(messageId);
       if (isP2PActive) p2pServiceRef.current?.requestIceRestart();
     } finally {
-      setInput(''); // Завжди очищаємо поле вводу після завершення
-      console.log('Input cleared');
-      isSendingRef.current = false;
       shouldScrollToBottomRef.current = true;
     }
   }, [userId, selectedChatId, tweetNaclKeyPair, isP2PActive]);
@@ -457,7 +449,6 @@ const App: React.FC = () => {
   };
 
   const fetchData = async () => {
-    // Завантажуємо локальні дані завжди, незалежно від стану сервера
     const localContacts = JSON.parse(localStorage.getItem('contacts') || '[]');
     setContacts(localContacts);
 
@@ -466,14 +457,12 @@ const App: React.FC = () => {
       setMessages(cachedMessages);
     }
 
-    // Якщо немає підключення до сервера або ключів, зупиняємося тут
     if (!userId || !socketRef.current?.connected || !tweetNaclKeyPair) {
       console.log('Server unavailable or keys not loaded, using local data only');
       return;
     }
 
     try {
-      // Отримуємо чати з сервера
       const fetchedChats = (await fetchChats(userId)).data;
       const decryptedChats = await Promise.all(fetchedChats.map(async (contact: Contact) => ({
         ...contact,
@@ -496,7 +485,7 @@ const App: React.FC = () => {
 
       if (selectedChatId) {
         const cachedMessages = JSON.parse(localStorage.getItem(`chat_${selectedChatId}`) || '[]');
-        const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data; // Лише непрочитані з сервера
+        const fetchedMessages = (await fetchMessages(userId, selectedChatId)).data;
         const decryptedMessages = await Promise.all(fetchedMessages.map(async msg => ({
           ...msg,
           isMine: msg.userId === userId,
@@ -507,7 +496,7 @@ const App: React.FC = () => {
           .sort((a, b) => a.timestamp - b.timestamp);
         setMessages(combinedMessages);
         localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(combinedMessages));
-        if (isAtBottom() && fetchedMessages.length > 0) await markAsRead(userId, selectedChatId); // Видаляємо з сервера
+        if (isAtBottom() && fetchedMessages.length > 0) await markAsRead(userId, selectedChatId);
       }
     } catch (error) {
       console.error('Failed to fetch data from server:', error);
@@ -519,7 +508,7 @@ const App: React.FC = () => {
     if (!userId) return;
     if (!tweetNaclKeyPair) {
       initializeKeys().then(() => {
-        fetchData(); // Завантажуємо локальні дані навіть без сервера
+        fetchData();
       });
     } else if (isKeysLoaded) {
       fetchData();
@@ -537,7 +526,6 @@ const App: React.FC = () => {
     );
     socketRef.current.on('key-updated', async ({ userId: updatedUserId, publicKey }: { userId: string, publicKey: string }) => {
       const cleanedKey = cleanBase64(publicKey);
-      console.log(`Received key update for user ${updatedUserId}: ${cleanedKey}`);
       publicKeysCache.set(updatedUserId, cleanedKey);
       localStorage.setItem(`publicKey_${updatedUserId}`, cleanedKey);
       
@@ -552,7 +540,6 @@ const App: React.FC = () => {
       );
 
       if (selectedChatId === updatedUserId) {
-        console.log(`Re-decrypting messages for chat with ${updatedUserId} due to key update`);
         await reDecryptMessages(selectedChatId);
       }
     });
@@ -667,7 +654,7 @@ const App: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch messages from server:', error);
-      setMessages(cachedMessages); // Використовуємо локальні дані, якщо сервер недоступний
+      setMessages(cachedMessages);
     }
   };
 
@@ -723,7 +710,6 @@ const App: React.FC = () => {
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
   const headerBackground = isDarkTheme ? '#2c3e50' : '#f1f3f5';
-  const inputBackground = isDarkTheme ? '#34495e' : '#e9ecef';
 
   if (!userId) return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
 
@@ -731,32 +717,16 @@ const App: React.FC = () => {
     <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
       <style>
         {`
-          @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-          .message-enter { animation: slideIn 0.3s ease-out forwards; }
-          .input-placeholder-dark::placeholder, .search-placeholder-dark::placeholder { color: #b0b0b0; }
           .chat-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid ${isDarkTheme ? '#444' : '#eee'}; cursor: pointer; }
           .chat-item:hover { background: ${isDarkTheme ? '#444' : '#f8f9fa'}; }
           .avatar { width: 40px; height: 40px; border-radius: 50%; background: ${isDarkTheme ? '#6c757d' : '#e9ecef'}; color: ${isDarkTheme ? '#fff' : '#212529'}; display: flex; align-items: center; justify-content: center; margin-right: 10px; }
-          .scroll-container { overflow-y: auto; scrollbar-width: thin; scrollbar-color: ${isDarkTheme ? '#6c757d #212529' : '#dee2e6 #fff'}; }
-          .scroll-container::-webkit-scrollbar { width: 8px; }
-          .scroll-container::-webkit-scrollbar-track { background: ${isDarkTheme ? '#212529' : '#fff'}; }
-          .scroll-container::-webkit-scrollbar-thumb { background: ${isDarkTheme ? '#6c757d' : '#dee2e6'}; border-radius: 4px; }
-          .scroll-container::-webkit-scrollbar-thumb:hover { background: ${isDarkTheme ? '#868e96' : '#adb5bd'}; }
-          .message-mine { background-color: #ff9966 !important; color: #333; }
-          .message-theirs { background-color: #ffccb3 !important; color: #333; }
-          .retry-button { margin-left: 5px; cursor: pointer; }
-          .send-btn-active { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
-          .send-btn-inactive { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; color: #fff; }
-          .send-btn-active:disabled { background: linear-gradient(90deg, #00C7D4, #00C79D); border: none; opacity: 0.5; color: #fff; }
-          .btn { transition: background-color 0.2s ease-in-out; }
-          .input-field { background: ${inputBackground}; border: none; outline: none; }
-          .input-field:focus { background: ${inputBackground}; outline: none; box-shadow: none; }
-          .icon-hover:hover { color: ${isDarkTheme ? '#00C7D4' : '#00C79D'}; }
-          .call-icon { cursor: pointer; transition: color 0.2s ease-in-out; }
-          .call-icon:disabled { cursor: not-allowed; opacity: 0.5; }
           .search-container { margin: 0; padding: 0; width: 100%; }
           .search-container .form-control { border-radius: 20px; margin: 0; padding-left: 15px; padding-right: 15px; width: 100%; box-shadow: none; }
           .form-control:focus { outline: none; box-shadow: none; }
+          .input-placeholder-dark::placeholder { color: #b0b0b0; }
+          .icon-hover:hover { color: ${isDarkTheme ? '#00C7D4' : '#00C79D'}; }
+          .call-icon { cursor: pointer; transition: color 0.2s ease-in-out; }
+          .call-icon:disabled { cursor: not-allowed; opacity: 0.5; }
         `}
       </style>
 
@@ -783,7 +753,7 @@ const App: React.FC = () => {
           <div className="search-container mx-0 px-3 w-100 d-flex align-items-center" style={{ boxSizing: 'border-box', height: '38px', padding: '0 15px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <input 
               type="text" 
-              className={`form-control input-field ${isDarkTheme ? 'text-light search-placeholder-dark' : 'text-dark'}`} 
+              className={`form-control ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
               value={searchQuery} 
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)} 
               placeholder="Search users..." 
@@ -856,33 +826,6 @@ const App: React.FC = () => {
         )}
         {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} unreadMessages={unreadMessages} />}
       </div>
-
-      {selectedChatId && !callState.isCalling && (
-        <div className="p-0" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: headerBackground, zIndex: 10, height: '49px', display: 'flex', alignItems: 'center', borderTop: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef', width: '100%', boxSizing: 'border-box' }}>
-          <div className="d-flex align-items-center w-100 px-3">
-            <button className="btn btn-sm me-2" onClick={() => console.log('Attach clicked')} style={{ border: 'none', background: 'transparent', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <RiAttachment2 size={24} color={isDarkTheme ? '#fff' : '#212529'} className="icon-hover" />
-            </button>
-            <input 
-              type="text" 
-              className={`form-control input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
-              value={input} 
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)} 
-              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage(input)} 
-              placeholder="Message..." 
-              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', padding: '0.375rem 15px', margin: 0 }} 
-            />
-            <button 
-              className={`btn ms-1 d-flex align-items-center justify-content-center ${input.trim() && !isSendingRef.current ? 'send-btn-active' : 'send-btn-inactive'}`}
-              onClick={() => sendMessage(input)} 
-              disabled={!input.trim() || !socketRef.current?.connected || isSendingRef.current}
-              style={{ borderRadius: '20px', minWidth: '60px', height: '38px', transition: 'background 0.1s ease', padding: '0.375rem 0.75rem', margin: 0 }}
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
