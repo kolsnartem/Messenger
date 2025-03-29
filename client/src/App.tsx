@@ -638,6 +638,7 @@ useEffect(() => {
   };
 
   const handleContactSelect = async (contact: Contact) => {
+    setMessages([]);
     setSelectedChatId(contact.id);
     localStorage.setItem('selectedChatId', contact.id);
     setSearchQuery('');

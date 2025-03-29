@@ -155,7 +155,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
         }
         const timeout = setTimeout(() => {
             setIsLoading(false); // Вимкнути спінер через 300 мс
-        }, 300);
+        }, 250);
     
         return () => clearTimeout(timeout); // Очистити таймаут
     }, [selectedChatId, chatContainerRef]);
@@ -300,7 +300,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                 .input-placeholder-dark::placeholder { color: #b0b0b0; }
                 .input-placeholder-light::placeholder { color: #6c757d; }
             `}</style>
-
+{!isLoading && (
             <div ref={chatContainerRef} id="chat-scroll-container" role="log" aria-live="polite" style={{ position: 'absolute', top: '3px', left: 0, right: 0, bottom: `${inputAreaHeight + 20}px`, overflowY: 'auto', overflowX: 'hidden', contain: 'layout style size' }}>
                 <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, width: '100%', position: 'relative' }}>
                     {virtualItems.map((virtualRow) => {
@@ -309,7 +309,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                         return (<MessageItem key={virtualRow.key} virtualRow={virtualRow} message={msg} isDarkTheme={isDarkTheme} selectedChatId={selectedChatId} onRetryDecryption={onRetryDecryption} measureRef={rowVirtualizer.measureElement} />);
                     })}
                 </div>
-            </div>
+            </div> )}
 
             <div ref={inputAreaRef} className="message-input-container">
                 <div className="input-inner-container">
@@ -342,7 +342,9 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                 </div>
             )}
         </div>
+        
     );
+        
 };
-
+        
 export default ChatWindow;

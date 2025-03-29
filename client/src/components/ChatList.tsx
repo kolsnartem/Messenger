@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { Contact, ChatListProps } from '../types';
 
 interface ChatListPropsExtended extends ChatListProps {
@@ -10,6 +10,15 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
   const touchStartY = useRef<number | null>(null);
   const touchStartTime = useRef<number | null>(null);
   const previousScrollPosition = useRef<number>(0);
+
+  // Sort contacts by lastMessage timestamp (newest first)
+  const sortedContacts = useMemo(() => {
+    return [...contacts].sort((a, b) => {
+      const timeA = a.lastMessage?.timestamp || 0;
+      const timeB = b.lastMessage?.timestamp || 0;
+      return timeB - timeA; // Descending order (newest first)
+    });
+  }, [contacts]);
 
   useEffect(() => {
     const container = chatListRef.current;
@@ -92,9 +101,10 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
         background: isDarkTheme ? '#101010' : '#FFFFFF',
       }}
     >
-      {contacts.map((contact) => {
+      {sortedContacts.map((contact) => {
         const unreadCount = unreadMessages.get(contact.id) || 0;
-        const hasUnread = unreadCount > 0 || (contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id);
+        // Only show unread indicator if there are unread messages and they're not marked as read
+        const hasUnread = (unreadCount > 0 || (contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id));
         const isSelected = selectedChatId === contact.id;
 
         return (
@@ -117,11 +127,11 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
               background: isSelected ? (isDarkTheme ? '#1E1E1E' : '#f0f0f0') : 'transparent',
               width: '100%',
               userSelect: 'none',
-              padding: '10px',
-              marginBottom: '5px',
+              padding: '12px',
+              marginBottom: '8px', // Consistent spacing between chats
               borderRadius: '8px',
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               cursor: 'pointer',
               transition: 'background 0.2s ease',
             }}
@@ -143,44 +153,75 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
               {contact.email.charAt(0).toUpperCase()}
             </div>
             <div style={{ flex: 1, overflow: 'hidden' }}>
-              <div className={`fw-bold ${hasUnread ? 'unread-text' : ''}`}>
-                {contact.email}
-              </div>
-              {contact.lastMessage && (
-                <div className={`${hasUnread ? 'unread-text' : ''}`} style={{ fontSize: '0.9rem' }}>
-                  {contact.lastMessage.text.length > 20
-                    ? `${contact.lastMessage.text.substring(0, 20)}...`
-                    : contact.lastMessage.text}
-                  <span className="chat-timestamp" style={{ marginLeft: '10px', opacity: 0.7 }}>
+              <div 
+                style={{ 
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '4px'
+                }}
+              >
+                <div className={`fw-bold ${hasUnread ? 'unread-text' : ''}`}>
+                  {contact.email}
+                </div>
+                {contact.lastMessage && (
+                  <div 
+                    className="chat-timestamp" 
+                    style={{ 
+                      opacity: 0.7,
+                      fontSize: '0.8rem',
+                      flexShrink: 0,
+                      textAlign: 'right'
+                    }}
+                  >
                     {new Date(contact.lastMessage.timestamp).toLocaleString([], {
                       day: '2-digit',
                       month: '2-digit',
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
-                  </span>
-                </div>
-              )}
-            </div>
-            {hasUnread && (
-              <div
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  backgroundColor: '#007bff',
-                  borderRadius: '50%',
-                  marginLeft: '10px',
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '12px',
-                }}
-              >
-                {unreadCount > 0 ? unreadCount : ''}
+                  </div>
+                )}
               </div>
-            )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                {contact.lastMessage && (
+                  <div 
+                    className={`${hasUnread ? 'unread-text' : ''}`} 
+                    style={{ 
+                      fontSize: '0.9rem',
+                      flex: 1,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      paddingRight: '10px'
+                    }}
+                  >
+                    {contact.lastMessage.text.length > 30
+                      ? `${contact.lastMessage.text.substring(0, 30)}...`
+                      : contact.lastMessage.text}
+                  </div>
+                )}
+                {hasUnread && (
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: '#007bff',
+                      borderRadius: '50%',
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '12px',
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    {unreadCount > 0 ? unreadCount : ''}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         );
       })}
@@ -195,6 +236,9 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
           }
           .scroll-container::-webkit-scrollbar-track {
             background: transparent;
+          }
+          .unread-text {
+            font-weight: 600;
           }
         `}
       </style>
