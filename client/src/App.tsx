@@ -16,6 +16,7 @@ import { FiCamera, FiMoon, FiPhone, FiVideo } from 'react-icons/fi';
 import { RiP2PFill } from "react-icons/ri";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { TbMenuDeep } from "react-icons/tb";
+import toast, { Toaster } from 'react-hot-toast';
 
 interface ApiErrorResponse {
   error?: string;
@@ -130,6 +131,7 @@ const App: React.FC = () => {
     });
     socketRef.current.on('connect', () => {
       console.log('Socket connected');
+      toast.success('Connected to server');
       fetchData();
       if (selectedChatId) reDecryptMessages(selectedChatId);
     });
@@ -147,6 +149,7 @@ const App: React.FC = () => {
     });
     socketRef.current.on('disconnect', () => {
       console.log('Socket disconnected');
+      toast.error('Disconnected from server');
     });
     videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
       setCallState(prev => ({ ...prev, ...state, callDuration: prev.callDuration || 0, reactions: prev.reactions || [] }));
@@ -595,6 +598,7 @@ const App: React.FC = () => {
     setUserId(id);
     setUserEmail(email);
     localStorage.setItem('userEmail', email);
+    toast.success('Login successful!');
     let keyPair = newTweetNaclKeyPair;
     if (!keyPair) {
       keyPair = await initializeTweetNaclKeys(id);
@@ -729,6 +733,7 @@ const App: React.FC = () => {
           .call-icon:disabled { cursor: not-allowed; opacity: 0.5; }
         `}
       </style>
+      <Toaster position="top-center" reverseOrder={false} />
 
       <div className="p-0" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: '96px', borderBottom: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef' }}>
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '48px' }}>
