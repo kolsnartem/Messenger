@@ -1,70 +1,428 @@
 Server running on https://100.64.221.88:4000
 Connected to SQLite database
-New Socket.IO connection for user: 256, total users: 1
-User disconnected: 256, remaining users: 0
-New Socket.IO connection for user: 256, total users: 1
-User disconnected: 256, remaining users: 0
-New Socket.IO connection for user: 256, total users: 1
-User disconnected: 256, remaining users: 0
-New Socket.IO connection for user: 256, total users: 1
-User disconnected: 256, remaining users: 0
-New Socket.IO connection for user: 256, total users: 1
-User disconnected: 256, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-Message 1742603011387-pkb4y temporarily stored for offline user 19
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-Message 1742603055372-lejz2 temporarily stored for offline user 19
-Message 1742603062720-3bkr7 temporarily stored for offline user 19
-Message 1742603071235-f0vtc temporarily stored for offline user 19
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-Message 1742603628651-jagjx temporarily stored for offline user 19
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-Message 1742603820662-fy2v9 temporarily stored for offline user 19
-Message 1742603823166-s1wqa temporarily stored for offline user 19
-Message 1742603826216-rqfbg temporarily stored for offline user 19
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-Message 1742604034374-drkz8 temporarily stored for offline user 19
-Message 1742604048164-nwrys temporarily stored for offline user 105
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 260, total users: 1
-User disconnected: 260, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-User disconnected: 226, remaining users: 0
-New Socket.IO connection for user: 226, total users: 1
-User disconnected: 226, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:z+/Uy77IE9l6RfVdtypERK6srQg0KmQiCoiJAbf7GW9CxeL4MEahHxVN"
+[32m📩 1 → 2 (offline, saved):[0m "base64:JmBE+lHSbf1HIqwQo8ouIshUXjjoudQWlKtbMpSwMx+9zELvhgdgwS8="
+[32m📩 1 → 2 (offline, saved):[0m "base64:bsYnJC/1yAxiqM+fgjFBarq6HyfuWwlKW4ik8/j0kOHZcNk5/QfD9Is="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:mDZMnMz8lm1Wxss845FlJQmBnWRCUHui+MStC9omwSN3ghMeknHwyGc="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:ECBhhwAJezesrtaz1WCsO43Yr6MP/7uGX++ah9kgYIwNc9REoBONqPoI"
+[32m📩 1 → 2 (offline, saved):[0m "base64:t7vZocm69jsjvCA7hF2t+p5+qxpO0z4z3QRV8SvRGDVE5+WM+OesgNeKrg=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:yuWu8VUolpDW4jWZ9Bbr3WM1oWM1gCirsn4D9KpJLd2WoKOJLsaMIyJA"
+[32m📩 1 → 2 (offline, saved):[0m "base64:y9SW/XAFbUx4Zm2CAjEMi+XW33vMrC2JRraaMnJU7IrM29QZpw0Tkm8="
+[32m📩 1 → 2 (offline, saved):[0m "base64:8uJCQnp8hXmQGznXfJmIpDG1UsxP5PmjGxu2m6lqMJOR4D516xTZ9TM="
+[32m📩 1 → 2 (offline, saved):[0m "base64:8Kjn4z0Y+L9hmQRO97YF13NAht0OQnmJVXsl72UT91BDVpDtkD+gzhEY"
+[32m📩 1 → 2 (offline, saved):[0m "base64:+wUwo0odgL9b6RCn67cNuOfXHKxRzOa3KdEjhK5LAEVkcr5VsLpWQMH8Ow=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:nBqnyiwrM0UlNO6gsQM5J9gnRSmlzF25VJEbHX1KWFw7OSMO44fDHxsi2J4="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 290, total users: 1
+[33mSent 0 unread messages to user 290[0m
+User disconnected: 290, remaining users: 0
+[36m🔑 2:[0m "pvPUQ8HiIy85LsR1DIchgX2iwDfkthUhtHgaacCqiWM="
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 12 unread messages to user 2[0m
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:z+/Uy77IE9l6RfVdtypERK6srQg0KmQiCoiJAbf7GW9CxeL4MEahHxVN"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:JmBE+lHSbf1HIqwQo8ouIshUXjjoudQWlKtbMpSwMx+9zELvhgdgwS8="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:bsYnJC/1yAxiqM+fgjFBarq6HyfuWwlKW4ik8/j0kOHZcNk5/QfD9Is="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:mDZMnMz8lm1Wxss845FlJQmBnWRCUHui+MStC9omwSN3ghMeknHwyGc="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:ECBhhwAJezesrtaz1WCsO43Yr6MP/7uGX++ah9kgYIwNc9REoBONqPoI"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:t7vZocm69jsjvCA7hF2t+p5+qxpO0z4z3QRV8SvRGDVE5+WM+OesgNeKrg=="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:yuWu8VUolpDW4jWZ9Bbr3WM1oWM1gCirsn4D9KpJLd2WoKOJLsaMIyJA"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:y9SW/XAFbUx4Zm2CAjEMi+XW33vMrC2JRraaMnJU7IrM29QZpw0Tkm8="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:8uJCQnp8hXmQGznXfJmIpDG1UsxP5PmjGxu2m6lqMJOR4D516xTZ9TM="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:8Kjn4z0Y+L9hmQRO97YF13NAht0OQnmJVXsl72UT91BDVpDtkD+gzhEY"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:+wUwo0odgL9b6RCn67cNuOfXHKxRzOa3KdEjhK5LAEVkcr5VsLpWQMH8Ow=="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:nBqnyiwrM0UlNO6gsQM5J9gnRSmlzF25VJEbHX1KWFw7OSMO44fDHxsi2J4="
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+[36m🔑 1:[0m "FEjAC4krEoVdbcnS5+z9KfNkAdJW3pgoCxcY3ToC5CM="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 1 unread messages to user 2[0m
+[36m🗑️ Deleted after read: 1 → 2:[0m "{"type":"offer","sdp":"v=0\r\no=- 2127433043831227328 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:4dPt\r\na=ice-pwd:jEz/aHXAwRIhNELCw5UwLgzp\r\na=ice-options:trickle\r\na=fingerprint:sha-256 73:AB:07:62:05:40:07:C0:1E:A3:2C:85:64:53:57:38:FA:75:37:C9:0C:D9:3C:FF:19:6E:19:A7:A4:E0:78:D0\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"}"
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "CniKbGJCOjc8I+q3dHjElmpquJw9KmgqFyMQNNSvCW0="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+[36m🔑 1:[0m "hYOkkRqFQLJ9VKA+rRRF5i8CU8CYcwaITQmAWVRhzmw="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 2 unread messages to user 2[0m
+[36m🗑️ Deleted after read: 1 → 2:[0m "{"type":"offer","sdp":"v=0\r\no=- 2127433043831227328 3 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:+qh2\r\na=ice-pwd:PZMVqZee6pqynPIKClLyHK9R\r\na=ice-options:trickle\r\na=fingerprint:sha-256 73:AB:07:62:05:40:07:C0:1E:A3:2C:85:64:53:57:38:FA:75:37:C9:0C:D9:3C:FF:19:6E:19:A7:A4:E0:78:D0\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"}"
+[36m🗑️ Deleted after read: 1 → 2:[0m "{"type":"offer","sdp":"v=0\r\no=- 2127433043831227328 4 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:6bfU\r\na=ice-pwd:iBGr8EljkLeq1WnfBtOuwD/R\r\na=ice-options:trickle\r\na=fingerprint:sha-256 73:AB:07:62:05:40:07:C0:1E:A3:2C:85:64:53:57:38:FA:75:37:C9:0C:D9:3C:FF:19:6E:19:A7:A4:E0:78:D0\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"}"
+[32m📩 2 → 1 (offline, saved):[0m "base64:8T7EYpoIEcZhVwe3Z0xriH1NsLgkrRxgMNdbrUIsxcacUEugJNHC+PmNNw=="
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 1 unread messages to user 1[0m
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:8T7EYpoIEcZhVwe3Z0xriH1NsLgkrRxgMNdbrUIsxcacUEugJNHC+PmNNw=="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:b9lEZo1YyZrRLY49ypNFhl8biQXXAbV6H1u0/aT+xfNJL5L40rEHLR3XRGjm4Q=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:1haUCTYW3W3dZhMSF6q3SvXb4HrIaomKaMFQuN2lUyfdK8BXUFfwgFgDXUA="
+[32m📩 1 → 2 (offline, saved):[0m "base64:q3b2EnW9JJI28epNJZq3ixKaZj16ApBx9xLKniiXyH006mHF9354lyraULQQSh5GoU4Hrg3SoIZnVm+mJ8E="
+[32m📩 1 → 2 (offline, saved):[0m "base64:kCRZmeojJeIMgarjxv1+NT3PvplM/eTYzRP0g0HHqM3Sc4n4vKBkbeO3KS5hyeMDyAOepQ=="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:CnXz2Ucy76JIm7rpsTWzNHx2fYSouv8UiBKfksX86hbDoLBYJdzIfX3EoG9BjsFPiL4="
+[32m📩 1 → 2 (offline, saved):[0m "base64:Rof2fawjQKBrfCI57TU0m4bE34KGVgXuOJeIiREYtQ9RDzc8bmA+HJnb468="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:h9MIduWmwd2iPDytsT6Ov3rsb4gGbqK0mpPDHlokplVCNVtfrajf3neVMlfK"
+[32m📩 1 → 2 (offline, saved):[0m "base64:LOaXQeexuieZ13ERBEbglZcq8kTQz4PGLrOmjZ94hT1pqzbOguch+CRv"
+[32m📩 1 → 2 (offline, saved):[0m "base64:MRKeY2hByhCGka+ytIUL3dq6NN7p/TSzauM9f2jUCBjhzLs7WdrFM8l0iEcMUHtU"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:myo5HQwhSk3XSE/a0+4y+fPYwbItSCceGSuMqeuGhnYywYKvRpCxMqw="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "OOKLHqJ0TK271jJWmNA5NAeKcBjqTUOi7OvUfmC9GHA="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 10 unread messages to user 2[0m
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:b9lEZo1YyZrRLY49ypNFhl8biQXXAbV6H1u0/aT+xfNJL5L40rEHLR3XRGjm4Q=="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:1haUCTYW3W3dZhMSF6q3SvXb4HrIaomKaMFQuN2lUyfdK8BXUFfwgFgDXUA="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:q3b2EnW9JJI28epNJZq3ixKaZj16ApBx9xLKniiXyH006mHF9354lyraULQQSh5GoU4Hrg3SoIZnVm+mJ8E="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:kCRZmeojJeIMgarjxv1+NT3PvplM/eTYzRP0g0HHqM3Sc4n4vKBkbeO3KS5hyeMDyAOepQ=="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:CnXz2Ucy76JIm7rpsTWzNHx2fYSouv8UiBKfksX86hbDoLBYJdzIfX3EoG9BjsFPiL4="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:Rof2fawjQKBrfCI57TU0m4bE34KGVgXuOJeIiREYtQ9RDzc8bmA+HJnb468="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:h9MIduWmwd2iPDytsT6Ov3rsb4gGbqK0mpPDHlokplVCNVtfrajf3neVMlfK"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:LOaXQeexuieZ13ERBEbglZcq8kTQz4PGLrOmjZ94hT1pqzbOguch+CRv"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:MRKeY2hByhCGka+ytIUL3dq6NN7p/TSzauM9f2jUCBjhzLs7WdrFM8l0iEcMUHtU"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:myo5HQwhSk3XSE/a0+4y+fPYwbItSCceGSuMqeuGhnYywYKvRpCxMqw="
+[32m📩 2 → 1 (offline, saved):[0m "base64:BMoPpABiuDnGiC1fCpvTcnlzeZP0Fi82SfovKk6glqaME8134mTowsw="
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 1 unread messages to user 1[0m
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:BMoPpABiuDnGiC1fCpvTcnlzeZP0Fi82SfovKk6glqaME8134mTowsw="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:GEvbxGx8jmCztkoxhVkGWD1jS8IilHzlIL4h0TztMz59IWqGu6RkWU0="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 1 unread messages to user 2[0m
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:GEvbxGx8jmCztkoxhVkGWD1jS8IilHzlIL4h0TztMz59IWqGu6RkWU0="
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+[32m📩 2 → 1 (offline, saved):[0m "base64:L3JfTfoqoROnkorc/N0L3bQMPQdND1OL/2Q4GM4ijUud1JC9362KU+E2Bbmn5xQX"
+[32m📩 2 → 1 (offline, saved):[0m "base64:yNEs+sv7S9v8vLygszx5/Ne0+L0ukhalx7HWnwpuWj8QCdPjlet/j5x2zzYC9A=="
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+[32m📩 2 → 1 (offline, saved):[0m "base64:Ge3s/qzJeN908LABezicj9WM5WMXDuHw3aiNCRlHMUKm1ZI5FZMLCnSw"
+[32m📩 2 → 1 (offline, saved):[0m "base64:L9X/I9SVBbaW+ProNKne1jHrR0S/h/VWuHnK7lQmokZonB44/qYKmRTlhA=="
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+[32m📩 2 → 1 (offline, saved):[0m "base64:IMFd9mkI4Bu73fzJznofD/++OMfY70RZDGyO7T5NUdAi2dBYQYLHaNrM"
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+[32m📩 2 → 1 (offline, saved):[0m "base64:49sYpMZgFBqLBxDwwVefif+IcZ0VpIgoKluV6QhhW3nIXxsGhzHD1WjxpQ=="
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+[36m🔑 1:[0m "rUboMC9bIGRKszQtvJtKkOdDOAlo+pbtwxuWhJMGOhg="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 6 unread messages to user 1[0m
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:L3JfTfoqoROnkorc/N0L3bQMPQdND1OL/2Q4GM4ijUud1JC9362KU+E2Bbmn5xQX"
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:yNEs+sv7S9v8vLygszx5/Ne0+L0ukhalx7HWnwpuWj8QCdPjlet/j5x2zzYC9A=="
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:Ge3s/qzJeN908LABezicj9WM5WMXDuHw3aiNCRlHMUKm1ZI5FZMLCnSw"
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:L9X/I9SVBbaW+ProNKne1jHrR0S/h/VWuHnK7lQmokZonB44/qYKmRTlhA=="
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:IMFd9mkI4Bu73fzJznofD/++OMfY70RZDGyO7T5NUdAi2dBYQYLHaNrM"
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:49sYpMZgFBqLBxDwwVefif+IcZ0VpIgoKluV6QhhW3nIXxsGhzHD1WjxpQ=="
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "zGXEMGHxx7xNbroFKsUOHzACYoXiT53Xe5QaJ1LHHB0="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "/XJSqGLGd0EcdJO6cI7v5wBZBBOFwnCcPcuKdSViNQw="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:6hi7cwdEH1Ft1v7RMsNQlWpqU2uuVvsB410uKBsDOs15rW+xeiVJ7+Es"
+[32m📩 1 → 2 (offline, saved):[0m "base64:gmwsi+Puv0d8yigG70/sMub4B7tmgFlyyjgo6DuEA4pyzFbDpdM9T8BqtYTy"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:mhdTGOSjDR7zmaIZuG3IyzQ+JgBgDT1Z6F9PhvRs9kU2yUeY19yzM8mL"
+[32m📩 1 → 2 (offline, saved):[0m "base64:/o8alnfdPjor+adfypHHSxyT3BjWWJ7VgL6o5KScAkVqbfGoBk0/skZ6bA=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:gohZyBTUllYX+WrYmbDsowXOgxeZJ9HuK1O+Zbv/kqap1yoR5PZ+ZuA="
+[32m📩 1 → 2 (offline, saved):[0m "base64:PLYwI2hLJ2DgC5NcYYy3o8VsFEZ63jxSx3Mdm5j6KvRXPbOq7ZEmQsg="
+[32m📩 1 → 2 (offline, saved):[0m "base64:f9Z+4VWHjnpBkGiqPjPWa/Sac6K67BHAE2Daa+YwZQqiaJzAyHTRIgc="
+[32m📩 1 → 2 (offline, saved):[0m "base64:IsmInCgxVeUXjFwUEWKgMmgpNMkY7hngyTLX8WhnDjwqDbxUt2mTMpY="
+[32m📩 1 → 2 (offline, saved):[0m "base64:wIpt/1lZuiz+lGKnAoI93Aj1s+RtqvA7V98jyXPvmDpl0pFk90DFky8="
+[32m📩 1 → 2 (offline, saved):[0m "base64:ld10ZxzzE1QnRM4Lisz0dfKzged4KYf7fOTcB96MfdpN0ldXJJFFGXc="
+[32m📩 1 → 2 (offline, saved):[0m "base64:JED8eZ2Vi3k0WIzFMzRJm0ej1dYrdJORd/GRZ0IGX4MK69qpMx2n/4I="
+[32m📩 1 → 2 (offline, saved):[0m "base64:BAOvmy3LDVvRwircARQWh9t7X4/HBzEXcuIA3I5oBF7xIJKQBi5Q0gc="
+[32m📩 1 → 2 (offline, saved):[0m "base64:E6EIitRDibe2192nYvht5hWh+NkzX9cITLpFStNiknNtRHaVhr7PFZs="
+[32m📩 1 → 2 (offline, saved):[0m "base64:jeO759PJ/Q5POZSkRxP2bnNLFnBSaF+VaBtgZXNfNoQEzuZWbARwYRaSluz0Qw=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:muV2JAIwaSdLQ2Bo4FqSCEedpM+AHomic92u6oTxLo4hx6XS4rdZb3dzbAWSn78zyg=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:CdBZ+Awr3fHTPGw31AuODMInOmNENgQb5nPG1JLEx06Lg87wCOVGisStuXQf"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "LHqS5m8Zy96BhZb8dpXHklXfShXdBbdUpl0iLSzJMgk="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
