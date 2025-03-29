@@ -13,7 +13,7 @@ import P2PService from './services/p2p';
 import VideoCallService, { CallState } from './services/VideoCallService';
 import io, { Socket } from 'socket.io-client';
 import { FiCamera, FiMoon, FiPhone, FiVideo } from 'react-icons/fi';
-import { RiP2PFill } from "react-icons/ri";
+import { RiP2PFill, RiSearchLine } from "react-icons/ri";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { TbMenuDeep } from "react-icons/tb";
 import toast, { Toaster } from 'react-hot-toast';
@@ -713,7 +713,7 @@ const App: React.FC = () => {
   };
 
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
-  const headerBackground = isDarkTheme ? '#2c3e50' : '#f1f3f5';
+  const headerBackground = isDarkTheme ? '#101010' : '#FFFFFF';
 
   if (!userId) return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
 
@@ -721,11 +721,11 @@ const App: React.FC = () => {
     <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
       <style>
         {`
-          .chat-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid ${isDarkTheme ? '#444' : '#eee'}; cursor: pointer; }
+          .chat-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid ${isDarkTheme ? '#1E1E1E' : '#F3F4F6'}; cursor: pointer; }
           .chat-item:hover { background: ${isDarkTheme ? '#444' : '#f8f9fa'}; }
           .avatar { width: 40px; height: 40px; border-radius: 50%; background: ${isDarkTheme ? '#6c757d' : '#e9ecef'}; color: ${isDarkTheme ? '#fff' : '#212529'}; display: flex; align-items: center; justify-content: center; margin-right: 10px; }
           .search-container { margin: 0; padding: 0; width: 100%; }
-          .search-container .form-control { border-radius: 20px; margin: 0; padding-left: 15px; padding-right: 15px; width: 100%; box-shadow: none; }
+          .search-container .form-control { border-radius: 20px; margin: 0; padding-left: 40px; padding-right: 15px; width: 100%; box-shadow: none; background-color: ${isDarkTheme ? '#1E1E1E' : '#F3F4F6'}; border: 1px solid ${isDarkTheme ? '#1E1E1E' : '#F3F4F6'}; color: ${isDarkTheme ? '#fff' : '#000'}}
           .form-control:focus { outline: none; box-shadow: none; }
           .input-placeholder-dark::placeholder { color: #b0b0b0; }
           .icon-hover:hover { color: ${isDarkTheme ? '#00C7D4' : '#00C79D'}; }
@@ -735,8 +735,8 @@ const App: React.FC = () => {
       </style>
       <Toaster position="top-center" reverseOrder={false} />
 
-      <div className="p-0" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: '96px', borderBottom: isDarkTheme ? '1px solid #465E73' : '1px solid #e8ecef' }}>
-        <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '48px' }}>
+      <div className="p-0" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: '96px', borderBottom: isDarkTheme ? '1px solid #1E1E1E' : '1px solid #F3F4F6' }}>
+        <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '42px' }}>
           <div className="d-flex align-items-center" style={{ gap: '15px' }}>
             <h5 className="m-0" style={{ cursor: 'pointer' }}>
               MSNGR ({userEmail})
@@ -755,15 +755,31 @@ const App: React.FC = () => {
         </div>
 
         {!selectedChatId && (
-          <div className="search-container mx-0 px-3 w-100 d-flex align-items-center" style={{ boxSizing: 'border-box', height: '38px', padding: '0 15px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <input 
-              type="text" 
-              className={`form-control ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`} 
-              value={searchQuery} 
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)} 
-              placeholder="Search users..." 
-              style={{ borderRadius: '20px', color: isDarkTheme ? '#fff' : '#000', width: '100%', boxSizing: 'border-box', margin: 0, padding: '0 15px', border: 'none', height: '38px' }} 
-            />
+          <div className="search-container mx-0 px-3 w-100 d-flex align-items-center" style={{ height: '48px', boxSizing: 'border-box' }}>
+            {/* Додано обгортку для позиціонування іконки */}
+            <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
+              {/* Ось сама іконка зі стилями */}
+              <RiSearchLine style={{
+                  position: 'absolute',
+                  left: '15px', // Відступ іконки зліва
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: isDarkTheme ? '#8a9aa3' : '#6c757d', // Колір іконки
+                  pointerEvents: 'none', // Не заважає кліку
+                  zIndex: 2
+              }} />
+              {/* Ось поле вводу (input) */}
+              <input
+                type="text"
+                // Клас form-control тепер має лівий падінг 40px (зміни його в <style>!)
+                className={`form-control ${isDarkTheme ? 'input-placeholder-dark' : 'input-placeholder-light'}`}
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                aria-label="Search users"
+                // Стилі перенесено в CSS-клас в тегу <style>
+              />
+            </div>
           </div>
         )}
 

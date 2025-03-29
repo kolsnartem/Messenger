@@ -89,6 +89,7 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
         paddingBottom: '100px',
         msOverflowStyle: 'auto',
         scrollbarWidth: 'thin',
+        background: isDarkTheme ? '#101010' : '#FFFFFF',
       }}
     >
       {contacts.map((contact) => {
@@ -113,7 +114,7 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
               }
             }}
             style={{
-              background: isSelected ? (isDarkTheme ? '#444' : '#f0f0f0') : 'transparent',
+              background: isSelected ? (isDarkTheme ? '#1E1E1E' : '#f0f0f0') : 'transparent',
               width: '100%',
               userSelect: 'none',
               padding: '10px',

@@ -5,6 +5,7 @@ import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
 // Import icons from react-icons
 import { FaGithub, FaInstagram, FaTelegram } from 'react-icons/fa';
+import { RiUser3Line, RiLockLine } from "react-icons/ri"; // Іконки вже імпортовано
 
 interface ApiErrorResponse {
   error?: string;
@@ -23,6 +24,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    // --- Код useEffect без змін ---
     const viewportMeta = document.createElement('meta');
     viewportMeta.name = 'viewport';
     viewportMeta.content =
@@ -96,12 +98,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
       document.removeEventListener('touchstart', preventMultiTouch);
       document.removeEventListener('touchend', handleTouchEnd);
       document.removeEventListener('touchcancel', handleTouchEnd);
-      document.head.removeChild(viewportMeta);
-      document.head.removeChild(style);
+      // Перевірка на існування елементів перед видаленням
+      if (viewportMeta.parentNode) viewportMeta.parentNode.removeChild(viewportMeta);
+      if (style.parentNode) style.parentNode.removeChild(style);
     };
   }, []);
 
   const handleAuth = async () => {
+    // --- Код handleAuth без змін ---
     if (!email || !password) {
       setErrorMessage('Please fill in all fields');
       return;
@@ -150,17 +154,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
   };
 
   const toggleAuthMode = () => {
+    // --- Код toggleAuthMode без змін ---
     setIsLogin(!isLogin);
     setErrorMessage(null);
     setEmail('');
     setPassword('');
   };
 
+  // --- Стилі ---
   const containerStyle: React.CSSProperties = {
     width: '100%',
     height: '100vh',
     minHeight: '-webkit-fill-available',
-    background: isDarkTheme ? '#2c3e50' : '#f1f3f5',
+    background: isDarkTheme ? '#101010' : '#FFFFFF',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
@@ -175,11 +181,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
     perspective: '1000px',
     margin: '0 auto',
     position: 'relative',
-    height: '300px',
+    height: '300px', // Висота контейнера для анімації
   };
 
   const baseFormStyle: React.CSSProperties = {
-    background: isDarkTheme ? 'rgba(34, 48, 62, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    background: isDarkTheme ? 'rgba(32, 35, 40, 1)' : 'rgba(230, 235, 240, 1)',
     padding: '20px 15px',
     borderRadius: '12px',
     boxShadow: '0 8px 20px rgba(0, 0, 0, 0.08)',
@@ -188,17 +194,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
     position: 'absolute',
     top: 0,
     left: 0,
-    backfaceVisibility: 'hidden',
+    backfaceVisibility: 'hidden', // Для плавної анімації обертання
   };
 
-  const formStyle: React.CSSProperties = {
+  const formStyle: React.CSSProperties = { // Стиль для видимої форми (логін)
     ...baseFormStyle,
     transform: isLogin ? 'rotateY(0deg)' : 'rotateY(180deg)',
     opacity: isLogin ? 1 : 0,
     zIndex: isLogin ? 1 : 0,
   };
 
-  const altFormStyle: React.CSSProperties = {
+  const altFormStyle: React.CSSProperties = { // Стиль для невидимої форми (реєстрація)
     ...baseFormStyle,
     transform: isLogin ? 'rotateY(-180deg)' : 'rotateY(0deg)',
     opacity: isLogin ? 0 : 1,
@@ -207,10 +213,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    padding: '12px',
+    padding: '12px 12px 12px 40px', // Змінено: Додано лівий відступ для іконки
     border: 'none',
     borderRadius: '8px',
-    background: isDarkTheme ? '#34495e' : '#f1f3f5',
+    background: isDarkTheme ? '#1E1E1E' : '#F3F4F6',
     fontSize: '16px',
     color: isDarkTheme ? '#fff' : '#2c3e50',
     transition: 'all 0.3s ease',
@@ -235,37 +241,45 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
     WebkitAppearance: 'none',
   };
 
-  // Style for the footer container holding the icons and copyright notice
   const footerStyle: React.CSSProperties = {
     position: 'absolute',
-    bottom: '20px', // Adjust this value to position the footer above the safe-area-inset-bottom
+    bottom: '20px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     width: '100%',
   };
 
-  // Style for the container of the icons
   const iconContainerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    gap: '20px', // Space between the icons
-    marginBottom: '10px', // Space between icons and copyright notice
+    gap: '20px',
+    marginBottom: '10px',
   };
 
-  // Style for each icon link
   const iconLinkStyle: React.CSSProperties = {
     color: isDarkTheme ? '#fff' : '#2c3e50',
     transition: 'color 0.3s ease',
   };
 
-  // Style for the copyright notice
   const copyrightStyle: React.CSSProperties = {
     fontSize: '12px',
     color: isDarkTheme ? '#ccc' : '#666',
     textAlign: 'center',
   };
 
+  // --- Стиль для іконок в полях вводу ---
+  const inputIconStyle: React.CSSProperties = {
+      position: 'absolute',
+      left: '15px', // Відступ зліва
+      top: '50%', // Центрування по вертикалі
+      transform: 'translateY(-50%)', // Точне центрування
+      color: isDarkTheme ? '#8a9aa3' : '#6c757d', // Колір як у плейсхолдера
+      pointerEvents: 'none', // Не заважати кліку
+      zIndex: 2 // Перекривати фон інпуту
+  };
+
+  // --- Рендеринг ---
   return (
     <div className="safe-area-container" style={containerStyle}>
       <div style={formContainerStyle}>
@@ -298,17 +312,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
           )}
 
           <div style={{ position: 'relative', marginBottom: '18px' }}>
+             <RiUser3Line style={inputIconStyle} />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Username, Email, or Phone Number"
+              placeholder="Username"
               required
               style={inputStyle}
             />
           </div>
 
           <div style={{ position: 'relative', marginBottom: '18px' }}>
+             <RiLockLine style={inputIconStyle} />
             <input
               type="password"
               value={password}
@@ -324,20 +340,26 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
             Log In
           </button>
 
+          {/* --- Змінено блок перемикання --- */}
           <div
             onClick={toggleAuthMode}
             style={{
               textAlign: 'center',
               marginTop: '15px',
-              color: '#00C7D4',
               fontSize: '14px',
               cursor: 'pointer',
               transition: 'color 0.3s ease',
               touchAction: 'manipulation',
             }}
           >
-            New here? Sign Up
+            <span style={{ color: isDarkTheme ? '#ccc' : '#666' }}>
+              New here?{' '}
+            </span>
+            <span style={{ color: '#00C7D4' }}>
+              Sign Up
+            </span>
           </div>
+          {/* --- Кінець зміненого блоку --- */}
         </div>
 
         {/* Register Form */}
@@ -369,17 +391,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
           )}
 
           <div style={{ position: 'relative', marginBottom: '18px' }}>
+             <RiUser3Line style={inputIconStyle} />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Username, Email, or Phone Number"
+              placeholder="Username"
               required
               style={inputStyle}
             />
           </div>
 
           <div style={{ position: 'relative', marginBottom: '18px' }}>
+             <RiLockLine style={inputIconStyle} />
             <input
               type="password"
               value={password}
@@ -395,20 +419,26 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
             Sign Up
           </button>
 
+          {/* --- Змінено блок перемикання --- */}
           <div
             onClick={toggleAuthMode}
             style={{
               textAlign: 'center',
               marginTop: '15px',
-              color: '#00C7D4',
               fontSize: '14px',
               cursor: 'pointer',
               transition: 'color 0.3s ease',
               touchAction: 'manipulation',
             }}
           >
-            Already have an account? Log In
+            <span style={{ color: isDarkTheme ? '#ccc' : '#666' }}>
+              Already have an account?{' '}
+            </span>
+            <span style={{ color: '#00C7D4' }}>
+              Log In
+            </span>
           </div>
+          {/* --- Кінець зміненого блоку --- */}
         </div>
       </div>
 

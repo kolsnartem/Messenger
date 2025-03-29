@@ -65,9 +65,9 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
 
     const virtualItems = rowVirtualizer.getVirtualItems();
 
-    const mainBackground = isDarkTheme ? '#1e2a38' : '#E5DDD5';
-    const headerBackground = isDarkTheme ? '#2c3e50' : '#f1f3f5';
-    const inputFieldBackground = isDarkTheme ? '#34495e' : '#e9ecef';
+    const mainBackground = isDarkTheme ? '#101010' : '#FFFFFF';
+    const headerBackground = isDarkTheme ? '#101010' : '#FFFFFF';
+    const inputFieldBackground = isDarkTheme ? '#1E1E1E' : '#F3F4F6';
 
     const checkNearBottom = useCallback(() => {
         if (!chatContainerRef?.current) return true;
@@ -235,7 +235,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                     position: fixed; bottom: 0; left: 0; right: 0;
                     background: ${headerBackground};
                     padding: 0;
-                    border-top: 1px solid ${isDarkTheme ? '#465E73' : '#e8ecef'};
+                    border-top: 1px solid ${isDarkTheme ? '#1E1E1E' : '#F3F4F6'};
                     width: 100%; box-sizing: border-box; zIndex: 1000;
                     display: flex; align-items: center;
                     height: 49px;
