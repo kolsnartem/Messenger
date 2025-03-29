@@ -92,7 +92,32 @@ const App: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(localStorage.getItem('selectedChatId'));
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
-  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(() => {
+    const storedTheme = localStorage.getItem('theme'); // Читаємо збережену тему
+    if (storedTheme) {
+      
+        return storedTheme === 'dark'; // Якщо збережена 'dark', то тема темна
+    }
+    // Якщо нічого не збережено, дивимось системні налаштування
+    
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+});
+
+// === ВСТАВ ЦЕЙ КОД ПІСЛЯ РЯДКА ВИЩЕ ===
+useEffect(() => {
+  // Цей код запам'ятовує тему (темна/світла)
+  const themeToSave = isDarkTheme ? 'dark' : 'light';
+  localStorage.setItem('theme', themeToSave);
+
+  // Цей код робить фон всієї сторінки правильним
+  document.documentElement.style.backgroundColor = isDarkTheme ? '#101010' : '#FFFFFF';
+
+  // Цей код додає спеціальний атрибут до HTML (для CSS)
+  document.documentElement.setAttribute('data-theme', themeToSave);
+
+}, [isDarkTheme]); // Цей код працює тільки коли isDarkTheme міняється
+// === КІНЕЦЬ КОДУ ДЛЯ ВСТАВКИ ===
+
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [tweetNaclKeyPair, setTweetNaclKeyPair] = useState<TweetNaClKeyPair | null>(null);
   const [isKeysLoaded, setIsKeysLoaded] = useState<boolean>(false);
@@ -733,7 +758,31 @@ const App: React.FC = () => {
           .call-icon:disabled { cursor: not-allowed; opacity: 0.5; }
         `}
       </style>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster
+  position="top-center"
+  reverseOrder={false}
+  toastOptions={{
+    style: {
+      background: isDarkTheme ? '#333' : '#fff', // Темний фон для темної теми, світлий для світлої
+      color: isDarkTheme ? '#fff' : '#000',     // Білий текст для темної теми, чорний для світлої
+      border: isDarkTheme ? '1px solid #333' : '1px solid #fff', // Межа для кращої видимості
+      padding: '10px 20px',                     // Додаткові відступи для зручності
+      borderRadius: '8px',                      // Закруглені кути
+    },
+    success: {
+      style: {
+        background: isDarkTheme ? '#2d6b2d' : '#d4edda', // Зелений для успіху
+        color: isDarkTheme ? '#fff' : '#155724',
+      },
+    },
+    error: {
+      style: {
+        background: isDarkTheme ? '#6b2d2d' : '#f8d7da', // Червоний для помилок
+        color: isDarkTheme ? '#fff' : '#721c24',
+      },
+    },
+  }}
+/>
 
       <div className="p-0" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: '96px', borderBottom: isDarkTheme ? '1px solid #1E1E1E' : '1px solid #F3F4F6' }}>
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '42px' }}>

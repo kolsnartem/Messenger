@@ -42,6 +42,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
     const inputAreaRef = useRef<HTMLDivElement>(null);
     const [inputAreaHeight, setInputAreaHeight] = useState(49);
     const [forceScrollOnChatChange, setForceScrollOnChatChange] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const isMountedRef = useRef(false);
     const isNearBottomRef = useRef(true);
     const prevMessagesLengthRef = useRef(messages.length);
@@ -139,11 +140,12 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                 } else {
                     rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
                 }
-            }, 300);
+            }, 400);
         }
     }, [isFirstLoad, selectedChatId, messages.length, rowVirtualizer, chatContainerRef]);
 
     useEffect(() => {
+        setIsLoading(true); // Увімкнути спінер
         isMountedRef.current = false;
         isNearBottomRef.current = true;
         prevMessagesLengthRef.current = 0;
@@ -151,6 +153,11 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
         if (chatContainerRef?.current) {
             chatContainerRef.current.scrollTop = 0;
         }
+        const timeout = setTimeout(() => {
+            setIsLoading(false); // Вимкнути спінер через 300 мс
+        }, 300);
+    
+        return () => clearTimeout(timeout); // Очистити таймаут
     }, [selectedChatId, chatContainerRef]);
 
     useEffect(() => {
@@ -191,34 +198,34 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
 
     return (
         <div style={{ height: '100%', overflow: 'hidden', position: 'relative', background: mainBackground }} id="chat-window-outer">
-            {isFirstLoad && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        background: '#fff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000,
-                    }}
-                >
-                    <div
-                        className="spinner-border"
-                        style={{
-                            width: '50px',
-                            height: '50px',
-                            borderWidth: '5px',
-                            borderColor: isDarkTheme ? '#00C79D' : '#00C7D4',
-                            borderRightColor: 'transparent',
-                        }}
-                        role="status"
-                    >
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            )}
+            {isLoading && (
+    <div
+        style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            background: isDarkTheme ? '#101010' : '#FFFFFF', // Динамічний фон
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+        }}
+    >
+        <div
+            className="spinner-border"
+            style={{
+                width: '50px',
+                height: '50px',
+                borderWidth: '5px',
+                borderColor: isDarkTheme ? '#00C79D' : '#00C7D4',
+                borderRightColor: 'transparent',
+            }}
+            role="status"
+        >
+            <span className="visually-hidden">Loading...</span>
+        </div>
+    </div>
+)}
 
             <style>{`
                 #chat-scroll-container { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: ${scrollbarThumbColor} ${scrollbarTrackColor}; }
