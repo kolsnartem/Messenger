@@ -93,30 +93,19 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(() => {
-    const storedTheme = localStorage.getItem('theme'); // Читаємо збережену тему
+    const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
-      
-        return storedTheme === 'dark'; // Якщо збережена 'dark', то тема темна
+      return storedTheme === 'dark';
     }
-    // Якщо нічого не збережено, дивимось системні налаштування
-    
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
-});
+  });
 
-// === ВСТАВ ЦЕЙ КОД ПІСЛЯ РЯДКА ВИЩЕ ===
-useEffect(() => {
-  // Цей код запам'ятовує тему (темна/світла)
-  const themeToSave = isDarkTheme ? 'dark' : 'light';
-  localStorage.setItem('theme', themeToSave);
-
-  // Цей код робить фон всієї сторінки правильним
-  document.documentElement.style.backgroundColor = isDarkTheme ? '#101010' : '#FFFFFF';
-
-  // Цей код додає спеціальний атрибут до HTML (для CSS)
-  document.documentElement.setAttribute('data-theme', themeToSave);
-
-}, [isDarkTheme]); // Цей код працює тільки коли isDarkTheme міняється
-// === КІНЕЦЬ КОДУ ДЛЯ ВСТАВКИ ===
+  useEffect(() => {
+    const themeToSave = isDarkTheme ? 'dark' : 'light';
+    localStorage.setItem('theme', themeToSave);
+    document.documentElement.style.backgroundColor = isDarkTheme ? '#101010' : '#FFFFFF';
+    document.documentElement.setAttribute('data-theme', themeToSave);
+  }, [isDarkTheme]);
 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [tweetNaclKeyPair, setTweetNaclKeyPair] = useState<TweetNaClKeyPair | null>(null);
@@ -136,13 +125,10 @@ useEffect(() => {
   const [showScrollDown, setShowScrollDown] = useState<boolean>(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const isInitialMount = useRef<boolean>(true);
   const p2pServiceRef = useRef<P2PService | null>(null);
   const videoCallServiceRef = useRef<VideoCallService | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const sentMessageIds = useRef<Set<string>>(new Set());
-  const scrollPositionRef = useRef<number>(0);
-  const shouldScrollToBottomRef = useRef<boolean>(true);
 
   useEffect(() => {
     if (!userId) return;
@@ -460,8 +446,6 @@ useEffect(() => {
       console.error('Failed to send message:', error);
       sentMessageIds.current.delete(messageId);
       if (isP2PActive) p2pServiceRef.current?.requestIceRestart();
-    } finally {
-      shouldScrollToBottomRef.current = true;
     }
   }, [userId, selectedChatId, tweetNaclKeyPair, isP2PActive]);
 
@@ -588,37 +572,6 @@ useEffect(() => {
     }
   }, [searchQuery, userId]);
 
-  useEffect(() => {
-    const chatContainer = chatContainerRef.current;
-    if (!chatContainer || !selectedChatId) return;
-    const savedPosition = localStorage.getItem(`scrollPosition_${selectedChatId}`);
-    if (savedPosition && isInitialMount.current) chatContainer.scrollTop = parseFloat(savedPosition);
-    else if (isInitialMount.current) chatContainer.scrollTop = chatContainer.scrollHeight;
-    isInitialMount.current = false;
-
-    const handleScroll = () => {
-      scrollPositionRef.current = chatContainer.scrollTop;
-      localStorage.setItem(`scrollPosition_${selectedChatId}`, scrollPositionRef.current.toString());
-      const atBottom = isAtBottom();
-      setShowScrollDown(!atBottom);
-      if (atBottom && selectedChatId && (unreadMessages.get(selectedChatId) || 0) > 0) {
-        setUnreadMessages(prev => {
-          const newMap = new Map(prev);
-          newMap.set(selectedChatId, 0);
-          return newMap;
-        });
-      }
-      shouldScrollToBottomRef.current = atBottom;
-    };
-    chatContainer.addEventListener('scroll', handleScroll);
-    return () => chatContainer.removeEventListener('scroll', handleScroll);
-  }, [selectedChatId, messages, unreadMessages, isAtBottom]);
-
-  useEffect(() => {
-    if (!selectedChatId || messages.length === 0) return;
-    if (shouldScrollToBottomRef.current || isAtBottom()) scrollToBottom();
-  }, [messages, selectedChatId, isAtBottom, scrollToBottom]);
-
   const handleAuthSuccess = async (id: string, email: string, newTweetNaclKeyPair?: TweetNaClKeyPair) => {
     setUserId(id);
     setUserEmail(email);
@@ -659,7 +612,6 @@ useEffect(() => {
       return updatedContacts;
     });
     if (!tweetNaclKeyPair) await initializeKeys();
-    isInitialMount.current = true;
 
     const cachedMessages = JSON.parse(localStorage.getItem(`chat_${contact.id}`) || '[]');
     try {
@@ -760,30 +712,30 @@ useEffect(() => {
         `}
       </style>
       <Toaster
-  position="top-center"
-  reverseOrder={false}
-  toastOptions={{
-    style: {
-      background: isDarkTheme ? '#333' : '#fff', // Темний фон для темної теми, світлий для світлої
-      color: isDarkTheme ? '#fff' : '#000',     // Білий текст для темної теми, чорний для світлої
-      border: isDarkTheme ? '1px solid #333' : '1px solid #fff', // Межа для кращої видимості
-      padding: '10px 20px',                     // Додаткові відступи для зручності
-      borderRadius: '8px',                      // Закруглені кути
-    },
-    success: {
-      style: {
-        background: isDarkTheme ? '#2d6b2d' : '#d4edda', // Зелений для успіху
-        color: isDarkTheme ? '#fff' : '#155724',
-      },
-    },
-    error: {
-      style: {
-        background: isDarkTheme ? '#6b2d2d' : '#f8d7da', // Червоний для помилок
-        color: isDarkTheme ? '#fff' : '#721c24',
-      },
-    },
-  }}
-/>
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            background: isDarkTheme ? '#333' : '#fff',
+            color: isDarkTheme ? '#fff' : '#000',
+            border: isDarkTheme ? '1px solid #333' : '1px solid #fff',
+            padding: '10px 20px',
+            borderRadius: '8px',
+          },
+          success: {
+            style: {
+              background: isDarkTheme ? '#2d6b2d' : '#d4edda',
+              color: isDarkTheme ? '#fff' : '#155724',
+            },
+          },
+          error: {
+            style: {
+              background: isDarkTheme ? '#6b2d2d' : '#f8d7da',
+              color: isDarkTheme ? '#fff' : '#721c24',
+            },
+          },
+        }}
+      />
 
       <div className="p-0" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: '96px', borderBottom: isDarkTheme ? '1px solid #1E1E1E' : '1px solid #F3F4F6' }}>
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '42px' }}>
@@ -806,28 +758,23 @@ useEffect(() => {
 
         {!selectedChatId && (
           <div className="search-container mx-0 px-3 w-100 d-flex align-items-center" style={{ height: '48px', boxSizing: 'border-box' }}>
-            {/* Додано обгортку для позиціонування іконки */}
             <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
-              {/* Ось сама іконка зі стилями */}
               <RiSearchLine style={{
                   position: 'absolute',
-                  left: '15px', // Відступ іконки зліва
+                  left: '15px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: isDarkTheme ? '#8a9aa3' : '#6c757d', // Колір іконки
-                  pointerEvents: 'none', // Не заважає кліку
+                  color: isDarkTheme ? '#8a9aa3' : '#6c757d',
+                  pointerEvents: 'none',
                   zIndex: 2
               }} />
-              {/* Ось поле вводу (input) */}
               <input
                 type="text"
-                // Клас form-control тепер має лівий падінг 40px (зміни його в <style>!)
                 className={`form-control ${isDarkTheme ? 'input-placeholder-dark' : 'input-placeholder-light'}`}
                 value={searchQuery}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
                 aria-label="Search users"
-                // Стилі перенесено в CSS-клас в тегу <style>
               />
             </div>
           </div>

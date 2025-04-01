@@ -4,7 +4,6 @@ import { FaRedo, FaAngleDown } from 'react-icons/fa';
 import { RiAttachment2 } from 'react-icons/ri';
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual';
 
-// --- Компонент MessageItem (без змін) ---
 interface MessageItemProps {
     virtualRow: VirtualItem;
     message: Message;
@@ -12,15 +11,61 @@ interface MessageItemProps {
     selectedChatId: string;
     onRetryDecryption: (message: Message) => void;
     measureRef: (node: Element | null) => void;
+    isEmptyChat: boolean;
 }
-const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isDarkTheme, selectedChatId, onRetryDecryption, measureRef }) => {
+
+const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isDarkTheme, selectedChatId, onRetryDecryption, measureRef, isEmptyChat }) => {
     const msg = message;
     return (
-        <div key={`${selectedChatId}-${msg.id}-${msg.timestamp}`} ref={measureRef} data-index={virtualRow.index} role="listitem" style={{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${virtualRow.start}px)`, padding: '2px 10px', boxSizing: 'border-box' }}>
+        <div
+            key={`${selectedChatId}-${msg.id}-${msg.timestamp}`}
+            ref={measureRef}
+            data-index={virtualRow.index}
+            role="listitem"
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualRow.start}px)`,
+                padding: '2px 10px',
+                boxSizing: 'border-box',
+            }}
+        >
             <div className={`d-flex ${msg.isMine ? 'justify-content-end' : 'justify-content-start'} mb-2`}>
-                <div className="message-bubble" style={{ background: msg.isMine ? (isDarkTheme ? '#005C4B' : '#DCF8C6') : (isDarkTheme ? '#3a3a3a' : '#FFFFFF'), color: isDarkTheme ? '#E0E0E0' : '#333', borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', maxWidth: '75%', padding: '8px 12px', wordBreak: 'break-word', boxShadow: '0 1px 1px rgba(0,0,0,0.05)', minWidth: '50px', position: 'relative' }}>
+                <div
+                    className="message-bubble"
+                    style={{
+                        background: msg.isMine ? (isDarkTheme ? '#005C4B' : '#DCF8C6') : (isDarkTheme ? '#3a3a3a' : '#FFFFFF'),
+                        color: isDarkTheme ? '#E0E0E0' : '#333',
+                        borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                        maxWidth: '75%',
+                        padding: '8px 12px',
+                        wordBreak: 'break-word',
+                        boxShadow: '0 1px 1px rgba(0,0,0,0.05)',
+                        minWidth: '50px',
+                        position: 'relative',
+                    }}
+                >
                     <span style={{ marginRight: msg.text.startsWith('base64:') ? '15px' : '0' }}>{msg.text}</span>
-                    {msg.text.startsWith('base64:') && (<FaRedo onClick={(e) => { e.stopPropagation(); onRetryDecryption(msg); }} style={{ fontSize: '0.8rem', color: isDarkTheme ? '#aaa' : '#888', cursor: 'pointer', position: 'absolute', bottom: '8px', right: '12px' }} title="Retry Decryption" aria-label="Retry Decryption" />)}
+                    {msg.text.startsWith('base64:') && (
+                        <FaRedo
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onRetryDecryption(msg);
+                            }}
+                            style={{
+                                fontSize: '0.8rem',
+                                color: isDarkTheme ? '#aaa' : '#888',
+                                cursor: 'pointer',
+                                position: 'absolute',
+                                bottom: '8px',
+                                right: '12px',
+                            }}
+                            title="Retry Decryption"
+                            aria-label="Retry Decryption"
+                        />
+                    )}
                     <div className="message-meta">
                         {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         {msg.isMine && msg.isRead === 1 && <span className="read-status read">✓✓</span>}
@@ -33,22 +78,32 @@ const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isD
     );
 });
 
-// --- Пропси для ChatWindow ---
-interface VirtualChatWindowProps extends OriginalChatWindowProps { }
+interface VirtualChatWindowProps extends OriginalChatWindowProps {}
 
-// --- Основний компонент ChatWindow ---
-const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId, isDarkTheme, unreadMessagesCount, showScrollDown, onRetryDecryption, onScrollToBottom, chatContainerRef, onSendMessage }) => {
+const ChatWindow: React.FC<VirtualChatWindowProps> = ({
+    messages,
+    selectedChatId,
+    isDarkTheme,
+    unreadMessagesCount,
+    showScrollDown,
+    onRetryDecryption,
+    onScrollToBottom,
+    chatContainerRef,
+    onSendMessage,
+}) => {
     const [input, setInput] = useState<string>('');
     const inputAreaRef = useRef<HTMLDivElement>(null);
     const [inputAreaHeight, setInputAreaHeight] = useState(49);
-    const [forceScrollOnChatChange, setForceScrollOnChatChange] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const isMountedRef = useRef(false);
     const isNearBottomRef = useRef(true);
     const prevMessagesLengthRef = useRef(messages.length);
-    const [isFirstLoad, setIsFirstLoad] = useState(() => {
-        return !localStorage.getItem(`chatLoaded-${selectedChatId}`);
-    });
+    const scrollPositionRestored = useRef(false);
+    const previousChatIdRef = useRef<string | null>(null);
+    const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const scrollPositionRef = useRef<number | null>(null);
+    const isEmptyChatRef = useRef(messages.length === 0);
+    const messageListRef = useRef<HTMLDivElement>(null);
 
     const CONTENT_PADDING_START = 17;
     const CONTENT_PADDING_END = 7;
@@ -76,33 +131,68 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
         if (el.clientHeight === 0) return true;
         const scrollHeight = rowVirtualizer.getTotalSize() + CONTENT_PADDING_START + CONTENT_PADDING_END;
         return scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_THRESHOLD;
-    }, [chatContainerRef, rowVirtualizer, CONTENT_PADDING_START, CONTENT_PADDING_END, NEAR_BOTTOM_THRESHOLD]);
+    }, [chatContainerRef, rowVirtualizer]);
 
     const handleScroll = useCallback(() => {
-        isNearBottomRef.current = checkNearBottom();
-        if (chatContainerRef?.current) {
-            localStorage.setItem(
-                `chatScrollPos-${selectedChatId}`,
-                chatContainerRef.current.scrollTop.toString()
-            );
+        if (!chatContainerRef.current) return;
+        const scrollTop = chatContainerRef.current.scrollTop;
+        scrollPositionRef.current = scrollTop;
+        if (selectedChatId) {
+            localStorage.setItem(`chatScrollPos-${selectedChatId}`, scrollTop.toString());
         }
-    }, [checkNearBottom, selectedChatId, chatContainerRef]);
+        isNearBottomRef.current = checkNearBottom();
+    }, [selectedChatId, checkNearBottom]);
 
     const handleSend = () => {
         if (input.trim()) {
             onSendMessage(input);
             setInput('');
+            
+            // Always scroll to bottom after sending a message
+            setTimeout(() => {
+                rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), { align: 'end', behavior: 'auto' });
+                isNearBottomRef.current = true;
+            }, 50);
         }
     };
 
-    // --- Effects ---
+    const restoreScrollPosition = useCallback(() => {
+        if (!chatContainerRef.current || scrollPositionRestored.current || !selectedChatId) return;
+        try {
+            if (scrollPositionRef.current !== null && previousChatIdRef.current === selectedChatId) {
+                chatContainerRef.current.scrollTop = scrollPositionRef.current;
+                isNearBottomRef.current = checkNearBottom();
+                scrollPositionRestored.current = true;
+                return;
+            }
+            const savedScrollPos = localStorage.getItem(`chatScrollPos-${selectedChatId}`);
+            if (savedScrollPos && messages.length > 0) {
+                const scrollPos = parseInt(savedScrollPos, 10);
+                chatContainerRef.current.scrollTop = scrollPos;
+                scrollPositionRef.current = scrollPos;
+                isNearBottomRef.current = checkNearBottom();
+            } else if (messages.length > 0) {
+                rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
+                isNearBottomRef.current = true;
+            }
+            scrollPositionRestored.current = true;
+        } catch (error) {
+            console.error('Error restoring scroll position:', error);
+            if (messages.length > 0) {
+                rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
+                isNearBottomRef.current = true;
+            }
+            scrollPositionRestored.current = true;
+        }
+    }, [selectedChatId, messages.length, rowVirtualizer, checkNearBottom]);
+
     useEffect(() => {
         const currentInputAreaRef = inputAreaRef.current;
         if (currentInputAreaRef) {
-            const resizeObserver = new ResizeObserver(entries => {
+            const resizeObserver = new ResizeObserver((entries) => {
                 for (let entry of entries) {
                     const newHeight = Math.round(entry.contentRect.height);
-                    setInputAreaHeight(prev => newHeight !== prev ? newHeight : prev);
+                    setInputAreaHeight((prev) => (newHeight !== prev ? newHeight : prev));
                 }
             });
             resizeObserver.observe(currentInputAreaRef);
@@ -112,84 +202,94 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
     }, []);
 
     useEffect(() => {
-        const element = chatContainerRef?.current;
+        const element = chatContainerRef.current;
         if (element) {
             element.addEventListener('scroll', handleScroll, { passive: true });
-            isNearBottomRef.current = checkNearBottom();
-
-            if (!isFirstLoad) {
-                const savedScrollPos = localStorage.getItem(`chatScrollPos-${selectedChatId}`);
-                if (savedScrollPos) {
-                    element.scrollTop = parseInt(savedScrollPos, 10);
-                } else {
-                    rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
-                }
+            if (!isLoading && selectedChatId) {
+                restoreScrollPosition();
             }
         }
         return () => element?.removeEventListener('scroll', handleScroll);
-    }, [chatContainerRef, handleScroll, selectedChatId, isFirstLoad, messages.length, rowVirtualizer, checkNearBottom]);
+    }, [chatContainerRef, handleScroll, restoreScrollPosition, isLoading, selectedChatId]);
 
     useEffect(() => {
-        if (isFirstLoad && chatContainerRef?.current) {
-            setTimeout(() => {
-                setIsFirstLoad(false);
-                localStorage.setItem(`chatLoaded-${selectedChatId}`, 'true');
-                const savedScrollPos = localStorage.getItem(`chatScrollPos-${selectedChatId}`);
-                if (savedScrollPos && chatContainerRef.current) {
-                    chatContainerRef.current.scrollTop = parseInt(savedScrollPos, 10);
-                } else {
-                    rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
-                }
-            }, 400);
-        }
-    }, [isFirstLoad, selectedChatId, messages.length, rowVirtualizer, chatContainerRef]);
+        isEmptyChatRef.current = messages.length === 0;
+    }, [messages.length]);
 
     useEffect(() => {
-        setIsLoading(true); // Увімкнути спінер
-        isMountedRef.current = false;
-        isNearBottomRef.current = true;
-        prevMessagesLengthRef.current = 0;
-        setForceScrollOnChatChange(true);
-        if (chatContainerRef?.current) {
-            chatContainerRef.current.scrollTop = 0;
+        return () => {
+            if (selectedChatId && chatContainerRef.current && scrollPositionRef.current !== null) {
+                localStorage.setItem(`chatScrollPos-${selectedChatId}`, scrollPositionRef.current.toString());
+            }
+        };
+    }, [selectedChatId]);
+
+    useEffect(() => {
+        if (loadingTimeoutRef.current) {
+            clearTimeout(loadingTimeoutRef.current);
+            loadingTimeoutRef.current = null;
         }
-        const timeout = setTimeout(() => {
-            setIsLoading(false); // Вимкнути спінер через 300 мс
-        }, 250);
-    
-        return () => clearTimeout(timeout); // Очистити таймаут
-    }, [selectedChatId, chatContainerRef]);
+        if (selectedChatId !== previousChatIdRef.current) {
+            setIsLoading(true);
+            isMountedRef.current = false;
+            isNearBottomRef.current = true;
+            prevMessagesLengthRef.current = 0;
+            scrollPositionRestored.current = false;
+            scrollPositionRef.current = null;
+            loadingTimeoutRef.current = setTimeout(() => {
+                setIsLoading(false);
+            }, 1000);
+            previousChatIdRef.current = selectedChatId;
+        } else if (isLoading && messages.length > 0) {
+            setIsLoading(false);
+        }
+        return () => {
+            if (loadingTimeoutRef.current) {
+                clearTimeout(loadingTimeoutRef.current);
+                loadingTimeoutRef.current = null;
+            }
+        };
+    }, [selectedChatId, messages.length]);
 
     useEffect(() => {
         const lastIndex = messages.length - 1;
-        if (lastIndex < 0 || !chatContainerRef?.current) return;
+        if (lastIndex < 0 || !chatContainerRef.current) return;
+
         const isInitialMount = !isMountedRef.current;
-        const isChatChange = forceScrollOnChatChange;
         const messageAdded = messages.length > prevMessagesLengthRef.current;
         const lastMessageIsMine = messageAdded && messages[lastIndex]?.isMine === true;
-        const shouldScrollNow = isInitialMount || isChatChange || lastMessageIsMine || (messageAdded && !lastMessageIsMine && isNearBottomRef.current);
-        let scrollTimeoutId: NodeJS.Timeout | undefined;
-        if (shouldScrollNow && !isFirstLoad) {
-            scrollTimeoutId = setTimeout(() => {
-                rowVirtualizer.scrollToIndex(lastIndex, { align: 'end', behavior: 'auto' });
-                isNearBottomRef.current = true;
-                if (isChatChange) setForceScrollOnChatChange(false);
+
+        if (isInitialMount || lastMessageIsMine || (messageAdded && isNearBottomRef.current)) {
+            setTimeout(() => {
+                if (chatContainerRef.current) {
+                    rowVirtualizer.scrollToIndex(lastIndex, { align: 'end', behavior: 'auto' });
+                    isNearBottomRef.current = true;
+                }
             }, 50);
         }
-        let mountTimeoutId: NodeJS.Timeout | undefined;
+
         if (!isMountedRef.current) {
-            mountTimeoutId = setTimeout(() => { isMountedRef.current = true; }, 100);
+            setTimeout(() => {
+                isMountedRef.current = true;
+            }, 100);
         }
         prevMessagesLengthRef.current = messages.length;
-        return () => { 
-            if (scrollTimeoutId) clearTimeout(scrollTimeoutId); 
-            if (mountTimeoutId) clearTimeout(mountTimeoutId); 
-        };
-    }, [messages, forceScrollOnChatChange, rowVirtualizer, chatContainerRef, selectedChatId, isFirstLoad]);
+    }, [messages, rowVirtualizer, isLoading]);
 
-    // --- Рендеринг ---
     if (!selectedChatId) {
-        return <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: mainBackground }}>Select a chat</div>;
+        return (
+            <div
+                style={{
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: mainBackground,
+                }}
+            >
+                Select a chat
+            </div>
+        );
     }
 
     const floatingButtonBottom = `${inputAreaHeight + 10}px`;
@@ -197,54 +297,104 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
     const scrollbarTrackColor = 'transparent';
 
     return (
-        <div style={{ height: '100%', overflow: 'hidden', position: 'relative', background: mainBackground }} id="chat-window-outer">
-            {isLoading && (
-    <div
-        style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            background: isDarkTheme ? '#101010' : '#FFFFFF', // Динамічний фон
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-        }}
-    >
         <div
-            className="spinner-border"
             style={{
-                width: '50px',
-                height: '50px',
-                borderWidth: '5px',
-                borderColor: isDarkTheme ? '#00C79D' : '#00C7D4',
-                borderRightColor: 'transparent',
+                height: '100%',
+                overflow: 'hidden',
+                position: 'relative',
+                background: mainBackground,
             }}
-            role="status"
+            id="chat-window-outer"
         >
-            <span className="visually-hidden">Loading...</span>
-        </div>
-    </div>
-)}
+            {isLoading && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        background: isDarkTheme ? '#101010' : '#FFFFFF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                    }}
+                >
+                    <div
+                        className="spinner-border"
+                        style={{
+                            width: '50px',
+                            height: '50px',
+                            borderWidth: '5px',
+                            borderColor: isDarkTheme ? '#00C79D' : '#00C7D4',
+                            borderRightColor: 'transparent',
+                        }}
+                        role="status"
+                    >
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            )}
 
             <style>{`
-                #chat-scroll-container { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: ${scrollbarThumbColor} ${scrollbarTrackColor}; }
-                #chat-scroll-container::-webkit-scrollbar { width: 8px; }
-                #chat-scroll-container::-webkit-scrollbar-track { background: ${scrollbarTrackColor}; border-radius: 4px; }
-                #chat-scroll-container::-webkit-scrollbar-thumb { background-color: ${scrollbarThumbColor}; border-radius: 4px; border: 2px solid ${scrollbarTrackColor}; background-clip: content-box; }
-                #chat-scroll-container::-webkit-scrollbar-thumb:hover { background-color: ${isDarkTheme ? 'rgba(120, 120, 120, 0.9)' : 'rgba(150, 150, 150, 0.9)'}; }
-                .message-meta { font-size: 0.7rem; opacity: 0.7; color: ${isDarkTheme ? '#aaa' : '#555'}; text-align: right; margin-top: 4px; padding-left: 10px; white-space: nowrap; float: right; line-height: 1; clear: both; }
-                .read-status { margin-left: 4px; display: inline-block; }
-                .read-status.read { color: #4FC3F7; }
-                .read-status.delivered {}
-                .read-status.failed { color: red; }
+                #chat-scroll-container {
+                    -webkit-overflow-scrolling: touch;
+                    overscroll-behavior-y: contain;
+                    scrollbar-width: thin;
+                    scrollbar-color: ${scrollbarThumbColor} ${scrollbarTrackColor};
+                }
+                #chat-scroll-container::-webkit-scrollbar {
+                    width: 8px;
+                }
+                #chat-scroll-container::-webkit-scrollbar-track {
+                    background: ${scrollbarTrackColor};
+                    border-radius: 4px;
+                }
+                #chat-scroll-container::-webkit-scrollbar-thumb {
+                    background-color: ${scrollbarThumbColor};
+                    border-radius: 4px;
+                    border: 2px solid ${scrollbarTrackColor};
+                    background-clip: content-box;
+                }
+                #chat-scroll-container::-webkit-scrollbar-thumb:hover {
+                    background-color: ${isDarkTheme ? 'rgba(120, 120, 120, 0.9)' : 'rgba(150, 150, 150, 0.9)'};
+                }
+                .message-meta {
+                    font-size: 0.7rem;
+                    opacity: 0.7;
+                    color: ${isDarkTheme ? '#aaa' : '#555'};
+                    text-align: right;
+                    margin-top: 4px;
+                    padding-left: 10px;
+                    white-space: nowrap;
+                    float: right;
+                    line-height: 1;
+                    clear: both;
+                }
+                .read-status {
+                    margin-left: 4px;
+                    display: inline-block;
+                }
+                .read-status.read {
+                    color: #4FC3F7;
+                }
+                .read-status.delivered {
+                }
+                .read-status.failed {
+                    color: red;
+                }
                 .message-input-container {
-                    position: fixed; bottom: 0; left: 0; right: 0;
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
                     background: ${headerBackground};
                     padding: 0;
                     border-top: 1px solid ${isDarkTheme ? '#1E1E1E' : '#F3F4F6'};
-                    width: 100%; box-sizing: border-box; zIndex: 1000;
-                    display: flex; align-items: center;
+                    width: 100%;
+                    box-sizing: border-box;
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
                     height: 49px;
                 }
                 .input-inner-container {
@@ -265,28 +415,40 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                     color: ${isDarkTheme ? '#fff' : '#000'};
                     padding: 0.375rem 15px;
                     line-height: 1.5;
-                    outline: none; box-shadow: none;
+                    outline: none;
+                    box-shadow: none;
                 }
                 .input-field:focus {
                     background: ${inputFieldBackground};
-                    outline: none; box-shadow: none;
+                    outline: none;
+                    box-shadow: none;
                 }
                 .icon-button {
-                    border: none; background: transparent;
+                    border: none;
+                    background: transparent;
                     padding: 0;
-                    display: flex; align-items: center; justifyContent: center;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     color: ${isDarkTheme ? '#fff' : '#212529'};
-                    cursor: pointer; transition: color 0.2s;
+                    cursor: pointer;
+                    transition: color 0.2s;
                 }
-                .icon-button:hover { color: ${isDarkTheme ? '#00C7D4' : '#007bff'}; }
+                .icon-button:hover {
+                    color: ${isDarkTheme ? '#00C7D4' : '#007bff'};
+                }
                 .send-button {
                     background: linear-gradient(90deg, #00C7D4, #00C79D);
-                    border: none; color: #fff;
+                    border: none;
+                    color: #fff;
                     border-radius: 20px;
                     min-width: 60px;
                     height: 38px;
-                    display: flex; align-items: center; justifyContent: center;
-                    cursor: pointer; transition: background 0.1s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: background 0.1s ease;
                     padding: 0.375rem 0.75rem;
                     margin: 0;
                     font-size: 1rem;
@@ -297,31 +459,82 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                     opacity: 0.5;
                     cursor: default;
                 }
-                .input-placeholder-dark::placeholder { color: #b0b0b0; }
-                .input-placeholder-light::placeholder { color: #6c757d; }
+                .input-placeholder-dark::placeholder {
+                    color: #b0b0b0;
+                }
+                .input-placeholder-light::placeholder {
+                    color: #6c757d;
+                }
             `}</style>
-{!isLoading && (
-            <div ref={chatContainerRef} id="chat-scroll-container" role="log" aria-live="polite" style={{ position: 'absolute', top: '3px', left: 0, right: 0, bottom: `${inputAreaHeight + 20}px`, overflowY: 'auto', overflowX: 'hidden', contain: 'layout style size' }}>
-                <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, width: '100%', position: 'relative' }}>
+
+            <div
+                ref={chatContainerRef}
+                id="chat-scroll-container"
+                role="log"
+                aria-live="polite"
+                style={{
+                    position: 'absolute',
+                    top: '3px',
+                    left: 0,
+                    right: 0,
+                    bottom: `${inputAreaHeight + 20}px`,
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    contain: 'layout style size',
+                    visibility: isLoading ? 'hidden' : 'visible',
+                    display: 'flex',
+                    flexDirection: 'column-reverse', // Key change: Use column-reverse to keep new messages at bottom
+                }}
+            >
+                <div
+                    ref={messageListRef}
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                        width: '100%',
+                        position: 'relative',
+                    }}
+                >
                     {virtualItems.map((virtualRow) => {
                         const msg = messages[virtualRow.index];
                         if (!msg) return null;
-                        return (<MessageItem key={virtualRow.key} virtualRow={virtualRow} message={msg} isDarkTheme={isDarkTheme} selectedChatId={selectedChatId} onRetryDecryption={onRetryDecryption} measureRef={rowVirtualizer.measureElement} />);
+                        return (
+                            <MessageItem
+                                key={virtualRow.key}
+                                virtualRow={virtualRow}
+                                message={msg}
+                                isDarkTheme={isDarkTheme}
+                                selectedChatId={selectedChatId}
+                                onRetryDecryption={onRetryDecryption}
+                                measureRef={rowVirtualizer.measureElement}
+                                isEmptyChat={isEmptyChatRef.current}
+                            />
+                        );
                     })}
                 </div>
-            </div> )}
+            </div>
 
             <div ref={inputAreaRef} className="message-input-container">
                 <div className="input-inner-container">
-                    <button className="icon-button" onClick={() => console.log('Attach clicked')} title="Attach file">
+                    <button
+                        className="icon-button"
+                        onClick={() => console.log('Attach clicked')}
+                        title="Attach file"
+                    >
                         <RiAttachment2 size={24} color={isDarkTheme ? '#fff' : '#212529'} />
                     </button>
                     <input
                         type="text"
-                        className={`input-field ${isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark'}`}
+                        className={`input-field ${
+                            isDarkTheme ? 'text-light input-placeholder-dark' : 'text-dark input-placeholder-light'
+                        }`}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { handleSend(); } }}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSend();
+                            }
+                        }}
                         placeholder="Message..."
                         aria-label="Type your message"
                     />
@@ -336,15 +549,53 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({ messages, selectedChatId
                 </div>
             </div>
 
-            {(unreadMessagesCount > 0 || showScrollDown) && (
-                <div onClick={() => { rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'smooth' }); isNearBottomRef.current = true; onScrollToBottom(true); }} style={{ position: 'fixed', bottom: floatingButtonBottom, right: '20px', width: '40px', height: '40px', borderRadius: '50%', background: isDarkTheme ? 'rgba(60,60,60,0.8)' : 'rgba(255,255,255,0.9)', backdropFilter: 'blur(3px)', color: isDarkTheme ? '#eee' : '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: unreadMessagesCount > 0 ? '14px' : '0', fontWeight: 'bold', cursor: 'pointer', zIndex: 1001, boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)', transition: 'opacity 0.3s ease, transform 0.3s ease, bottom 0.2s ease-out', opacity: (unreadMessagesCount > 0 || showScrollDown) ? 1 : 0, transform: (unreadMessagesCount > 0 || showScrollDown) ? 'scale(1)' : 'scale(0.8)', pointerEvents: (unreadMessagesCount > 0 || showScrollDown) ? 'auto' : 'none', }} title={unreadMessagesCount > 0 ? `${unreadMessagesCount} new...` : "Scroll to bottom"} aria-label={unreadMessagesCount > 0 ? `${unreadMessagesCount} new...` : "Scroll to bottom"}>
-                    {unreadMessagesCount > 0 ? unreadMessagesCount : <FaAngleDown style={{ width: '20px', height: '20px' }} aria-hidden="true" />}
+            {(unreadMessagesCount > 0 || showScrollDown) && !isLoading && (
+                <div
+                    onClick={() => {
+                        rowVirtualizer.scrollToIndex(messages.length - 1, {
+                            align: 'end',
+                            behavior: 'smooth',
+                        });
+                        isNearBottomRef.current = true;
+                        onScrollToBottom(true);
+                    }}
+                    style={{
+                        position: 'fixed',
+                        bottom: floatingButtonBottom,
+                        right: '20px',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: isDarkTheme ? 'rgba(60,60,60,0.8)' : 'rgba(255,255,255,0.9)',
+                        backdropFilter: 'blur(3px)',
+                        color: isDarkTheme ? '#eee' : '#333',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: unreadMessagesCount > 0 ? '14px' : '0',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        zIndex: 1001,
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
+                        transition: 'opacity 0.3s ease, transform 0.3s ease, bottom 0.2s ease-out',
+                        opacity: unreadMessagesCount > 0 || showScrollDown ? 1 : 0,
+                        transform: unreadMessagesCount > 0 || showScrollDown ? 'scale(1)' : 'scale(0.8)',
+                        pointerEvents: unreadMessagesCount > 0 || showScrollDown ? 'auto' : 'none',
+                    }}
+                    title={unreadMessagesCount > 0 ? `${unreadMessagesCount} new...` : 'Scroll to bottom'}
+                    aria-label={
+                        unreadMessagesCount > 0 ? `${unreadMessagesCount} new messages` : 'Scroll to bottom'
+                    }
+                >
+                    {unreadMessagesCount > 0 ? (
+                        unreadMessagesCount
+                    ) : (
+                        <FaAngleDown style={{ width: '20px', height: '20px' }} aria-hidden="true" />
+                    )}
                 </div>
             )}
         </div>
-        
     );
-        
 };
-        
+
 export default ChatWindow;

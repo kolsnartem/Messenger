@@ -6,10 +6,10 @@ Applying Webpack configuration...
 Updated source-map-loader rule with exclude: [ /node_modules\/@signalapp\/libsignal-client/ ]
 Webpack configuration applied successfully.
 Dev server middlewares set up.
-(node:1852) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
+(node:1882) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:1852) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(node:1852) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:1882) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:1882) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -26,3 +26,24 @@ webpack compiled successfully
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
 No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/ChatWindow.tsx
+  Line 81:8:   React Hook useCallback has a missing dependency: 'chatContainerRef'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 104:8:  React Hook useCallback has a missing dependency: 'chatContainerRef'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 164:8:  React Hook useEffect has a missing dependency: 'chatContainerRef'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/ChatWindow.tsx
+  Line 81:8:   React Hook useCallback has a missing dependency: 'chatContainerRef'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 104:8:  React Hook useCallback has a missing dependency: 'chatContainerRef'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 164:8:  React Hook useEffect has a missing dependency: 'chatContainerRef'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+
+webpack compiled with 1 warning
+No issues found.
+Compiling...
