@@ -1,16 +1,1192 @@
 Server running on https://100.64.221.88:4000
 Connected to SQLite database
-[36m🔑 1:[0m "3iL36WX06KqIHYXRl9MkPzf36VFKd4Y+fFSrdcI4uEo="
 New Socket.IO connection for user: 1, total users: 1
 [33mSent 0 unread messages to user 1[0m
-[32m📩 1 → 3 (offline, saved):[0m "base64:V63GLM6D3h91htONAhrb9MrokqRJPPnjaO4giHZb0ewLiT0TjR1jdYUn78Za"
-[32m📩 1 → 3 (offline, saved):[0m "base64:dXtlMhsWZAE0oh2YqqOOSX3jFW4bNX5w4NhXa68xE1E0wgmjWq3URAJSZC/BRaTPOC5MQziOa9sD"
-[32m📩 1 → 3 (offline, saved):[0m "base64:7w/Wvi4E3RmzW/DTz0dv7V9+StmqW4hb+hcMWyCBEFVZ78Dm0F6CRgdY"
+New Socket.IO connection for user: 2, total users: 2
+[33mSent 0 unread messages to user 2[0m
+[32m📩 2 → 1 (online, no save):[0m "base64:OcpDiv20cwU4TYiobfuOkuIFBlHuoD01wC7c7bld2d7y8QUVX9pa+Tc="
+[32m📩 2 → 1 (online, no save):[0m "base64:cpLFj/eTEnZ3yKdeim5vJ69eGW9x0bBiizSF1UdXzZyp0RYF6UrqueYt7n3+eg=="
+[32m📩 2 → 1 (online, no save):[0m "base64:DXw8TpER1mEAcooNGiVs0tBNainuEzirQivEU3J2dMdQXDfYfYSqro8fKsJ8bGg="
+[32m📩 2 → 1 (online, no save):[0m "base64:DAivR0VgTmGV/HS+JuMPZ5gC71JC0yxSgbJX6n3B52Hurs/K4r1hAeHg9kPZzg=="
+[32m📩 2 → 1 (online, no save):[0m "base64:C7MqKDLfupFIUq4ELHR+tKRXEnnHDB2lACmBjlegd/105qU37Xe8OEgQKQ=="
+[32m📩 2 → 1 (online, no save):[0m "base64:1TBHNiqVishZn+kSXrZpLOBPGJOsC7ZUQoOJ7hjEWMezhr9OgnV2NB5tsm8="
+[32m📩 1 → 2 (online, no save):[0m "base64:6MCA34ifPkd0XMYfnVF0DzVSCU3CdsLp3HW5mdMAurdk15jgKTNehPivNT5w+ZgngZfU4taI5nM="
+[32m📩 1 → 2 (online, no save):[0m "base64:Ib7T5Qdb0KTN+/I1BxOw5aeMBWLVRkbRzGWIoPnLRFV2uBsTo9Pg96lD+ArE4fzNwiFMTA=="
+[32m📩 1 → 2 (online, no save):[0m "base64:TF8bNo6j4AKIKbmm54Q/MSW1p58LkESWS5Z0a0LwLbRUjdvic3S9HjbywWZftyvpuUWgiQ=="
+[32m📩 1 → 2 (online, no save):[0m "base64:0EjKXOwVgh5hNpYzdEOwh3hS314l0zBbGN1981vsemFGhk9eNVyuo34D"
+User disconnected: 2, remaining users: 1
+[32m📩 1 → 2 (offline, saved):[0m "base64:pZmUNKdQNMTVFnUNet0oHyequXTRNOuwcKe4FROiMCodcFGoiBeUSVvWdxM="
 User disconnected: 1, remaining users: 0
 New Socket.IO connection for user: 1, total users: 1
 [33mSent 0 unread messages to user 1[0m
-[32m📩 1 → 2 (offline, saved):[0m "base64:XTELxr9yuF2oO0ubbog+Wn89FoO2yvnAk/qrsCrUTUZn5PQNx5D4kMKjsw=="
-[32m📩 1 → 2 (offline, saved):[0m "base64:hfeBPCJju3JeRLGngvOGKOL8nIRerOmfCcDP12/kLKYqVgyyv705Rrs2dg=="
-[32m📩 1 → 2 (offline, saved):[0m "base64:qsuQjApv5wvMiIf4WVCO0oVkoGKdsms7IsWChDKZd3VfikHVREaA/LWzmg=="
-[32m📩 1 → 2 (offline, saved):[0m "base64:vkOsssiOW648MAOFz0w6oOAhvRQKBqMZ7LJ0W5jn6Z5INCGJNKRa7XJibyH8"
+[32m📩 1 → 2 (offline, saved):[0m "base64:i8bYkCVGlbPXkPMqbP6o2i2406l6Mx/3Oi1TZtpV6Y4RxtQKZ5InJPhS"
 User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "YP09M9IcxMa7N18nEosveHWgdtJHYe2dCMiroT251iM="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:zGs7mYLu8KWqVE5UWIf4ued9aDlAlTX0O7092+QeqBHAYrqY2MGqWWWe4S0="
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "MNnYQ5V0ei96iUl2t0dsM2MnEHHS7zNeqMTtbjurJD4="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:1VmmyqzTAXrPbhwbwSFMjBPSxg2VDXQuIThrxgeAH5U+RXwFT6tOvd0zxls="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 4 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 4 unread messages to user 2[0m
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:pZmUNKdQNMTVFnUNet0oHyequXTRNOuwcKe4FROiMCodcFGoiBeUSVvWdxM="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:i8bYkCVGlbPXkPMqbP6o2i2406l6Mx/3Oi1TZtpV6Y4RxtQKZ5InJPhS"
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:zGs7mYLu8KWqVE5UWIf4ued9aDlAlTX0O7092+QeqBHAYrqY2MGqWWWe4S0="
+[36m🗑️ Deleted after read: 1 → 2:[0m "base64:1VmmyqzTAXrPbhwbwSFMjBPSxg2VDXQuIThrxgeAH5U+RXwFT6tOvd0zxls="
+[32m📩 2 → 1 (offline, saved):[0m "base64:BobDKNyWga51rBOxTDDPGZVj1pjdo8i7PjL0Sa4QjSUoWiXlWaXvk5/h"
+[32m📩 2 → 1 (offline, saved):[0m "base64:OaUuWKGOZZ90DGIyFO7jOTvyXpuPnryq7AQ7MFzUTilL1poNs9QNLbyIZHSs4LGl"
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 0
+New Socket.IO connection for user: 2, total users: 1
+[33mSent 0 unread messages to user 2[0m
+[32m📩 2 → 1 (offline, saved):[0m "base64:2nAKcCh1UhHk5Ucdc2V+KIwVkDWGxUhircmZYuZLAJv0PcDOSuqb4bmWYxurKxSqEAFnd9p1"
+[32m📩 2 → 1 (offline, saved):[0m "base64:YIM534F+DACUBz1qK+Aznrgfkpexlc+kpd91d7K1d4s0vpIhRLIKYIk8zMucJNn5f3VRqsLiQ8PeXwP8sUG3pA=="
+[32m📩 2 → 1 (offline, saved):[0m "base64:g0RXDlR2sPoJV+orpD1WSOvhVGcK5Z2/acDNASOL53yTSDq/B9Q52IDS7g=="
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 5 unread messages to user 1[0m
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:BobDKNyWga51rBOxTDDPGZVj1pjdo8i7PjL0Sa4QjSUoWiXlWaXvk5/h"
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:OaUuWKGOZZ90DGIyFO7jOTvyXpuPnryq7AQ7MFzUTilL1poNs9QNLbyIZHSs4LGl"
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:2nAKcCh1UhHk5Ucdc2V+KIwVkDWGxUhircmZYuZLAJv0PcDOSuqb4bmWYxurKxSqEAFnd9p1"
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:YIM534F+DACUBz1qK+Aznrgfkpexlc+kpd91d7K1d4s0vpIhRLIKYIk8zMucJNn5f3VRqsLiQ8PeXwP8sUG3pA=="
+[36m🗑️ Deleted after read: 2 → 1:[0m "base64:g0RXDlR2sPoJV+orpD1WSOvhVGcK5Z2/acDNASOL53yTSDq/B9Q52IDS7g=="
+User disconnected: 1, remaining users: 1
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 0 unread messages to user 1[0m
+[32m📩 2 → 1 (online, no save):[0m "base64:eouVanZLTfv4dfdzaJQGINd7uLm6Iv0jHZDs4SjBceNhd/Aao4Q0Dt4bdVDKlCnKKSytjy6j8ezlkBjv9Ig="
+[32m📩 2 → 1 (online, no save):[0m "base64:+aztWNIgB/b4KcVv3Q/KWrd15uSIYYSKXB2IOMDGMDO8vBMvk1vDRYKvcQqpF8Ku"
+[32m📩 2 → 1 (online, no save):[0m "base64:jHdTjizI/3B1dNW3qvi/liBby1ieKPodPFBUfx18aIGQR4xl2Amwfe3t4DeZvEX87wYRs0nJ"
+[32m📩 2 → 1 (online, no save):[0m "base64:kCougk3q6hLvzmkPvcXJhitJZ3BJ7m02afwJi1DqN9Go69FZpjzb9VU+IvqnIQ=="
+[32m📩 2 → 1 (online, no save):[0m "base64:5/l38XaSMxuhlRecMqq9Qqa382uUPFEsPWt34omTNhd4Nq7ol+OiCnS/bCI="
+[32m📩 2 → 1 (online, no save):[0m "base64:+IADF0XiXrwgeZNIXUDe7cj++vj2sFMj8kESMtDmhBurUYDjP+clhcc0Uto="
+[32m📩 2 → 1 (online, no save):[0m "base64:WVUYTLwfMQ/n0PqbznZCDTYAeSoswmAhlVJu2UOk+VXgpARuzF151elz6p4="
+[32m📩 2 → 1 (online, no save):[0m "base64:NBMM7+Jhk8hEldeUKucOtEBDZ5M9yMr1WmlaBEgcqImMQw2wG/j2zIPWHf60cg=="
+[32m📩 2 → 1 (online, no save):[0m "base64:3EVJbxTL7fhiboblmtD5eU2geLMuyL/QJENNXMVx/VxP8JONcxirpkMJr4K8Uw33zwoO+15DaZ3YB7Po"
+[32m📩 2 → 1 (online, no save):[0m "base64:iHnHLz8w0F63KDCgfLIJLwes6fXV5oXjlZ4JOknSiMtaiceWdK3QTzzvfEbILIwU"
+[32m📩 2 → 1 (online, no save):[0m "base64:I4qT+dliRpC6NW4xPxk36+XvviV5DYX/XE939EH8DQ6eb6x85QhLGA0y38Zzig=="
+[32m📩 2 → 1 (online, no save):[0m "base64:lQP5liZAud5a/f43aYENL5MFmbvGufS8h72ANFrSHO8hNQnJkuI4SsgrAmY="
+[32m📩 2 → 1 (online, no save):[0m "base64:b0VqaK9SUJjrNktXY0tHBscjWbc0DeU/tyqP+MtmPrul1C6XXTPSb7he3G/hnA=="
+[32m📩 2 → 1 (online, no save):[0m "base64:9IKNd3SH637HmOE5/mzTUelzvJsQya2FLJeRyn4cfEkfcv0+KkqG6vctaGtKsg=="
+[32m📩 2 → 1 (online, no save):[0m "base64:A+I43uKc4YMiMt76aPdejLrAg49xca1wCWtheA1nw6bvx81ultV8uyF5eF0="
+[32m📩 2 → 1 (online, no save):[0m "base64:n8g53d4/9oLd190e1voh/2ssByBkUh1t8U0oytwMQNe9rD7YkGDDVrJv9MJVbQ=="
+[32m📩 2 → 1 (online, no save):[0m "base64:r3iy8G793MG0pPfurDKaBg0mbV3iHMKlzaD8XEx4NnlJetaZNqR5xzyb3rI="
+[32m📩 2 → 1 (online, no save):[0m "base64:rMlV2k0P61cAuGONfVcbBuhyLcMdEW8WT3NHXwZCE4+N1kmArB/6wJJPBqM="
+[32m📩 2 → 1 (online, no save):[0m "base64:c3VW4AynpX1EKc7/629zI79VG/Dyg+TDsEgdUPOFx47QYkhy63LLSHCt"
+[32m📩 2 → 1 (online, no save):[0m "base64:haE073wWgPDb9suJne/uzyhXxA9Bfu+niVu97cdrZFec9cS/Viwz3GUAD6Ep3w=="
+[32m📩 2 → 1 (online, no save):[0m "base64:FhqjaSU5tWzm0/iTR7Wwm7LW4vrNsIur5UMptMXwcYzbQXhOElwYOwOcJo/WKw=="
+[32m📩 2 → 1 (online, no save):[0m "base64:G0HZ7QTagl3kb3Ggq62aNKoM2JaBBfM2vomjEfc8/MnNMpPzMtVgtqXmzGbcWA=="
+User disconnected: 2, remaining users: 1
+New Socket.IO connection for user: 2, total users: 2
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 1
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+New Socket.IO connection for user: 2, total users: 2
+[33mSent 0 unread messages to user 2[0m
+User disconnected: 2, remaining users: 1
+[36m🔑 3:[0m "3jWSqeOdUn/ysfij3CT1XSZX8cP3Afefy6xun4btplU="
+New Socket.IO connection for user: 3, total users: 2
+[33mSent 0 unread messages to user 3[0m
+[32m📩 3 → 1 (online, no save):[0m "base64:whfiNwifWT63l02vBbwwiLjrqpY1Z6Ek1he1SYNAqLcdUaVTQUJctOw="
+[32m📩 3 → 1 (online, no save):[0m "base64:3qthoiPhCCOkSYJjwxmDbkJSRtU5h5Vx541SZLP7sUEFxeDe2eQU3ksBQQ0="
+[32m📩 3 → 1 (online, no save):[0m "base64:CjtVMRaHRhjrzhERtmw+wrzJWx40x/wpj8QG/Bn3VRwzUHEPxLeTgY2GngeTbA=="
+[32m📩 3 → 1 (online, no save):[0m "base64:bYlps/QIsL+uxumXq1DMRMY7f43tk0N0r+uWJscgBGGtCIC59yEUFCBv9RWphbk="
+[32m📩 3 → 1 (online, no save):[0m "base64:g/zKCHxHs3peifWBHQSxibqSm9qs4MKE2gN8DHz9y8vqsGvmtkMY0QTbxPh7iLmUPYeDLQ=="
+User disconnected: 1, remaining users: 1
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 1
+[36m🔑 1:[0m "nV/vBkn58467M8MD+dw2Xsly9FpodWFS083cqZ72uQI="
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 0 unread messages to user 1[0m
+[32m📩 3 → 1 (online, no save):[0m "base64:T2gQ+yVwQ/UqC3xf8IadPag/HuX5ZHbNKB7N2kHdgtpY7uju1QxNBVMLP0IHJdO4"
+[32m📩 3 → 1 (online, no save):[0m "base64:iFdG1D1ek4sePtJxjr3fo+SbfQcqLdfPA8WYKjYPlh0bKTolikdfx0WVvQ=="
+[32m📩 3 → 1 (online, no save):[0m "base64:GxhtpVczKeGCNlHi+zf8fwWWIgsluLzcrakWfCRGIcFTkMtxWgdnvVk="
+[32m📩 3 → 1 (online, no save):[0m "base64:GA/b2Hr8VlxvjPWddKzYNwNpjnUmJ4QOq4fFxUP/vxxa6bwIZ8eqmUyYjA=="
+[32m📩 3 → 1 (online, no save):[0m "base64:szTT8IJtv0TCLtoVvujHVJbfmm/LhYTC30XkZMIvzo8lQkviQXsqbKWkSQ=="
+[32m📩 3 → 1 (online, no save):[0m "base64:Osn7Tdb2FXSu5rIktb9mOA6v71aBgPxygMgfgHcZ1cTbDm7GAYsdyDsL"
+[32m📩 3 → 1 (online, no save):[0m "base64:J6tv13pEGDFM4H6f/6HUs9fukpH0yS/Pc670rEWCDLdQ55C7oSCliDo="
+[32m📩 3 → 1 (online, no save):[0m "base64:v1h7Z2iTP8ICmCPMdCU7UZMBqxSndgBYcoC8hWEIlp9RzgVYhFPU63R0TA=="
+[32m📩 3 → 1 (online, no save):[0m "base64:sE8Ua2qYM7IZQ3oC/Q5Qxnao28BGdoBQFJlNisERHDllNKsSHwqZYmjFeOBl"
+[32m📩 3 → 1 (online, no save):[0m "base64:LdVYF3tWixWJ3JLcSOO8tfWRX9evkriFEtaShQy9KB4g+X+c86NzHBDzsA=="
+[32m📩 3 → 1 (online, no save):[0m "base64:8UgCI42OLrw+lt3YiE88CLG9vHM8KZDIM7wiuBN8LiaZRyl0Pivizew="
+[32m📩 3 → 1 (online, no save):[0m "base64:lb3PN6lLI9cSp+vTtTTxdD6AO9TM0dk6WruC58SvuvMk5V9pUBT2VJEafw=="
+[32m📩 3 → 1 (online, no save):[0m "base64:++a1n+RpF6oLNPn4ocT0V2pP2tNq9HDEZmTTh9ZN4zFTsVDnuADrmUY3xQ=="
+[32m📩 3 → 1 (online, no save):[0m "base64:n5rkgb9Dg1/mz0IdEJQy/TECZ6FfQGwywnSEMJ2o5i6XwH2N93GpFHsQ"
+[32m📩 3 → 1 (online, no save):[0m "base64:ju21PCLwkt5iP98kbHNJ+t6/LDW09xAsu5t6/dU+GsHkxGAN5fBExGnrkw=="
+[32m📩 3 → 1 (online, no save):[0m "base64:Aq8Tc38OpAN9AAOUBXAxZZ3Mo2qu30dqhL972UQx8s0p9mVjLDAYp+c="
+[32m📩 3 → 1 (online, no save):[0m "base64:zkHeoRU2vAR2R7/iOAen6LYnd2WGsmiSlELWcBcomQqqO767toBu/6ReCg=="
+[32m📩 3 → 1 (online, no save):[0m "base64:hSaVmqEwYUpn8lLPkgtRULmycDe1gbapyU5p7Kct4HZqahFdeL6Ad/UjL9DDUsg="
+[32m📩 3 → 1 (online, no save):[0m "base64:SLdcESAmdFjI6AajiJ3QK02EFgxCIhwjDMNVv6QXk56bzOTrypyMt7Infg=="
+[32m📩 3 → 1 (online, no save):[0m "base64:ODSkeIj/5ladnDo9W42nRvIzCb7DT7NwgDTbrx21Nzn9SQK84HS5ik6Lxg=="
+[32m📩 3 → 1 (online, no save):[0m "base64:xsXF9uuqtAWx718kWJ3n40nbqp7AnRucnMyypt7gs93k6mwlOQjW6zOG"
+[32m📩 3 → 1 (online, no save):[0m "base64:JEw7GEVCu7ZqdVXqTYcLX4QgL4SrZFfAHo7NSI5VplD4yjo1vojV2uWu/Q=="
+User disconnected: 3, remaining users: 1
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "Qt4b26DCfRvcAMBxG+Ihp7MH07NqBepEWB+LnwZCeQI="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 3 (offline, saved):[0m "base64:6KEX8vi7Lu8IE10JEXfAYg5xY3fqo2Dp0WsNX5kyQdTEj/RLW8WtyJAN"
+[32m📩 1 → 3 (offline, saved):[0m "base64:A529SqHkN9lGM9zt9o7BDygC+rQDyQZMIVHPXKLkBWcturmKJmhnz3tC"
+[32m📩 1 → 3 (offline, saved):[0m "base64:Mo+WXMnTuKzrLDJQIP3Rluy8ZQxbClcTG5OFbp0nV85H7vLljdvAckuENu3qdQ=="
+[32m📩 1 → 3 (offline, saved):[0m "base64:xxXENCRkabxdLOJgcep8aezK/AnhQahDCVjNO+fX/bhDn0mCPRw3NosN"
+[32m📩 1 → 3 (offline, saved):[0m "base64:OCqYtGPfEI6paJ1g/vG7vSn3kXx2CdzhTKloilNwiC5OlacBAPIzWL8W"
+[32m📩 1 → 3 (offline, saved):[0m "base64:QjKX27kyUePQUYfacyyQRqlSlX20m2fxNmdtVr3irZQHxu8o92GBMGrJ"
+[32m📩 1 → 3 (offline, saved):[0m "base64:Uq8z0iWcEbdVWMUj5RLSFcJSh0b69gZBiC2CynMZ+oS2LAebBi+mZ/Ey"
+[32m📩 1 → 3 (offline, saved):[0m "base64:KwI+4A1ffry7C9fIXDcLkTwe0mcOHsgADaJID1raesdbghmP1CLvqQ41"
+[32m📩 1 → 3 (offline, saved):[0m "base64:WrhL9j9W2eIdOAVgKDRok8ZJkYogdtA1fINrglnRyZQ/YoC3bBnUssdw"
+[32m📩 1 → 3 (offline, saved):[0m "base64:t0GFuHNdSGO0Seofy0DoPYLLV5yaqkJ9ljCw0V+Rmx/aNvD9+Yyxoadh"
+[32m📩 1 → 3 (offline, saved):[0m "base64:HOhalmzPeFyCcu7gh4ek5dtwcUqOBVKZ9X8rckVI4rsw0L85n1vrQqRX"
+[32m📩 1 → 3 (offline, saved):[0m "base64:dMY2nw6/rCLdRcLK0Z5FkGSCIxF+IXnjiVAbIaP4lXs5wXG9rn3XLNzC"
+[32m📩 1 → 3 (offline, saved):[0m "base64:D84cvPZ9FE4yhMal5NgV21utUxP9RQl+MNP5FMom7JMx+VHQaPRnooFM"
+[32m📩 1 → 3 (offline, saved):[0m "base64:knDNIXTgJdmgewuZZP1TAxIPxWU9GatvXj9CJ0+/LS+bKtEJxbTaQmAC"
+[32m📩 1 → 3 (offline, saved):[0m "base64:E8TYPftSEGg9B3elx4j0jiip545B0ie5nXnHfE/xOtG2GxgB+wbo6c4O"
+[32m📩 1 → 3 (offline, saved):[0m "base64:sZRs9jhwUwd+4FsUShRjik8zaiorvE1pARvorrF1j/yZv7ln1Ybrlse3"
+[32m📩 1 → 3 (offline, saved):[0m "base64:TsyP2BbowYUaxogntK0aFrs4KYFe5bj7QzuD26QfG2TJ9ERisuzWFIC/"
+[32m📩 1 → 3 (offline, saved):[0m "base64:bbJfQ9VCWVY2Mb+FHjQCnTA+PhNachyYc5cZTIMIaLcuh7FnBCc91N0a"
+[32m📩 1 → 3 (offline, saved):[0m "base64:MSjEHxlYAcrSBijVFXQRPsJRM5dJK/g+7S5vozVAHsEiv9noqinI6wQ9"
+[32m📩 1 → 3 (offline, saved):[0m "base64:0zpQY7wZgYgjQXfopa2s7lz0b4to+fm4BKhxTYTGbp62ta1OND8ffWPq"
+[32m📩 1 → 3 (offline, saved):[0m "base64:hD3/Iz4fiL/GaaWcER8VACPNSJRVRtaz13maQHVmBtgi9fTwJKXmHjQG"
+[32m📩 1 → 3 (offline, saved):[0m "base64:RqqZ8zmnmQr8yXkdxg/V0YrimXg5FJgnVh8ji5gE1IDmd5AnZhG+xnQD"
+[32m📩 1 → 3 (offline, saved):[0m "base64:TiLzMoFdFLTyyUJLlPi0goczFFdziFV5kL+cJF4Ugypb2y9BRJ0EJOVUcGM="
+[32m📩 1 → 3 (offline, saved):[0m "base64:SvmwXNFxK+M7/sR15d71L7ahFSq9aALb+HPqibCqXIn3TAPouhXi+GgFwODzij2r"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[36m🔑 1:[0m "0R44XOH2nbccE93frRuh6sVfiIV369k7t0Sa/nU520Q="
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 3 (offline, saved):[0m "base64:0JmZA2ExkvBVBxFJlHYI/YE5YlVnfd0RF+ojZiW+YKnmNaApIesoYKaxSvc="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 3 (offline, saved):[0m "base64:2yI7e/VLSjGbMe0J/IUefXhMk2qZ1rt6n/YrdJZIRTCUjwY4ra29P5RhTSYYIA=="
+[32m📩 1 → 3 (offline, saved):[0m "base64:IunEEHjYwx1ya7d4NzJZLwHxupQVdTbGMW+vPEFwuoNQ7UDM2fWzgSW63dE="
+[32m📩 1 → 3 (offline, saved):[0m "base64:Qvvu2fa7UeCQIL72RPz8ErvjRDAfwlKM/pcZqFLutG3RRnuoJSgjo0Ur"
+[32m📩 1 → 3 (offline, saved):[0m "base64:oRQp5LFjVaE8kYyrNkjcs0EufQwNj7I91EHi3C9DWzERS7lU9qT5M+Mh"
+[32m📩 1 → 3 (offline, saved):[0m "base64:4DSRKaTOLkAL9DKlHzcy7MGQE3WIjRBe5d1xJrVRZcMqZnnudkw48Dy1"
+[32m📩 1 → 3 (offline, saved):[0m "base64:Ayeh56Uv97/AS8hILXISSGVd8ykQefxobah8jV3DbmLm2BzlZA0OanRH"
+[32m📩 1 → 3 (offline, saved):[0m "base64:3yJ32gglClrvNhJNTeL+NLnsIM7DWmTyXTFVs8ZUKpwjDh9+46sbm3hV"
+[32m📩 1 → 3 (offline, saved):[0m "base64:TeT80o+FCsTg5bt9eFTMy2vHiG6g9jIk0x0Gwu3CdrqbHla42gVFid0v"
+[32m📩 1 → 3 (offline, saved):[0m "base64:udwkFk3mVLOLcAbR5LARWCZIryTDzL5xupIS1yHTAYSfgGtlFA2abwcG"
+[32m📩 1 → 3 (offline, saved):[0m "base64:COqP3B1pWtRDy5AHwVV2j7mQLw6sqozdAoUmlVQ2777VyHtIldc5ncjw"
+[32m📩 1 → 3 (offline, saved):[0m "base64:nE3ZbCR9LKCslCiDJgcS5ZERwNFAyNz63k/vzZNw6WKy3ddM8aK/T+ty"
+[32m📩 1 → 3 (offline, saved):[0m "base64:+NUWa43K9OVWUQqt27PTTNGCBNP2F45t0yIV4lCU9vUbOJ68ovFghPsr"
+[32m📩 1 → 3 (offline, saved):[0m "base64:Pj5E97CfZEgj18QzWqN74m17YcsB74XNbc8/CoCrwR9JEt2HznK9uSK/"
+[32m📩 1 → 3 (offline, saved):[0m "base64:fbrDybcbGfGtVYkZ9zXnhhyoIwmjyck1r6uLcemY2eYfVXNr/N7ZatTX"
+User disconnected: 1, remaining users: 0
+[36m🔑 4:[0m "0wYDnaOXuzH+ZNxnf+ZUn4nP3H1OAaWRGEXXXxaYunI="
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+New Socket.IO connection for user: 3, total users: 2
+[33mSent 39 unread messages to user 3[0m
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:6KEX8vi7Lu8IE10JEXfAYg5xY3fqo2Dp0WsNX5kyQdTEj/RLW8WtyJAN"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:A529SqHkN9lGM9zt9o7BDygC+rQDyQZMIVHPXKLkBWcturmKJmhnz3tC"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:Mo+WXMnTuKzrLDJQIP3Rluy8ZQxbClcTG5OFbp0nV85H7vLljdvAckuENu3qdQ=="
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:xxXENCRkabxdLOJgcep8aezK/AnhQahDCVjNO+fX/bhDn0mCPRw3NosN"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:OCqYtGPfEI6paJ1g/vG7vSn3kXx2CdzhTKloilNwiC5OlacBAPIzWL8W"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:QjKX27kyUePQUYfacyyQRqlSlX20m2fxNmdtVr3irZQHxu8o92GBMGrJ"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:Uq8z0iWcEbdVWMUj5RLSFcJSh0b69gZBiC2CynMZ+oS2LAebBi+mZ/Ey"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:KwI+4A1ffry7C9fIXDcLkTwe0mcOHsgADaJID1raesdbghmP1CLvqQ41"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:WrhL9j9W2eIdOAVgKDRok8ZJkYogdtA1fINrglnRyZQ/YoC3bBnUssdw"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:t0GFuHNdSGO0Seofy0DoPYLLV5yaqkJ9ljCw0V+Rmx/aNvD9+Yyxoadh"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:HOhalmzPeFyCcu7gh4ek5dtwcUqOBVKZ9X8rckVI4rsw0L85n1vrQqRX"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:dMY2nw6/rCLdRcLK0Z5FkGSCIxF+IXnjiVAbIaP4lXs5wXG9rn3XLNzC"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:D84cvPZ9FE4yhMal5NgV21utUxP9RQl+MNP5FMom7JMx+VHQaPRnooFM"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:knDNIXTgJdmgewuZZP1TAxIPxWU9GatvXj9CJ0+/LS+bKtEJxbTaQmAC"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:E8TYPftSEGg9B3elx4j0jiip545B0ie5nXnHfE/xOtG2GxgB+wbo6c4O"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:sZRs9jhwUwd+4FsUShRjik8zaiorvE1pARvorrF1j/yZv7ln1Ybrlse3"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:TsyP2BbowYUaxogntK0aFrs4KYFe5bj7QzuD26QfG2TJ9ERisuzWFIC/"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:bbJfQ9VCWVY2Mb+FHjQCnTA+PhNachyYc5cZTIMIaLcuh7FnBCc91N0a"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:MSjEHxlYAcrSBijVFXQRPsJRM5dJK/g+7S5vozVAHsEiv9noqinI6wQ9"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:0zpQY7wZgYgjQXfopa2s7lz0b4to+fm4BKhxTYTGbp62ta1OND8ffWPq"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:hD3/Iz4fiL/GaaWcER8VACPNSJRVRtaz13maQHVmBtgi9fTwJKXmHjQG"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:RqqZ8zmnmQr8yXkdxg/V0YrimXg5FJgnVh8ji5gE1IDmd5AnZhG+xnQD"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:TiLzMoFdFLTyyUJLlPi0goczFFdziFV5kL+cJF4Ugypb2y9BRJ0EJOVUcGM="
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:SvmwXNFxK+M7/sR15d71L7ahFSq9aALb+HPqibCqXIn3TAPouhXi+GgFwODzij2r"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:0JmZA2ExkvBVBxFJlHYI/YE5YlVnfd0RF+ojZiW+YKnmNaApIesoYKaxSvc="
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:2yI7e/VLSjGbMe0J/IUefXhMk2qZ1rt6n/YrdJZIRTCUjwY4ra29P5RhTSYYIA=="
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:IunEEHjYwx1ya7d4NzJZLwHxupQVdTbGMW+vPEFwuoNQ7UDM2fWzgSW63dE="
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:Qvvu2fa7UeCQIL72RPz8ErvjRDAfwlKM/pcZqFLutG3RRnuoJSgjo0Ur"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:oRQp5LFjVaE8kYyrNkjcs0EufQwNj7I91EHi3C9DWzERS7lU9qT5M+Mh"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:4DSRKaTOLkAL9DKlHzcy7MGQE3WIjRBe5d1xJrVRZcMqZnnudkw48Dy1"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:Ayeh56Uv97/AS8hILXISSGVd8ykQefxobah8jV3DbmLm2BzlZA0OanRH"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:3yJ32gglClrvNhJNTeL+NLnsIM7DWmTyXTFVs8ZUKpwjDh9+46sbm3hV"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:TeT80o+FCsTg5bt9eFTMy2vHiG6g9jIk0x0Gwu3CdrqbHla42gVFid0v"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:udwkFk3mVLOLcAbR5LARWCZIryTDzL5xupIS1yHTAYSfgGtlFA2abwcG"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:COqP3B1pWtRDy5AHwVV2j7mQLw6sqozdAoUmlVQ2777VyHtIldc5ncjw"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:nE3ZbCR9LKCslCiDJgcS5ZERwNFAyNz63k/vzZNw6WKy3ddM8aK/T+ty"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:+NUWa43K9OVWUQqt27PTTNGCBNP2F45t0yIV4lCU9vUbOJ68ovFghPsr"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:Pj5E97CfZEgj18QzWqN74m17YcsB74XNbc8/CoCrwR9JEt2HznK9uSK/"
+[36m🗑️ Deleted after read: 1 → 3:[0m "base64:fbrDybcbGfGtVYkZ9zXnhhyoIwmjyck1r6uLcemY2eYfVXNr/N7ZatTX"
+User disconnected: 3, remaining users: 1
+New Socket.IO connection for user: 3, total users: 2
+[33mSent 0 unread messages to user 3[0m
+[32m📩 3 → 4 (online, no save):[0m "base64:leDTtdBpLuJAe7vkyiHJfj9AdAEKolahfZ3hJ+kzRGs4X01EC01tsbM="
+[32m📩 3 → 4 (online, no save):[0m "base64:Vp6ZmiCeecWoKvHbF3Su+m6jWe3QNEQGL8N3y/CAUPD+PqjUc3/UFKn85n7u"
+[32m📩 3 → 4 (online, no save):[0m "base64:VcO9oKSF7nQ0pJnVJAgXWqsghtqx7jNnOn3FqfMKGeo7fLZQQGUFLFxC"
+[32m📩 3 → 4 (online, no save):[0m "base64:O6ysaRD1w+SmBXNyL1YNOf4HgS7FK0fWEgZWcHjBgT5l5j+i6go/l+DGCUIL"
+[32m📩 3 → 4 (online, no save):[0m "base64:QYgeMiveQc//5bwjoEAPnRzcIkO+lvKP7yHaMMqg4G4p6focCRyURkeRwA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:mijHd8Prr86vKnvPkxxL4+kRHpekAeyrraM46fKtnTQtugkfNjStGPI="
+[32m📩 3 → 4 (online, no save):[0m "base64:nUhoKn2aaupSMEuQf0Y5v1iO0Vq4A25CgpgkAfyHq5jroAQW5WbzQZNGTQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:3FhC0qEoqIfhrvcnRaEyrLHHY8uLLLItcgORdwiil5321sSuSS+9A1Tg"
+[32m📩 3 → 4 (online, no save):[0m "base64:YDzIJu55OOLzZtUoyhtTV+CDvR5DKYel6wQtTfYeV6I581ISURyL/eE="
+[32m📩 3 → 4 (online, no save):[0m "base64:HlUttz/z5+I17Lz+1GFtiN5j1eqbnaQh1On5YDEgGYyvS6e+MlQujnLCYe6tdQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:e7HTpiWFs5GsUj6ObECtkPMdnXyFjnjswCMvbJcL/mlxkS7d+cULtROidfnF"
+[32m📩 3 → 4 (online, no save):[0m "base64:dl9i7SrrtbeAvfsJvJ/o4q1bAPGTW66J7pj6tp1t7n8vwjZiiCXrLrDL"
+[32m📩 3 → 4 (online, no save):[0m "base64:FNX98B3mXNJecwNbmNq71zd7Btp7GgM1nLrCNUc4eCNefHhEhKCKRYNr6A=="
+[32m📩 3 → 4 (online, no save):[0m "base64:j6KxjMuLZS8qC2Gv1UzYGcxa3ZCw9QxnxvIw0UwhMqKntpFPtNwp+lTj7g=="
+[32m📩 3 → 4 (online, no save):[0m "base64:JCvw7h6kjnaVZPaWUS4Dlwt5RCJuJ+xf+2VomX3kgcwmOA16iHdcjHkS"
+[32m📩 3 → 4 (online, no save):[0m "base64:Xx522b99JGMAY8fuPDvf7rXTYFrd0cECbEkx2umQlF8o5Tm8ced2LHRQzw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:gguqxtXokAW/WtT16oTIeudoew8vK7vFH97tm+tNdkBysDETMAxngxg="
+[32m📩 3 → 4 (online, no save):[0m "base64:tgHCHiW5LqnaX2GgtUPRkd+B8H/TxT2QO9MvT0LsJ3LMbbaxJR9Y5HE28Q=="
+[32m📩 3 → 4 (online, no save):[0m "base64:YpWrcB6ilkcR3WLU3sj2me45U7xotpMR9KJqq/ElneU0VG/qQiJ7viHU"
+[32m📩 3 → 4 (online, no save):[0m "base64:+H5O5jOE1jJE8PeEx2eIQ0xWU3oWIcGCPevWTuNVD/QCH9noHGjMASrDlA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:OPyZa35ee9r4Rg1hmIQhL1NZuj6BBMyPsN5JhjlAA86swcoigW85Ci8NMQ=="
+User disconnected: 3, remaining users: 1
+New Socket.IO connection for user: 3, total users: 2
+[33mSent 0 unread messages to user 3[0m
+[32m📩 3 → 4 (online, no save):[0m "base64:gnR72B2pc4d6O51ORrzE3u6UymwrYbBMLUfhca/tAi4B6aEtmi+21QnXjzYVMOY="
+User disconnected: 3, remaining users: 1
+New Socket.IO connection for user: 3, total users: 2
+[33mSent 0 unread messages to user 3[0m
+[32m📩 3 → 4 (online, no save):[0m "base64:hBJpgRRfVOjm+Rzio95GaeOIeQ/nQ3qWIX80KcGEatAWy9StsSIvrVdjnSc="
+User disconnected: 4, remaining users: 1
+New Socket.IO connection for user: 4, total users: 2
+[33mSent 0 unread messages to user 4[0m
+[32m📩 3 → 4 (online, no save):[0m "base64:+74lpUrDR07rUiHyAPR8rUKsK+3MiGPJ9jkVuh8C/DWTKN+BUPTH0iU="
+[32m📩 3 → 4 (online, no save):[0m "base64:e9A/pNVUAd62daqdy3WmuxSU4+hSF1nRp2KE4QOIy0TzUaAg5l6Y+FqKCOE="
+[32m📩 4 → 3 (online, no save):[0m "base64:tQeLFmP44mQpM9iEYmd8upkHAKK2gWHgyEZ4TuRmlGXZW8Rlf5IDhzXeRt63"
+[32m📩 4 → 3 (online, no save):[0m "base64:O9SGOgExHEvoeQcUIE/YbXRyO2LQB1/uXb55/W79ZMNyQKuIlNs3z5f6"
+[32m📩 4 → 3 (online, no save):[0m "base64:xThPld6CIC9Okixpf5GwbofGj8LOsdAK0nhyvUf5YMiPj3GUocGBwFpd"
+[32m📩 4 → 3 (online, no save):[0m "base64:i0Iiny68DQqYIMUeixKx5fOpkxg1HTrIhAKzgAsTUc1ZvPP6w0oEVbO7tOQ="
+[32m📩 4 → 3 (online, no save):[0m "base64:5agQDtrVLPjIYNo9/jk8PiHI5gC3MTH3cvWUl1tTm/OZAxS81/KdJd4I1rZnSvqpw84="
+[32m📩 4 → 3 (online, no save):[0m "base64:WB81OkUXb2PHhPjYYpr5qFjYE3oAQWav+6UjKkPY5FKyZn62VGheCHsa"
+[32m📩 3 → 4 (online, no save):[0m "base64:PwsQYbfABSesAy9e8+qwztpkjNiZdjd/+DiJot0XtQbBDF1Zb/J2coaVhwRc"
+[32m📩 3 → 4 (online, no save):[0m "base64:dZ1VFlkyfh1rMJerOtCwWxjFt4oL1bcUlOT7MQWhWHQ088C6Fg5BMGkUYBUHG/c="
+[32m📩 3 → 4 (online, no save):[0m "base64:VtptfyGCSd/yUQ8wcPuwUtNKeFbJonkZYDDZcqNuZx342SgrgaC5YhfKqMA="
+[32m📩 3 → 4 (online, no save):[0m "base64:QiqCwTenuNR3ihfB6Wh2rbszOTtP2Gmkw4zST4ZIQvJkLF9r29ezEnFY3w=="
+[32m📩 3 → 4 (online, no save):[0m "base64:TLV51l3L6excX5+kP5Rg7L4+1/IHIJfJ08UvP7VgRETYAnLhOGfZNDumPeF1l0U="
+[32m📩 3 → 4 (online, no save):[0m "base64:Ze6LUNhQCL2TrHNAJXPppGA9BmBy2DWRZNMY3srjyx2+3heUXaeBDxlpRPLHJKD3"
+[32m📩 3 → 4 (online, no save):[0m "base64:ZWczZzqfNJQK0GB/6bosw37j1U8y1k8SKgk5cj5OLYekv2NoTWWISuINJw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:ybF5VD4mc3QLlt9QT5OgWSZot4HTO3skGPSGZpnoKycb7NuBy/ijh7rAZ8eEog=="
+[32m📩 3 → 4 (online, no save):[0m "base64:6ceh4sAUJEh87YPWTT1fktXMeknAMwLi+8MQJ4mxfuDJFrNEeq8t60CdiQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:5WMzNJO9ABhA3MNEKKUR+ylEpCOi90r3/z8eK8bBP+bNMdM59dJ0NtCh0Q=="
+[32m📩 3 → 4 (online, no save):[0m "base64:puJHIjm6SMlvihJ19D4pO7EGtoIEWX+to6z+had/gOe3ytJpfjs6IJYYUQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:0eczZyLYUB0FVbsUuviJo+OlIOvclA/7qxBs3WsrxyjEN7KqsdGEmyToIA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:II3m5QyBM6gkGAYvRSXWvN+t7+Wzu+HoEbJrPqdcF5MHcTlX8oFRNNU="
+[32m📩 3 → 4 (online, no save):[0m "base64:z6SoFhI1uw+WHWGaTEQsMhvKCyFmJb0PyhqYMYo/lYNRa9V/ZkSKWtZ3"
+[32m📩 3 → 4 (online, no save):[0m "base64:fWFfV31n7VEm1hhZ+g0EhLESuaxmqKZk9gWbfOia5f+EBk/u0TmXU/YGHQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:ur+iLsE3gn/8wcUvrFEh0quNrLOyogb/XHHWxT7dU4RehCDyR99AZBHW"
+[32m📩 3 → 4 (online, no save):[0m "base64:jnVoJrTcjrFBQa/yjx6Lp+N27vrtJtHaXraaaqz123DGZkknBOhVnvY8"
+[32m📩 3 → 4 (online, no save):[0m "base64:T/G+x/R5VnyTk4AFY0QMXldudnktRrn/sUQ2t/GNdUvNGyVcJmrw/6M="
+[32m📩 3 → 4 (online, no save):[0m "base64:tQz3RS7CHry2ndQfQY9Yrh8MO3zqtjv1T+ocS55TNXf+IrtVTPfylW4a"
+[32m📩 3 → 4 (online, no save):[0m "base64:nPdzjDzSVDsRpk0UGsQSROyCYhSzxrh1e3FxDrqEZn599s5oLte3DmWo"
+[32m📩 3 → 4 (online, no save):[0m "base64:cA0y3OsXItbVbTIoEMCOp8ztBRJ6fT9Qt6qjLm2dMoNScoEhtZExMDR5"
+[32m📩 3 → 4 (online, no save):[0m "base64:mcw3PQ9rUVG/kVf2inAmNcG6vgp4a9bISAiQb3fRmditX5K+fiGw3HEu6A=="
+[32m📩 3 → 4 (online, no save):[0m "base64:+HL9ztUD3UKkE1XygsCAU17+XpKGgfRpB1Y63bGVIDbj9mH1bA306cI="
+[32m📩 3 → 4 (online, no save):[0m "base64:lZwfnd7LYfwSAZZiuA0COvfKQ1PdYYoGXwbu5f0Heml7Ry1EATjobk9jdQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:5bxPDO3DPTiis6Vv2ps6+KleSWjTR3QgTHiZxzPc1LQW8XB3MWEFGlif"
+[32m📩 3 → 4 (online, no save):[0m "base64:SuxSG+mJX+QBpzE5gYoDvxuPZvDdZ+IcggFPQH6TFAp4XCARB5lYjUPevw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:7RuOS8KwpJohQ/pXqYv7HSc8Y5YhJdLAAoW/FDOL9vEGkcsSZn4cadY="
+[32m📩 3 → 4 (online, no save):[0m "base64:mD/gE6/m8hHz4lcBKeGAnvkjIQWTik9bUM/zKYjmm94WXAWAssdH0NDGzg=="
+[32m📩 3 → 4 (online, no save):[0m "base64:isIzlk7q0lELnKtFgo+UILgw+os7SWiCmGGNm7yDnhbTwBkklX+M7pxF"
+[32m📩 3 → 4 (online, no save):[0m "base64:74hsNvj8ty/lUu3Xo+QMGWFjeVS0sUKmF/+hLppLMbAU2mEncAMhfO0pKw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:8pAPS2avvKn6TRPmofScBEpLM12IKAPCkaJlj9MgfVjButpg9ExnQSo="
+[32m📩 3 → 4 (online, no save):[0m "base64:Wx8rNQILs85/PMi6xDcBLuJrrz4Bz29MmXG+4LVmC03taASXYrDdxtWF4Q=="
+[32m📩 3 → 4 (online, no save):[0m "base64:+oYEXHmt2rIvOimt10eKGY03oz/QI29yPeHoEEyGmk+IBZ+oBLrW3XC0"
+[32m📩 3 → 4 (online, no save):[0m "base64:n7dJt2WK/+BFtRFoN7g0k7e6ENQ5TgNgluXgINz5+z9oouR2cZH0+6kAkA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:G6YqZ/TLoXEMk3gjfpEQNyfDfjfQNQz+1x1/4Cmkzh863NHqfw5kDA5QiA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:IiO2mA3DU0SXjCDD+BS4TUljC9CvdxS54UFmT33BLN1pz4vLV+s4d68="
+[32m📩 3 → 4 (online, no save):[0m "base64:fnlaaIK3tQulvyzXKcN+/WiNPZOvXdAS8tbWn2wcCha74f4wY0maF3NfzQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:W+pH8JW87idA5nK1JAHuGIt8u4ecjb7MkK1QDPzkafjUssfzxuuw7yQ3"
+[32m📩 3 → 4 (online, no save):[0m "base64:/sKn2CVptptvmmaIfz44O2hRoMASqkh2uHsQZHpYwaoGorcqvsZ1ggj6Ew=="
+[32m📩 3 → 4 (online, no save):[0m "base64:4RaAhiTl69R2I+FZfQ35cFtRF6/DutzFk0oiTNlhf6P2ePrHGxOHqEY="
+[32m📩 3 → 4 (online, no save):[0m "base64:Lf+5bvRbReqF923zU9VEtlUlc7hOleWd7NFwwqBRkIBM5tF4Uywaukeiiw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:Ogj5WwqdV9qFZmKOwoJ7K/15odFHMhopIfb1p9FsMrTp3IuC1PoYFep8"
+[32m📩 3 → 4 (online, no save):[0m "base64:miaPLdeaCV6XJMB4ZNmWIxiI9mdt+sifVXshFzdkba9ulY1BHHV+kuNl6vcqZw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:GxlcjA2e4PGFVM6QLeOVPP1lgoP5XEYsHGtjy3Ptz5ZmuS2oDVmctaNOiL73"
+[32m📩 3 → 4 (online, no save):[0m "base64:UHuIOmSbRqeenL2x0xlz9A/X7VIP6rZ7CsYuSgOeppjk6NW7frAfkB8SsA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:c7vJisVU6u/eWY4124q5eYBblWLGSb161qh5Rze5QaUVsfa0qATzHsp0"
+[32m📩 3 → 4 (online, no save):[0m "base64:nzJgVpo4Crvt4aT4vj695w9lqI4ICKrqTFIUDiBppyX1xBwBR6G7Iv83"
+[32m📩 3 → 4 (online, no save):[0m "base64:RV+T4+/NeKYGnRx9Scj32PyX4rY17ruKGgKNkgJgej+aUFnmOwniSKEGew=="
+[32m📩 3 → 4 (online, no save):[0m "base64:GJNf/qgcomt7tvECloFBsNudH28vWuaoMIPYlnfR6A0KCpQejjP/3jIDQA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:IC+ik6rkV6LLdzC8nUzAPDspcqh6xFO96RquEflRQxinMD7As1YusvEP"
+[32m📩 3 → 4 (online, no save):[0m "base64:TTW/ErQiL34TyP37esET+rRw96LFNTInHS5PQ71U8Vbn+4mjYqDJitMxXA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:YHd+C3STyogMbfWeI0CWzNcOfSB07/0KCfVEYzZnjep7Bx8hdStBX36qBw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:ZJu/wtg1K2tQM9wLmeO/FNKo4fotd0UPH7QVKdMDN120cVbBgWclUpyh"
+[32m📩 3 → 4 (online, no save):[0m "base64:hcx5l5uniOXXghRv56dQnOTY24dpulMiCtVwhNhS8mXDc2LnK4LhpP5qEp8="
+[32m📩 3 → 4 (online, no save):[0m "base64:Ivtl+3a/4oiJZnRrEhhqNRfJ9FFVh0iQDzOyQxvQZ1ei7PSPuYRMXiXFkw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:WvCPKCgc77jhDnJbjlKQK1rEXyZxcXrxJj6RpWK+6RtZ3Y+glGu7f31X6pG7"
+[32m📩 3 → 4 (online, no save):[0m "base64:coeuyNKMKztBjcS6CrChVBKPzMnYnb9JRcJ1tAAZA/B2N56IxmngXMddXQ=="
+[32m📩 4 → 3 (online, no save):[0m "base64:jNw0c6lZyKwCnQFeVpdKAMSe3tq2KbMgg0w2hEFpwRzysZLEl45ksgfEwoXLiQ=="
+[32m📩 3 → 4 (online, no save):[0m "base64:FXLOsPOfOBT8eH+qJn0wza5LsRTPj2xl0Xdl3fErWc43Dvgl2ZALmRT8"
+User disconnected: 4, remaining users: 1
+[32m📩 3 → 4 (offline, saved):[0m "base64:AhTL9wETMlInKAOsDQ5v1+FQHnIRYLA98czGPxFiyVmGwYeRA1q4COt6eOBXKaJ8"
+New Socket.IO connection for user: 4, total users: 2
+[33mSent 1 unread messages to user 4[0m
+[36m🗑️ Deleted after read: 3 → 4:[0m "base64:AhTL9wETMlInKAOsDQ5v1+FQHnIRYLA98czGPxFiyVmGwYeRA1q4COt6eOBXKaJ8"
+User disconnected: 4, remaining users: 1
+[32m📩 3 → 4 (offline, saved):[0m "base64:OOa/L/giky84hHLgOZOlghDg6Ts3kqnvzCVgtI+z3ZFfihDNJR8ROsxIZdukd+fF7vo="
+[32m📩 3 → 4 (offline, saved):[0m "base64:jaE4a06tDFevraLcMtvJgFJnIPa6nI3DvaNo/LEx7ZyAok7Ie+tmbacIAQ9iCVIvQ+4/aQl/TyDIBhJ9c13kfHptHPxrew=="
+New Socket.IO connection for user: 4, total users: 2
+[33mSent 2 unread messages to user 4[0m
+[36m🗑️ Deleted after read: 3 → 4:[0m "base64:OOa/L/giky84hHLgOZOlghDg6Ts3kqnvzCVgtI+z3ZFfihDNJR8ROsxIZdukd+fF7vo="
+[36m🗑️ Deleted after read: 3 → 4:[0m "base64:jaE4a06tDFevraLcMtvJgFJnIPa6nI3DvaNo/LEx7ZyAok7Ie+tmbacIAQ9iCVIvQ+4/aQl/TyDIBhJ9c13kfHptHPxrew=="
+[32m📩 3 → 4 (online, no save):[0m "base64:ilISm3aUV8Xo9JhbNcfBpj1sCLBA1jkty2lMwYkHkF6fCOyHczk2tDB6Ww9NYcZuZ9U="
+[32m📩 3 → 4 (online, no save):[0m "base64:auKpi7D7AcIIGtk+/U6J1QSS3W9h39W4TyUNDAG/+zkn4J5TD0kxH5fPt4bwOw=="
+[32m📩 3 → 4 (online, no save):[0m "base64:lXzHk0jN7LGGm7fVugkd748cyjMXVsHtDMwcCB8kwrdMozatXhnmLtn4RJ39QA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:D9QyJkbotBpiZsB7LtjDYiuzASXIAgNOyUHXiEw8UKx7Pli3J6T5noc5+DVrGA=="
+[32m📩 3 → 4 (online, no save):[0m "base64:UkYqZe2+Rye/rJEx0yImROqHRfG0VjsKtcjf+r9mAlpAGicoPSg6qdQzAWzd2A=="
+[32m📩 3 → 4 (online, no save):[0m "base64:7rUo9U57IpPkYj4D2LsS2xzBh+LQNLkkfOfT273a7Fe9i3RpSUMWX0L6pjZKaOjgBner"
+User disconnected: 3, remaining users: 1
+[32m📩 4 → 3 (offline, saved):[0m "base64:FuXM5xs1VVR2r8Dn80JAwwCjPaBmtm9GSdwrRumshT5cBfz8wAFzLWpdtNa30XbC/qRQ"
+[32m📩 4 → 3 (offline, saved):[0m "base64:fOH5duTIWTpXu5dkCWqawDMobsytWnG1KYM80LW1K76ATQBEEsexHSw="
+[32m📩 4 → 3 (offline, saved):[0m "base64:xmFjedqYqRciGJTLftMK+sY8fIxFH5a1GO/dBNV++7OwXVMXAc3zvVw="
+[32m📩 4 → 3 (offline, saved):[0m "base64:oQGGPNmxP0jkVjTJdYtUUVTwYEJJue1b4Qa+fywjabzZ1gihswjQO8U="
+[32m📩 4 → 3 (offline, saved):[0m "base64:EJ/lZxMOrze96W3yf0DXPfsfnSqyEmZKzFp0GMXzGj5SvnyS1xT4MVM="
+[32m📩 4 → 3 (offline, saved):[0m "base64:nXZRttTmoJI+IkUWEQIo2Sec2eK7tsJWIqYEb/XSJet8NuyQJ3VCCFA="
+[32m📩 4 → 3 (offline, saved):[0m "base64:wNVap+W9jK7PrvG2HOGRxTFdRdl6kIuqtQYofeG9Jtxfu/UTLiejOyI="
+[32m📩 4 → 3 (offline, saved):[0m "base64:pxerdYcxIHkObjtGrRV6HXZfZqWlh0ZVKRnpOp4NyJ7Un7vZU2hwxyw="
+[32m📩 4 → 3 (offline, saved):[0m "base64:8LheLASL7ZokqVwIoLmfRIXk9d031RvHLjTb71bYSKqBJmaN8TlBUm0="
+[32m📩 4 → 3 (offline, saved):[0m "base64:cuv+x+vY23cnavT6mdVi7Rfse7bItjLwgr/ndbTrVNJMEf8NwvJC5po="
+[32m📩 4 → 3 (offline, saved):[0m "base64:DRFL4XnzWYnufkUvA6pUkYMgwThtAiQbCg4lx81DBfG44PoeRMn4ujo="
+[32m📩 4 → 3 (offline, saved):[0m "base64:PUyJ7iYcwWGmyd6prZ/GjHKFsWaoC1dgFqEVrbGHBbyQFExnT00RKNQzDAVmN7vB"
+[32m📩 4 → 3 (offline, saved):[0m "base64:j//1CVxLvNt/oqEFB31VnmyK42CbLSByqkQ2b28ly4jdkrv5jGwwKaIcgJVn6wI="
+[32m📩 4 → 3 (offline, saved):[0m "base64:XHsJajoDlDT/a9PECFAD8q6E/sg5rb2obyzzrnvrF7+nRv/c4FlIhgXBHyylBw6ZaQZtsrTjKy1IU8bG/Ieq"
+User disconnected: 4, remaining users: 0
+[36m🔑 4:[0m "qHXnSA8HF3z7mNZzXSTVB1KM5o4JtDYxsBsfUoqb+Bo="
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 3 (offline, saved):[0m "base64:eJyJX5wXgUKq2Zk28kbBes7Kq4HqCc6CEvZJxhBZm1HGz2IIOP1K/DY="
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 3 (offline, saved):[0m "base64:61AMkr1PincxjV7Dl5rpddd9S5U+UaDGi0e2uEOefLGk2V7PsOl4f70="
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+[36m🔑 1:[0m "qzTVCCb+PMDps36CY5C1t8K8IoIPNWxVHijzC85ZGTg="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 4:[0m "HZCUs33Xvn+AOFBlSXug2z+D/a/N9HOtPbw+ZzBd1ng="
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 3 (offline, saved):[0m "base64:vSOM/VVfD8F+WubQoGw/Czyu+7D/vTX+h6hGWJSYjNYYrD0SCa5motXD"
+[32m📩 4 → 3 (offline, saved):[0m "base64:oaYnKCksdCd3Ggc3V68LE4z7KMNQh2hQ6AU+UVvISUpDaXdZtoxW9waE/w=="
+[32m📩 4 → 3 (offline, saved):[0m "base64:/3a2YMUd5cJdJoxtPWGdbVT+k2DvrqJNIR87ZBr5nyc8m/7uDjWFbnU="
+User disconnected: 4, remaining users: 0
+[36m🔑 4:[0m "sIDMiRUpsAoSSuYkrIApooGAWCBJnkxXSnzOD+THTiw="
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 3 (offline, saved):[0m "base64:Yt0skG/bzuJKhJT/CfPO0IMGqdWslSwFkMhoUvKYS3jWRO3a79j20ho="
+[32m📩 4 → 3 (offline, saved):[0m "base64:uyi8qBxsK5IT2rhNQ5pQh7EKrFFjImGM+FQi6l6+ZTQBaQb2mkWlrEzk6WfjSw=="
+[32m📩 4 → 3 (offline, saved):[0m "base64:XY7rDpK+pyGGTe2B9qmhhNE7QvDqb02UW4jBg0uxceuxep3kfxondCg="
+[32m📩 4 → 3 (offline, saved):[0m "base64:MHjLjYYXTKAZundI1l0NxFvgEQHnFQI08opSUUiIchuRtce25qF2XP4="
+[32m📩 4 → 3 (offline, saved):[0m "base64:A0IPCS7c6euRAQ4syS3y7i8woJ/svygCzgIN06gdTOkBlHI5h8gm/M8="
+[32m📩 4 → 3 (offline, saved):[0m "base64:HLmF4J/UuGnM61PFDwCCOhuNMN9e70fjUI967Q04Y54EeNFMCkQFggA="
+[32m📩 4 → 3 (offline, saved):[0m "base64:yPt1apL9rBy89Z7AhkoQ/Ft8Slxxcon7gICjJxRzk8RdqMlfKw0Bpd4="
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 3 (offline, saved):[0m "base64:N3OR2fiZpGNuVnbNh0BRNBym0Ke46ajpfTbDrPyqhxN3W/G0vkn5DnToe3E="
+[32m📩 4 → 3 (offline, saved):[0m "base64:8DeRO2FojZ0BQNriS00e1C4TCICvNb3n1e13X7kqhvBBHzfoIbd9OE9JcBM="
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 1 (offline, saved):[0m "base64:XkxQV6OPvcDBN2wQFJdvztv8ossKl0Rzd6eLOPXbPLAUEY6J4nrvl3mJqg=="
+[32m📩 4 → 1 (offline, saved):[0m "base64:8hQMao+F+gD2qKreduA1TaazR1K7+5uHK6dldLdSVUhjZ2nLQA7XitLXYpJo5dS8Wyos"
+[32m📩 4 → 1 (offline, saved):[0m "base64:YXLq74Vu9sfZEbx8jVfwT8AKYq5l5UA7U7rzf0c+LcDy7G1A+x613f4="
+[32m📩 4 → 1 (offline, saved):[0m "base64:hpjp8+Iw7qaxYYr075jD4z8Vb01bbk/yxgXW9ChlsUmpPQEv6q1K3Alj"
+[32m📩 4 → 1 (offline, saved):[0m "base64:3RxOPcH1NFqLC7k6/hU15ntsg2zzqhRVrnIZx+2xhfeNlWklM7XaLf14tRkTrQ=="
+[32m📩 4 → 1 (offline, saved):[0m "base64:EZUaxGyxgIinnP/P5YrlDxT3vlX7IsfJaULlLPEsRGOPBycroxbszne9GA=="
+[32m📩 4 → 1 (offline, saved):[0m "base64:g65nqZ1cmeNMpX7EkWVzOC96fQvQQgDEBFj95NgqW71hsbg6zSESc1E="
+[32m📩 4 → 1 (offline, saved):[0m "base64:lytnw9vI5n/aNtAnQt8yKvQxe7yuSnbKQLFal2Q5xImlgFNenyrIrpWkqpM="
+[32m📩 4 → 1 (offline, saved):[0m "base64:EbRMEREWLUvSmJ036wifXhETZiT5LYMT1SsV8Xf9hIKb3jrYgNkez5bs7iI="
+[32m📩 4 → 1 (offline, saved):[0m "base64:1rR4luWfsoOE5mQMFkiaHncPjuAHLtkvj6MHSZsOk8guy4ThWimc1voQkyd1N9MZpBuHVs3D"
+[32m📩 4 → 1 (offline, saved):[0m "base64:bWgAg+QHDmQJYK3MyHQJUs0u9sQCizSg255rGACVtSg+BalmFjki/03RhRsh09Lwipt6LQ=="
+[32m📩 4 → 1 (offline, saved):[0m "base64:QdMHpTR/xJDZ3PdrWaRCm9cVZKrgHzEKnxtm9g9j/sGDTipC4WNJJTFuoAbmKzDUp1A="
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 1 (offline, saved):[0m "base64:jLO6pLYC49FWCGbh2OFj+VwipyUQ9ZovuNxP4BYDsk0+oaYzJl5cv7QOmw=="
+[32m📩 4 → 1 (offline, saved):[0m "base64:1vKqjhtH4bbDxk2a2IO/aEkS0rA0i+j1qFRXUMyQKg+Sa+i2CE/XmV4Y"
+[32m📩 4 → 1 (offline, saved):[0m "base64:WuAjF4C5xcrHSuDDCZxV8v4iAdr8hRCjS2n08M8D7TmqNwmD4P7q42Hd"
+[32m📩 4 → 1 (offline, saved):[0m "base64:IjLVXKHQCyCxURgCyA9FNraXlarBYu9tq3gQvhEu/opfq+iDMGVyB0x1VTPQIlc5"
+[32m📩 4 → 1 (offline, saved):[0m "base64:6rXCOiTR1fu892BY0TxbEtfcIBjlwvPv+6naFcb8ctBEsiwRhwNMrO0vUCU950MUaa0="
+[32m📩 4 → 1 (offline, saved):[0m "base64:WyJyqgjxNI/qwy6Ex9zxXHGjpsAONnQ3I03J0+o1nCvWxRmt23sX28Q="
+[32m📩 4 → 1 (offline, saved):[0m "base64:/g48GwePFGU29USEVrHk1CNiSuqfgfEad6mhpteL+mcMSTy4XzeKkDo="
+[32m📩 4 → 1 (offline, saved):[0m "base64:W5ct3ZUPDYfadfRouMp05EHounjGXGq86PlPxTsnqbiAxXrKZOKS1x41"
+[32m📩 4 → 1 (offline, saved):[0m "base64:X/TtjybtHAd9x54BUY2EqpQUsHRLnt9gW4Fbamps6frAKfJ8pp+epVU="
+[32m📩 4 → 1 (offline, saved):[0m "base64:RrX4afEITs9bUfCgoj/+CuvYT3VJtvJs4ibspEkR9q7KwdfH4jQwLOs="
+[32m📩 4 → 1 (offline, saved):[0m "base64:PJoge50qsnUUMrIQM2/2hYlWj3AMsLWiDZJZCflxUVg8p3wRe7eGgy4="
+[32m📩 4 → 1 (offline, saved):[0m "base64:LO5jmPdvWuSM0TwANMAPYO+S9zUCNPK48M14wzPB48y7ZkLZUUVHH2E="
+[32m📩 4 → 1 (offline, saved):[0m "base64:DLU2zeGiuUG8Kpa8+H81vCPfmmzEN3+BvtHTdZbr1P9YlgilE1o04PU="
+[32m📩 4 → 1 (offline, saved):[0m "base64:sf5FGzoK+/z4V3ufedN1tKcBNvy4pr/W2LWlxF0X9+rnq05p944zuHA="
+[32m📩 4 → 1 (offline, saved):[0m "base64:xl6MJ7IRWw4zV86I0VqqM9h8w0+iySF9K2dIFBfUNAIZ2tEvQHPFN4g="
+[32m📩 4 → 1 (offline, saved):[0m "base64:+fehNE9+yvtzVlxqtFxusDHxN5tjBG1ON+GBzZ1Gei1ImF51MtggY3o="
+[32m📩 4 → 1 (offline, saved):[0m "base64:fOcHxlZbTrtCn8pWvLgwwSdxdGjkiWENw/+zwk45SOblhxGV4I0Hqqo="
+[32m📩 4 → 1 (offline, saved):[0m "base64:kpO5DN6iJle5VdFienceqQUlnoYsQCjaxWcXbMgWeP3j6IXMucf5LD0="
+[32m📩 4 → 1 (offline, saved):[0m "base64:hKlPb2LsV4Old+mJ5eSj3jeTed87QlqNKA5aqGbb9dV8KYYG1V7vtQc="
+[32m📩 4 → 1 (offline, saved):[0m "base64:ukBw+FPboSpfsatDPfPjuJNfqJQkEyGZ+Rf7Eyxj9e7CW0L6b2uA7af5l+VbuscY2AhOaw=="
+[32m📩 4 → 1 (offline, saved):[0m "base64:dALWy4Vlps7Tha2M8ZNU2zLqd+7Zx2eGe6opLIRjEsegeOJHBl/OxtVA6raUbrrJIMQt0w=="
+[32m📩 4 → 1 (offline, saved):[0m "base64:li/a4XZok1uMwifF6LiFRxWIStKbB6HcVbjEYIavXwM7EaMFbqfNTdNA0Wk="
+[32m📩 4 → 1 (offline, saved):[0m "base64:oHZnqUK87IAdiVV+jIFe0jNSXWao4JTNw90/7cls888OFhHR87+U7EumAA=="
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 1 (offline, saved):[0m "base64:MGlNyKbCLw9dZJsMBAbBnC80ZcbXd0uiKcLmDa1tpLGRNtR9KFK1noJF2w=="
+User disconnected: 4, remaining users: 0
+New Socket.IO connection for user: 4, total users: 1
+[33mSent 0 unread messages to user 4[0m
+User disconnected: 4, remaining users: 0
+[36m🔑 1:[0m "1BRvWcn2j/YfLmKWw2IBEv+PCd/gfI01+z0/fZFqoTM="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 36 unread messages to user 1[0m
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:XkxQV6OPvcDBN2wQFJdvztv8ossKl0Rzd6eLOPXbPLAUEY6J4nrvl3mJqg=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:8hQMao+F+gD2qKreduA1TaazR1K7+5uHK6dldLdSVUhjZ2nLQA7XitLXYpJo5dS8Wyos"
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:YXLq74Vu9sfZEbx8jVfwT8AKYq5l5UA7U7rzf0c+LcDy7G1A+x613f4="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:hpjp8+Iw7qaxYYr075jD4z8Vb01bbk/yxgXW9ChlsUmpPQEv6q1K3Alj"
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:3RxOPcH1NFqLC7k6/hU15ntsg2zzqhRVrnIZx+2xhfeNlWklM7XaLf14tRkTrQ=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:EZUaxGyxgIinnP/P5YrlDxT3vlX7IsfJaULlLPEsRGOPBycroxbszne9GA=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:g65nqZ1cmeNMpX7EkWVzOC96fQvQQgDEBFj95NgqW71hsbg6zSESc1E="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:lytnw9vI5n/aNtAnQt8yKvQxe7yuSnbKQLFal2Q5xImlgFNenyrIrpWkqpM="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:EbRMEREWLUvSmJ036wifXhETZiT5LYMT1SsV8Xf9hIKb3jrYgNkez5bs7iI="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:1rR4luWfsoOE5mQMFkiaHncPjuAHLtkvj6MHSZsOk8guy4ThWimc1voQkyd1N9MZpBuHVs3D"
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:bWgAg+QHDmQJYK3MyHQJUs0u9sQCizSg255rGACVtSg+BalmFjki/03RhRsh09Lwipt6LQ=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:QdMHpTR/xJDZ3PdrWaRCm9cVZKrgHzEKnxtm9g9j/sGDTipC4WNJJTFuoAbmKzDUp1A="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:jLO6pLYC49FWCGbh2OFj+VwipyUQ9ZovuNxP4BYDsk0+oaYzJl5cv7QOmw=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:1vKqjhtH4bbDxk2a2IO/aEkS0rA0i+j1qFRXUMyQKg+Sa+i2CE/XmV4Y"
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:WuAjF4C5xcrHSuDDCZxV8v4iAdr8hRCjS2n08M8D7TmqNwmD4P7q42Hd"
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:IjLVXKHQCyCxURgCyA9FNraXlarBYu9tq3gQvhEu/opfq+iDMGVyB0x1VTPQIlc5"
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:6rXCOiTR1fu892BY0TxbEtfcIBjlwvPv+6naFcb8ctBEsiwRhwNMrO0vUCU950MUaa0="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:WyJyqgjxNI/qwy6Ex9zxXHGjpsAONnQ3I03J0+o1nCvWxRmt23sX28Q="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:/g48GwePFGU29USEVrHk1CNiSuqfgfEad6mhpteL+mcMSTy4XzeKkDo="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:W5ct3ZUPDYfadfRouMp05EHounjGXGq86PlPxTsnqbiAxXrKZOKS1x41"
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:X/TtjybtHAd9x54BUY2EqpQUsHRLnt9gW4Fbamps6frAKfJ8pp+epVU="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:RrX4afEITs9bUfCgoj/+CuvYT3VJtvJs4ibspEkR9q7KwdfH4jQwLOs="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:PJoge50qsnUUMrIQM2/2hYlWj3AMsLWiDZJZCflxUVg8p3wRe7eGgy4="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:LO5jmPdvWuSM0TwANMAPYO+S9zUCNPK48M14wzPB48y7ZkLZUUVHH2E="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:DLU2zeGiuUG8Kpa8+H81vCPfmmzEN3+BvtHTdZbr1P9YlgilE1o04PU="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:sf5FGzoK+/z4V3ufedN1tKcBNvy4pr/W2LWlxF0X9+rnq05p944zuHA="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:xl6MJ7IRWw4zV86I0VqqM9h8w0+iySF9K2dIFBfUNAIZ2tEvQHPFN4g="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:+fehNE9+yvtzVlxqtFxusDHxN5tjBG1ON+GBzZ1Gei1ImF51MtggY3o="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:fOcHxlZbTrtCn8pWvLgwwSdxdGjkiWENw/+zwk45SOblhxGV4I0Hqqo="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:kpO5DN6iJle5VdFienceqQUlnoYsQCjaxWcXbMgWeP3j6IXMucf5LD0="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:hKlPb2LsV4Old+mJ5eSj3jeTed87QlqNKA5aqGbb9dV8KYYG1V7vtQc="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:ukBw+FPboSpfsatDPfPjuJNfqJQkEyGZ+Rf7Eyxj9e7CW0L6b2uA7af5l+VbuscY2AhOaw=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:dALWy4Vlps7Tha2M8ZNU2zLqd+7Zx2eGe6opLIRjEsegeOJHBl/OxtVA6raUbrrJIMQt0w=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:li/a4XZok1uMwifF6LiFRxWIStKbB6HcVbjEYIavXwM7EaMFbqfNTdNA0Wk="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:oHZnqUK87IAdiVV+jIFe0jNSXWao4JTNw90/7cls888OFhHR87+U7EumAA=="
+[36m🗑️ Deleted after read: 4 → 1:[0m "base64:MGlNyKbCLw9dZJsMBAbBnC80ZcbXd0uiKcLmDa1tpLGRNtR9KFK1noJF2w=="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[36m🔑 1:[0m "1gRgtdXjJFnLJpVNSgIr6pCF9G5FXwE6fZWdA+GABFY="
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:o7K1j0AO+mt6ZCZPnxxPy2WPgnnbewSBx3TB8EENFNroVlSrmYpLdWy6"
+[32m📩 1 → 4 (offline, saved):[0m "base64:F/14xhYS89H74wyrHOGzjYfJyQ0wp7cXngmCINa9TlktyCYRHXeSpU0="
+[32m📩 1 → 4 (offline, saved):[0m "base64:CuW9rXKaX8lCTgD+0Vlp+1cqtXH51K0YskaOzW/9mKromzPyVnfhpNc="
+[32m📩 1 → 4 (offline, saved):[0m "base64:j+CL+2LYRgTEP/y8davkG+7sdqAzC9vZQcNxyh9R7qgb5EggvznTZTs="
+[32m📩 1 → 4 (offline, saved):[0m "base64:i+jeI2XvStdBNKed+FMahcD84d4cxzlPhfwZTTE5e5oTovLedt9Qk1o="
+[32m📩 1 → 4 (offline, saved):[0m "base64:iLg1BuXsbH86QdB2lteKP7Pu9uTALAhI37HjwM26guOx+ksvb4nBIww="
+[32m📩 1 → 4 (offline, saved):[0m "base64:kuuyFsTeNi0oBwxEtxMBPPKknkcGG5MLiQ6VdkJQkzgTvKXzDQe3LgM="
+[32m📩 1 → 4 (offline, saved):[0m "base64:i5PDA1jLcTjHQX5y6/J+E7l5ULRlErKaE5Dgzs8mY+N3fJpCdj7FeK8="
+[32m📩 1 → 4 (offline, saved):[0m "base64:0WqkWj/FJRRDvU96dyJt90Eh21AoPjgN2xV7ZyMFFNkMLxxczW93FRA="
+[32m📩 1 → 4 (offline, saved):[0m "base64:6BxKobW7+APZEj01g4awWTZLAervoSNHgGZ4pzvH3IyuSl6VRWbcaZk="
+[32m📩 1 → 4 (offline, saved):[0m "base64:GfwTvhqX/F6UJzuf2gr9albXvcQAQmF2vMdEHTaEBSpJd7ZYWQ43XVk="
+[32m📩 1 → 4 (offline, saved):[0m "base64:serHyVrXeCW1aaKm0JT68hFsJ+x9vcAkccSieveAJ3ZSKI/3d1a9jSI="
+[32m📩 1 → 4 (offline, saved):[0m "base64:HbEPilmmMm2WwJ+sUDzZtaKSKxPkOtVxnV0NGwZ29zGYcJK78d8cWsU="
+[32m📩 1 → 4 (offline, saved):[0m "base64:94O9fElUOMaxMVOtf9rA8aOgwt2SXEkpVnHvWGgQO05zIMaRpJemspw="
+[32m📩 1 → 4 (offline, saved):[0m "base64:at6fmuNFy3RFOiCRGThpLJPy9Wm/ggno+hs67sZFqaS8t+7TDA0Y4WE="
+[32m📩 1 → 4 (offline, saved):[0m "base64:T0OUehVLQVNj1RUZQWW9fy45wI28VJ++lYNtlkn+Z/crtMDek1W+41M="
+[32m📩 1 → 4 (offline, saved):[0m "base64:yOWyAIiJDAc3hEgRwApxhqNty0/bFwqsQTodkkET4GHE9lCa1302qFo="
+[32m📩 1 → 4 (offline, saved):[0m "base64:9J7JP5w8QAh9sInq2iFoEJ+o6AHVpoC53Byqbu0tBOCdzFWqYkVlJQI="
+[32m📩 1 → 4 (offline, saved):[0m "base64:x/SaNhsXbVjdlYYkbk/1kA0uExp8NoumoWjAnDHqnqrV8Ccl1ji2Dxw2"
+[32m📩 1 → 4 (offline, saved):[0m "base64:QODKTTEPqRJ/o2mpxMMaA6b6p/F9bK8PV0qDfuqmQerxMJU/pGag8kY="
+[32m📩 1 → 4 (offline, saved):[0m "base64:zYpRPNnjhdphKSeR6rOO5/vdid9QEEYDR1QpSrJPgsXhWfaBMWvHcHg="
+[32m📩 1 → 4 (offline, saved):[0m "base64:G28IY+l8wUk5jVKHVdwIGpedw2wj7sq30s1lbVSMzh+n23ZNIjqKQJM="
+[32m📩 1 → 4 (offline, saved):[0m "base64:lXlGDwcXj3P56w0mcnPQwjU5EzVvVshV3D19StXuWbywPtSc6VlDhhM="
+[32m📩 1 → 4 (offline, saved):[0m "base64:mr1PC+zIvOb//7Bm4tU4zWfzDQ+PXTXbTk3m7wVZBdn5fAXnoXqn42DGniIgiiVKqDpk"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:GXAn9/Flp/kzYj4DPuT/0O8s1ooTHdZhNdf1nE4BUhEja2Bq/gC2uB06GcU="
+[32m📩 1 → 4 (offline, saved):[0m "base64:aXbjBtnpFjI8mEwWbO63sUG6dKFeEK/jt2FeRM5tCLV/OCvOB8qWA9AvQQo="
+[32m📩 1 → 4 (offline, saved):[0m "base64:rCeY+ZPf/ltkqQxLVctnZVbuXbScUMSed/eMjOeYs+qTHjZagx75N4E="
+[32m📩 1 → 4 (offline, saved):[0m "base64:/k78SgBHAKXINJIMmTmWBm0EpyKza7Ya2SjBFd6jM/ZnZjl7+a9UaVI="
+[32m📩 1 → 4 (offline, saved):[0m "base64:bQjUFqjKWYOp95f8w1aEaKV3Zm4GAq0P8r1DCRRTVrv3nfFi962b/FUGCBZYRg=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:WZJw0ZktMyC5JTfRk66FYq4rJ0RJ37YFKZnMEZkxgnbvnScShKk5ydtxpC67gw=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:3m/QCBodrP+efHrb3r14rTQ3U7lS8uS001cmfu0p9cTKOVCVo78SpFyYlYep/rAL"
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "xyqdDozu9nztcnOI1b72XCFhpx/7ENZY5BKKxamo1hQ="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:AbKk/7V05gKrGOa4kAzOb9SBHOTVKq4rkfGTunhM0wQheqiWJPMnmsaGUg=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:YfUuRi34gwe5kOg6D2sYCL/+Z9KACd+OezBj/kJkQ/JaorblRhzCQvs="
+New Socket.IO connection for user: 3, total users: 2
+[33mSent 28 unread messages to user 3[0m
+User disconnected: 3, remaining users: 1
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:FuXM5xs1VVR2r8Dn80JAwwCjPaBmtm9GSdwrRumshT5cBfz8wAFzLWpdtNa30XbC/qRQ"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:fOH5duTIWTpXu5dkCWqawDMobsytWnG1KYM80LW1K76ATQBEEsexHSw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:xmFjedqYqRciGJTLftMK+sY8fIxFH5a1GO/dBNV++7OwXVMXAc3zvVw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oQGGPNmxP0jkVjTJdYtUUVTwYEJJue1b4Qa+fywjabzZ1gihswjQO8U="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:EJ/lZxMOrze96W3yf0DXPfsfnSqyEmZKzFp0GMXzGj5SvnyS1xT4MVM="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:nXZRttTmoJI+IkUWEQIo2Sec2eK7tsJWIqYEb/XSJet8NuyQJ3VCCFA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:wNVap+W9jK7PrvG2HOGRxTFdRdl6kIuqtQYofeG9Jtxfu/UTLiejOyI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:pxerdYcxIHkObjtGrRV6HXZfZqWlh0ZVKRnpOp4NyJ7Un7vZU2hwxyw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8LheLASL7ZokqVwIoLmfRIXk9d031RvHLjTb71bYSKqBJmaN8TlBUm0="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:cuv+x+vY23cnavT6mdVi7Rfse7bItjLwgr/ndbTrVNJMEf8NwvJC5po="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:DRFL4XnzWYnufkUvA6pUkYMgwThtAiQbCg4lx81DBfG44PoeRMn4ujo="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:PUyJ7iYcwWGmyd6prZ/GjHKFsWaoC1dgFqEVrbGHBbyQFExnT00RKNQzDAVmN7vB"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:j//1CVxLvNt/oqEFB31VnmyK42CbLSByqkQ2b28ly4jdkrv5jGwwKaIcgJVn6wI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XHsJajoDlDT/a9PECFAD8q6E/sg5rb2obyzzrnvrF7+nRv/c4FlIhgXBHyylBw6ZaQZtsrTjKy1IU8bG/Ieq"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:eJyJX5wXgUKq2Zk28kbBes7Kq4HqCc6CEvZJxhBZm1HGz2IIOP1K/DY="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:61AMkr1PincxjV7Dl5rpddd9S5U+UaDGi0e2uEOefLGk2V7PsOl4f70="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:vSOM/VVfD8F+WubQoGw/Czyu+7D/vTX+h6hGWJSYjNYYrD0SCa5motXD"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oaYnKCksdCd3Ggc3V68LE4z7KMNQh2hQ6AU+UVvISUpDaXdZtoxW9waE/w=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:/3a2YMUd5cJdJoxtPWGdbVT+k2DvrqJNIR87ZBr5nyc8m/7uDjWFbnU="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:Yt0skG/bzuJKhJT/CfPO0IMGqdWslSwFkMhoUvKYS3jWRO3a79j20ho="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:uyi8qBxsK5IT2rhNQ5pQh7EKrFFjImGM+FQi6l6+ZTQBaQb2mkWlrEzk6WfjSw=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XY7rDpK+pyGGTe2B9qmhhNE7QvDqb02UW4jBg0uxceuxep3kfxondCg="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:MHjLjYYXTKAZundI1l0NxFvgEQHnFQI08opSUUiIchuRtce25qF2XP4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:A0IPCS7c6euRAQ4syS3y7i8woJ/svygCzgIN06gdTOkBlHI5h8gm/M8="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:HLmF4J/UuGnM61PFDwCCOhuNMN9e70fjUI967Q04Y54EeNFMCkQFggA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:yPt1apL9rBy89Z7AhkoQ/Ft8Slxxcon7gICjJxRzk8RdqMlfKw0Bpd4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:N3OR2fiZpGNuVnbNh0BRNBym0Ke46ajpfTbDrPyqhxN3W/G0vkn5DnToe3E="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8DeRO2FojZ0BQNriS00e1C4TCICvNb3n1e13X7kqhvBBHzfoIbd9OE9JcBM="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:FuXM5xs1VVR2r8Dn80JAwwCjPaBmtm9GSdwrRumshT5cBfz8wAFzLWpdtNa30XbC/qRQ"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:fOH5duTIWTpXu5dkCWqawDMobsytWnG1KYM80LW1K76ATQBEEsexHSw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:xmFjedqYqRciGJTLftMK+sY8fIxFH5a1GO/dBNV++7OwXVMXAc3zvVw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oQGGPNmxP0jkVjTJdYtUUVTwYEJJue1b4Qa+fywjabzZ1gihswjQO8U="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:EJ/lZxMOrze96W3yf0DXPfsfnSqyEmZKzFp0GMXzGj5SvnyS1xT4MVM="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:nXZRttTmoJI+IkUWEQIo2Sec2eK7tsJWIqYEb/XSJet8NuyQJ3VCCFA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:wNVap+W9jK7PrvG2HOGRxTFdRdl6kIuqtQYofeG9Jtxfu/UTLiejOyI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:pxerdYcxIHkObjtGrRV6HXZfZqWlh0ZVKRnpOp4NyJ7Un7vZU2hwxyw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8LheLASL7ZokqVwIoLmfRIXk9d031RvHLjTb71bYSKqBJmaN8TlBUm0="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:cuv+x+vY23cnavT6mdVi7Rfse7bItjLwgr/ndbTrVNJMEf8NwvJC5po="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:DRFL4XnzWYnufkUvA6pUkYMgwThtAiQbCg4lx81DBfG44PoeRMn4ujo="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:PUyJ7iYcwWGmyd6prZ/GjHKFsWaoC1dgFqEVrbGHBbyQFExnT00RKNQzDAVmN7vB"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:j//1CVxLvNt/oqEFB31VnmyK42CbLSByqkQ2b28ly4jdkrv5jGwwKaIcgJVn6wI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XHsJajoDlDT/a9PECFAD8q6E/sg5rb2obyzzrnvrF7+nRv/c4FlIhgXBHyylBw6ZaQZtsrTjKy1IU8bG/Ieq"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:eJyJX5wXgUKq2Zk28kbBes7Kq4HqCc6CEvZJxhBZm1HGz2IIOP1K/DY="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:61AMkr1PincxjV7Dl5rpddd9S5U+UaDGi0e2uEOefLGk2V7PsOl4f70="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:vSOM/VVfD8F+WubQoGw/Czyu+7D/vTX+h6hGWJSYjNYYrD0SCa5motXD"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oaYnKCksdCd3Ggc3V68LE4z7KMNQh2hQ6AU+UVvISUpDaXdZtoxW9waE/w=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:/3a2YMUd5cJdJoxtPWGdbVT+k2DvrqJNIR87ZBr5nyc8m/7uDjWFbnU="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:Yt0skG/bzuJKhJT/CfPO0IMGqdWslSwFkMhoUvKYS3jWRO3a79j20ho="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:uyi8qBxsK5IT2rhNQ5pQh7EKrFFjImGM+FQi6l6+ZTQBaQb2mkWlrEzk6WfjSw=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XY7rDpK+pyGGTe2B9qmhhNE7QvDqb02UW4jBg0uxceuxep3kfxondCg="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:MHjLjYYXTKAZundI1l0NxFvgEQHnFQI08opSUUiIchuRtce25qF2XP4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:A0IPCS7c6euRAQ4syS3y7i8woJ/svygCzgIN06gdTOkBlHI5h8gm/M8="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:HLmF4J/UuGnM61PFDwCCOhuNMN9e70fjUI967Q04Y54EeNFMCkQFggA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:yPt1apL9rBy89Z7AhkoQ/Ft8Slxxcon7gICjJxRzk8RdqMlfKw0Bpd4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:N3OR2fiZpGNuVnbNh0BRNBym0Ke46ajpfTbDrPyqhxN3W/G0vkn5DnToe3E="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8DeRO2FojZ0BQNriS00e1C4TCICvNb3n1e13X7kqhvBBHzfoIbd9OE9JcBM="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:FuXM5xs1VVR2r8Dn80JAwwCjPaBmtm9GSdwrRumshT5cBfz8wAFzLWpdtNa30XbC/qRQ"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:fOH5duTIWTpXu5dkCWqawDMobsytWnG1KYM80LW1K76ATQBEEsexHSw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:xmFjedqYqRciGJTLftMK+sY8fIxFH5a1GO/dBNV++7OwXVMXAc3zvVw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oQGGPNmxP0jkVjTJdYtUUVTwYEJJue1b4Qa+fywjabzZ1gihswjQO8U="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:EJ/lZxMOrze96W3yf0DXPfsfnSqyEmZKzFp0GMXzGj5SvnyS1xT4MVM="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:nXZRttTmoJI+IkUWEQIo2Sec2eK7tsJWIqYEb/XSJet8NuyQJ3VCCFA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:wNVap+W9jK7PrvG2HOGRxTFdRdl6kIuqtQYofeG9Jtxfu/UTLiejOyI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:pxerdYcxIHkObjtGrRV6HXZfZqWlh0ZVKRnpOp4NyJ7Un7vZU2hwxyw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8LheLASL7ZokqVwIoLmfRIXk9d031RvHLjTb71bYSKqBJmaN8TlBUm0="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:cuv+x+vY23cnavT6mdVi7Rfse7bItjLwgr/ndbTrVNJMEf8NwvJC5po="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:DRFL4XnzWYnufkUvA6pUkYMgwThtAiQbCg4lx81DBfG44PoeRMn4ujo="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:PUyJ7iYcwWGmyd6prZ/GjHKFsWaoC1dgFqEVrbGHBbyQFExnT00RKNQzDAVmN7vB"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:j//1CVxLvNt/oqEFB31VnmyK42CbLSByqkQ2b28ly4jdkrv5jGwwKaIcgJVn6wI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XHsJajoDlDT/a9PECFAD8q6E/sg5rb2obyzzrnvrF7+nRv/c4FlIhgXBHyylBw6ZaQZtsrTjKy1IU8bG/Ieq"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:eJyJX5wXgUKq2Zk28kbBes7Kq4HqCc6CEvZJxhBZm1HGz2IIOP1K/DY="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:61AMkr1PincxjV7Dl5rpddd9S5U+UaDGi0e2uEOefLGk2V7PsOl4f70="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:vSOM/VVfD8F+WubQoGw/Czyu+7D/vTX+h6hGWJSYjNYYrD0SCa5motXD"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oaYnKCksdCd3Ggc3V68LE4z7KMNQh2hQ6AU+UVvISUpDaXdZtoxW9waE/w=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:/3a2YMUd5cJdJoxtPWGdbVT+k2DvrqJNIR87ZBr5nyc8m/7uDjWFbnU="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:Yt0skG/bzuJKhJT/CfPO0IMGqdWslSwFkMhoUvKYS3jWRO3a79j20ho="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:uyi8qBxsK5IT2rhNQ5pQh7EKrFFjImGM+FQi6l6+ZTQBaQb2mkWlrEzk6WfjSw=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XY7rDpK+pyGGTe2B9qmhhNE7QvDqb02UW4jBg0uxceuxep3kfxondCg="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:MHjLjYYXTKAZundI1l0NxFvgEQHnFQI08opSUUiIchuRtce25qF2XP4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:A0IPCS7c6euRAQ4syS3y7i8woJ/svygCzgIN06gdTOkBlHI5h8gm/M8="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:HLmF4J/UuGnM61PFDwCCOhuNMN9e70fjUI967Q04Y54EeNFMCkQFggA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:yPt1apL9rBy89Z7AhkoQ/Ft8Slxxcon7gICjJxRzk8RdqMlfKw0Bpd4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:N3OR2fiZpGNuVnbNh0BRNBym0Ke46ajpfTbDrPyqhxN3W/G0vkn5DnToe3E="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8DeRO2FojZ0BQNriS00e1C4TCICvNb3n1e13X7kqhvBBHzfoIbd9OE9JcBM="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:FuXM5xs1VVR2r8Dn80JAwwCjPaBmtm9GSdwrRumshT5cBfz8wAFzLWpdtNa30XbC/qRQ"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:fOH5duTIWTpXu5dkCWqawDMobsytWnG1KYM80LW1K76ATQBEEsexHSw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:xmFjedqYqRciGJTLftMK+sY8fIxFH5a1GO/dBNV++7OwXVMXAc3zvVw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oQGGPNmxP0jkVjTJdYtUUVTwYEJJue1b4Qa+fywjabzZ1gihswjQO8U="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:EJ/lZxMOrze96W3yf0DXPfsfnSqyEmZKzFp0GMXzGj5SvnyS1xT4MVM="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:nXZRttTmoJI+IkUWEQIo2Sec2eK7tsJWIqYEb/XSJet8NuyQJ3VCCFA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:wNVap+W9jK7PrvG2HOGRxTFdRdl6kIuqtQYofeG9Jtxfu/UTLiejOyI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:pxerdYcxIHkObjtGrRV6HXZfZqWlh0ZVKRnpOp4NyJ7Un7vZU2hwxyw="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8LheLASL7ZokqVwIoLmfRIXk9d031RvHLjTb71bYSKqBJmaN8TlBUm0="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:cuv+x+vY23cnavT6mdVi7Rfse7bItjLwgr/ndbTrVNJMEf8NwvJC5po="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:DRFL4XnzWYnufkUvA6pUkYMgwThtAiQbCg4lx81DBfG44PoeRMn4ujo="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:PUyJ7iYcwWGmyd6prZ/GjHKFsWaoC1dgFqEVrbGHBbyQFExnT00RKNQzDAVmN7vB"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:j//1CVxLvNt/oqEFB31VnmyK42CbLSByqkQ2b28ly4jdkrv5jGwwKaIcgJVn6wI="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XHsJajoDlDT/a9PECFAD8q6E/sg5rb2obyzzrnvrF7+nRv/c4FlIhgXBHyylBw6ZaQZtsrTjKy1IU8bG/Ieq"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:eJyJX5wXgUKq2Zk28kbBes7Kq4HqCc6CEvZJxhBZm1HGz2IIOP1K/DY="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:61AMkr1PincxjV7Dl5rpddd9S5U+UaDGi0e2uEOefLGk2V7PsOl4f70="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:vSOM/VVfD8F+WubQoGw/Czyu+7D/vTX+h6hGWJSYjNYYrD0SCa5motXD"
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:oaYnKCksdCd3Ggc3V68LE4z7KMNQh2hQ6AU+UVvISUpDaXdZtoxW9waE/w=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:/3a2YMUd5cJdJoxtPWGdbVT+k2DvrqJNIR87ZBr5nyc8m/7uDjWFbnU="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:Yt0skG/bzuJKhJT/CfPO0IMGqdWslSwFkMhoUvKYS3jWRO3a79j20ho="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:uyi8qBxsK5IT2rhNQ5pQh7EKrFFjImGM+FQi6l6+ZTQBaQb2mkWlrEzk6WfjSw=="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:XY7rDpK+pyGGTe2B9qmhhNE7QvDqb02UW4jBg0uxceuxep3kfxondCg="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:MHjLjYYXTKAZundI1l0NxFvgEQHnFQI08opSUUiIchuRtce25qF2XP4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:A0IPCS7c6euRAQ4syS3y7i8woJ/svygCzgIN06gdTOkBlHI5h8gm/M8="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:HLmF4J/UuGnM61PFDwCCOhuNMN9e70fjUI967Q04Y54EeNFMCkQFggA="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:yPt1apL9rBy89Z7AhkoQ/Ft8Slxxcon7gICjJxRzk8RdqMlfKw0Bpd4="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:N3OR2fiZpGNuVnbNh0BRNBym0Ke46ajpfTbDrPyqhxN3W/G0vkn5DnToe3E="
+[36m🗑️ Deleted after read: 4 → 3:[0m "base64:8DeRO2FojZ0BQNriS00e1C4TCICvNb3n1e13X7kqhvBBHzfoIbd9OE9JcBM="
+New Socket.IO connection for user: 4, total users: 2
+[36m🔑 4:[0m "HzvplDzYLyoVD0mxr9HHqk2psRne3FddVQkmlWX91mo="
+[33mSent 33 unread messages to user 4[0m
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:o7K1j0AO+mt6ZCZPnxxPy2WPgnnbewSBx3TB8EENFNroVlSrmYpLdWy6"
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:F/14xhYS89H74wyrHOGzjYfJyQ0wp7cXngmCINa9TlktyCYRHXeSpU0="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:CuW9rXKaX8lCTgD+0Vlp+1cqtXH51K0YskaOzW/9mKromzPyVnfhpNc="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:j+CL+2LYRgTEP/y8davkG+7sdqAzC9vZQcNxyh9R7qgb5EggvznTZTs="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:i+jeI2XvStdBNKed+FMahcD84d4cxzlPhfwZTTE5e5oTovLedt9Qk1o="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:iLg1BuXsbH86QdB2lteKP7Pu9uTALAhI37HjwM26guOx+ksvb4nBIww="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:kuuyFsTeNi0oBwxEtxMBPPKknkcGG5MLiQ6VdkJQkzgTvKXzDQe3LgM="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:i5PDA1jLcTjHQX5y6/J+E7l5ULRlErKaE5Dgzs8mY+N3fJpCdj7FeK8="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:0WqkWj/FJRRDvU96dyJt90Eh21AoPjgN2xV7ZyMFFNkMLxxczW93FRA="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:6BxKobW7+APZEj01g4awWTZLAervoSNHgGZ4pzvH3IyuSl6VRWbcaZk="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:GfwTvhqX/F6UJzuf2gr9albXvcQAQmF2vMdEHTaEBSpJd7ZYWQ43XVk="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:serHyVrXeCW1aaKm0JT68hFsJ+x9vcAkccSieveAJ3ZSKI/3d1a9jSI="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:HbEPilmmMm2WwJ+sUDzZtaKSKxPkOtVxnV0NGwZ29zGYcJK78d8cWsU="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:94O9fElUOMaxMVOtf9rA8aOgwt2SXEkpVnHvWGgQO05zIMaRpJemspw="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:at6fmuNFy3RFOiCRGThpLJPy9Wm/ggno+hs67sZFqaS8t+7TDA0Y4WE="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:T0OUehVLQVNj1RUZQWW9fy45wI28VJ++lYNtlkn+Z/crtMDek1W+41M="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:yOWyAIiJDAc3hEgRwApxhqNty0/bFwqsQTodkkET4GHE9lCa1302qFo="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:9J7JP5w8QAh9sInq2iFoEJ+o6AHVpoC53Byqbu0tBOCdzFWqYkVlJQI="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:x/SaNhsXbVjdlYYkbk/1kA0uExp8NoumoWjAnDHqnqrV8Ccl1ji2Dxw2"
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:QODKTTEPqRJ/o2mpxMMaA6b6p/F9bK8PV0qDfuqmQerxMJU/pGag8kY="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:zYpRPNnjhdphKSeR6rOO5/vdid9QEEYDR1QpSrJPgsXhWfaBMWvHcHg="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:G28IY+l8wUk5jVKHVdwIGpedw2wj7sq30s1lbVSMzh+n23ZNIjqKQJM="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:lXlGDwcXj3P56w0mcnPQwjU5EzVvVshV3D19StXuWbywPtSc6VlDhhM="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:mr1PC+zIvOb//7Bm4tU4zWfzDQ+PXTXbTk3m7wVZBdn5fAXnoXqn42DGniIgiiVKqDpk"
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:GXAn9/Flp/kzYj4DPuT/0O8s1ooTHdZhNdf1nE4BUhEja2Bq/gC2uB06GcU="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:aXbjBtnpFjI8mEwWbO63sUG6dKFeEK/jt2FeRM5tCLV/OCvOB8qWA9AvQQo="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:rCeY+ZPf/ltkqQxLVctnZVbuXbScUMSed/eMjOeYs+qTHjZagx75N4E="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:/k78SgBHAKXINJIMmTmWBm0EpyKza7Ya2SjBFd6jM/ZnZjl7+a9UaVI="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:bQjUFqjKWYOp95f8w1aEaKV3Zm4GAq0P8r1DCRRTVrv3nfFi962b/FUGCBZYRg=="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:WZJw0ZktMyC5JTfRk66FYq4rJ0RJ37YFKZnMEZkxgnbvnScShKk5ydtxpC67gw=="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:3m/QCBodrP+efHrb3r14rTQ3U7lS8uS001cmfu0p9cTKOVCVo78SpFyYlYep/rAL"
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:AbKk/7V05gKrGOa4kAzOb9SBHOTVKq4rkfGTunhM0wQheqiWJPMnmsaGUg=="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:YfUuRi34gwe5kOg6D2sYCL/+Z9KACd+OezBj/kJkQ/JaorblRhzCQvs="
+[32m📩 4 → 1 (online, no save):[0m "base64:LvfSQPEJRvFYmWmkBVwmbTA3BwYopeo8Po+FRY9g7i1Nvgl8yvuyBqI="
+[32m📩 4 → 1 (online, no save):[0m "base64:pJ9f9VmJln+UIzzV60walxWt5ZSleQGwCCxbY3hg3Lh+7mJLsZkHFkWRemvwQA=="
+[32m📩 4 → 1 (online, no save):[0m "base64:mwxFF3DFac3plK+UHa0+imRtXtgv5f5GVebQM0t+VUEkUiwsGQfDw79fG/g="
+[32m📩 4 → 1 (online, no save):[0m "base64:dmYyrjiOSt7HDuEqL6Qm0k7Iqik2A+hRTs1Qu6V4oN+28q9KKzWdc2HBkw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:aw4otmrcsLlAE6rc8aZoy3AhOdeNUBTILMRe6yTtz6OYmWFkK28JoNYlTA=="
+[32m📩 4 → 1 (online, no save):[0m "base64:k/bUGa8ESEb1hCFaTzueqeb8T2SUJS6t9RIKypJ7MgsUTph1V2dKnxBx"
+[32m📩 4 → 1 (online, no save):[0m "base64:i4TbF2WmwkJZTzhnoAyyqjhKUv/E/kmCA/hCc6Uz03pS/9rUnj/hewgFCg=="
+[32m📩 4 → 1 (online, no save):[0m "base64:RrssNyaOLiIRoKMoB+r3thab6VcfVnk3diSDp0L+ieLPQ6LxOFA3MLk="
+[32m📩 4 → 1 (online, no save):[0m "base64:N7JRSf1b5x5qk6MjrC+7d61CpCnbPQz+pMUilca2YwvMjgLU8P/7TsqI9Q=="
+[32m📩 4 → 1 (online, no save):[0m "base64:klyDDjhseJZJdQEAWUwpX+P5SXiLXSBxUyrqD3i3eTpLEFMICeUPtMW8"
+[32m📩 4 → 1 (online, no save):[0m "base64:lwSt8d6OzxV3tFxcyBkOytv08UxbB7wyd4Og6l8gM05JjWzIdIjyoTxJnK8="
+[32m📩 4 → 1 (online, no save):[0m "base64:CfFSwzfz1OxHtJL7tazjK0s4OJUN59+CGoodD+4OaTqpwUMaOZ0MkPGVOQ=="
+[32m📩 4 → 1 (online, no save):[0m "base64:OLVfasKuA/71+gvA/fhWSC1CpnpWeW+w6ZRlUBb1GBSv9D/Oa5dhIQGnXA=="
+[32m📩 4 → 1 (online, no save):[0m "base64:MhvITGoNH2Zk/O83carq3PSScdr/gZ4Ms6nJnc8yLTROb9w2R1I/3Ld8"
+[32m📩 4 → 1 (online, no save):[0m "base64:qAI7Ow3ckr3P4UksDqZn/GjP4SSnih0jV/VZLdqK0vv039ju7bj5iwa+"
+[32m📩 4 → 1 (online, no save):[0m "base64:2l8wrfuFLf4BJvFuvpSONmHCSlIcIKx0AkGHpmLaSlRZWXfJnS6L7VJmAQ=="
+[32m📩 4 → 1 (online, no save):[0m "base64:rZ1a36HrAT+RYY0ZmUKJZCZdEAiN/W2wScOyx8MjzY6szPFVMANbvaIPBw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:iCOixY64nYFngqm3fR9XoqvwakpowLgGGkYgkZVGB1AhMlXgNTK235Lz4Q=="
+[32m📩 4 → 1 (online, no save):[0m "base64:7RBmPEf7z4WGoFvFSRgWD3rOFsxl52WATdQfirXe5rU8EcxpuPP0eT/EDg=="
+[32m📩 4 → 1 (online, no save):[0m "base64:v3OxVpsaw4mX3fIPkfac9M880ZOdaXGO6H1TzjQxl8md5FrQsifsVNA="
+[32m📩 4 → 1 (online, no save):[0m "base64:qj4T9ylKMqaIe5m9klMFtV1NpuJyutQP2qTnQNzR/4pMMzh9JM5jB+vDCYw="
+[32m📩 4 → 1 (online, no save):[0m "base64:6crg1BPALDFUoZ4yg8MvpspLtmhT1IEWZQE8ftn3yHwxaP2IHOHMUBVbpw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:9//QhemTbEVoUrZFSYFChFPHZG8WDjYGfc0EeATes92l89g7vwPZUEliZw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:DWhn+lexsfFQWbIF9o8Rs0VmaZh0AweRB1Enp9jsBxtF04eAGOUOHPA2"
+[32m📩 4 → 1 (online, no save):[0m "base64:jQ6yOQZAMgE6r22Gf5Hd/lCtpCzSfCJRnXbQwF816+SXmmWVBONqDxl6"
+[32m📩 4 → 1 (online, no save):[0m "base64:uCt6Hsgp2hwV8S+eemNu+vagaFiKU1IL86X9tzyN/I664fVY2AtiuF6X1g=="
+[32m📩 4 → 1 (online, no save):[0m "base64:7aEAseVex2XFA6l1H8fv/toF6cyXrYuJhH0QiwCQ9jVeas4QMkZtmaMfcA=="
+[32m📩 4 → 1 (online, no save):[0m "base64:yJrp73GkTXpP2m/Lf5NBNf12ejNoHIvMOB/YAPcVOG4Lgn2F42XnSvj79w=="
+[32m📩 4 → 1 (online, no save):[0m "base64:LEoVa60hrk5+2ICqWn3CZ/NMdrwrKRH37n2sjlM8GhDVnO5rkHZGYxZTX5I="
+[32m📩 4 → 1 (online, no save):[0m "base64:Gew7O88xTSven8nIWl8czZogpnowGf3GJMKhH/UhJp+kDoezrs1rlBpB/QNwyw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:ruOxyPrr5kZB9lG8va/kfrAkWfEzoJaLC72WbK+lqJC6R1WSTSCy5ITA4Q=="
+[32m📩 4 → 1 (online, no save):[0m "base64:8wJ+oeiMB+DNqCHJ3LwzUycdHEF1m+E9+HiSP6V9iC75q+iONq0v2D5vzA=="
+[32m📩 4 → 1 (online, no save):[0m "base64:bBl+kb6YyZErp6mfXKStPtg+ybormyNdVCitVjxKnvDONbXZ2RFxWdj1sw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:u+YCdgEuxNgQqv2msJ5W1IWQOjSvLFjJdk//tYC2Cc2SPvH6AqIP3B9ZUw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:UpDU+E16MdcoOcfNyuqfU1UiAIo51SEX3JLFjD9hkI+w8GxOxUr3hE90gg=="
+[32m📩 4 → 1 (online, no save):[0m "base64:jpRKibVG38tcQJhx/oaY6ok7jT2GSEj73zu8MSRZUmuyhZNJGnPutMXg"
+[32m📩 4 → 1 (online, no save):[0m "base64:p1iXe7JVMfrxfyLXfccdo7pbG/8y4+DYEuEdTAWfAVSZsIkR+8+2K1j1"
+[32m📩 4 → 1 (online, no save):[0m "base64:0I1sG5Psbo7Tv5c+ttksgHVfeONfVc54Yx6KTyFNvEXpOKxOW2xtYcBOqQ=="
+[32m📩 4 → 1 (online, no save):[0m "base64:pTuYYe427eN2hnBSFhsmmrkMM09xgAKJklV68sIZw0FJrs4FKmeIg4wdDAinqZuwnw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:gRDb9Srj2OvEyyM+DubdVCd8cBvS3s01QKsSQOYQ37Pm55mADofES0/fftglCVA="
+[32m📩 1 → 4 (online, no save):[0m "base64:6+qsu/XjELM3CXH1H401iCUi5P06CGpJTscWY3b+e5gKqVC9qQfI3Y5yZHxUxA=="
+[32m📩 1 → 4 (online, no save):[0m "base64:RSABzoOpmX8PxCAcmX4hoo36yiXUinGUUhSriJvd+BAh0QL+RHryelmXLaY="
+[32m📩 1 → 4 (online, no save):[0m "base64:B1mc4zORHxznY1d3/ERhAKtMnXCZi3xnlJPC9sov0kqY0MoZ642Nv2iG7S8L"
+[32m📩 1 → 4 (online, no save):[0m "base64:Ckj2IQ3rokkRQsQ3bnA3tc3JlHE+Es1/yws9QICn0COaQtcCGZuSFc3B"
+[32m📩 1 → 4 (online, no save):[0m "base64:wd21cG9phk3FHVT9i7T/hEY8ayDvPd89gy6SxQrpbpZYOKRqJOPfe5M="
+User disconnected: 4, remaining users: 1
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:fuGCyEDGlSwTh5OR4espbNKFqgwmimJ6aILje21sr73+OsQeS6djwr0="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:Rdz64O0sUV1X09IHJiquNT5E3BEJZx3ONfXELHunlcTPgP2huxTU4lASPg=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:O5XsaKjXDcX2cFDD0aPmBUWoVJpBfFHgaWN8eKm5MlQF0phcHAt8iRfcbw=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:jnV5YzvvHuzflRUtxMB0BBdpOEdbYR+6B009xTKzjXTdigdQ7IzxLuTm0Vg="
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "+bUJA23O6xEjMuBrLNtKJH1v82Lz1rfs2y85QAznG24="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+New Socket.IO connection for user: 4, total users: 2
+[33mSent 4 unread messages to user 4[0m
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:fuGCyEDGlSwTh5OR4espbNKFqgwmimJ6aILje21sr73+OsQeS6djwr0="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:Rdz64O0sUV1X09IHJiquNT5E3BEJZx3ONfXELHunlcTPgP2huxTU4lASPg=="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:O5XsaKjXDcX2cFDD0aPmBUWoVJpBfFHgaWN8eKm5MlQF0phcHAt8iRfcbw=="
+[36m🗑️ Deleted after read: 1 → 4:[0m "base64:jnV5YzvvHuzflRUtxMB0BBdpOEdbYR+6B009xTKzjXTdigdQ7IzxLuTm0Vg="
+User disconnected: 4, remaining users: 1
+New Socket.IO connection for user: 4, total users: 2
+[33mSent 0 unread messages to user 4[0m
+[32m📩 4 → 1 (online, no save):[0m "base64:4hr8ofJFuQnI5w/Ba7/0a74x6JBUfFRqHoRc8o71d2CcZ/LmVzGvC8t4af+JIcGrIFaJvg=="
+[32m📩 4 → 1 (online, no save):[0m "base64:pFh339UTqn0S4Q3RO6MfrkvXkUG/Wbvou5mpUlMHb73AhTI1S0bJe8acAgd0yqJ65R86/U0lUig="
+[32m📩 1 → 4 (online, no save):[0m "base64:Bs/yK7+rewuRLp8fjX+sofj9qR89gzW3L1v9GiVU4rRVMJl62QxZLY/SNSk="
+[32m📩 1 → 4 (online, no save):[0m "base64:4T5FRT6Lpw2OkLQFuagqeeLvq7LiZmNMrQIQxeDgkvt9krUegDNZAgk9xQ=="
+[32m📩 1 → 4 (online, no save):[0m "base64:j7cflOz+ZMdHu7NMEBGjCQgc1B85YkN3gVCGnfgB0b0KK1Wa7hTTeFjsXEM9DncT"
+[32m📩 4 → 1 (online, no save):[0m "base64:jL9ityN1uExNSaCGNo6f7XqBSzEg3f59zkeUtInlCojh7xV9PB0aTtZz9wi6p0/WU+TjWg=="
+[32m📩 4 → 1 (online, no save):[0m "base64:q0uMpiYo2BgdvxCNWHqj3RUx/3DaI95w/MArRgSBAu6TO6tpfPqiTzqZ"
+[32m📩 4 → 1 (online, no save):[0m "base64:hSwYRQPwatulS2JJQOreLI7wxOQpNhwfCQRJq1en6Zzh4yeHBKOYIw6+keCdXw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:j/pDwNIXvWgPsEMnV886NRwXbFf79nu2rgqT6A2zMRkutbtxtIoxZs2JoR+yog=="
+[32m📩 4 → 1 (online, no save):[0m "base64:PaAfoGsDUfk8GVL91KWnl2PBLdL9O5JInWPPGADU4wtX1evUCmwY5XST8UQ="
+[32m📩 4 → 1 (online, no save):[0m "base64:4ZkYzyjzOJBBT1zibV4KoGnWoBW5aDuy6b3HWiGYKkV1LraZW+a5YIzGLQBcdg=="
+[32m📩 4 → 1 (online, no save):[0m "base64:5iMs1PKj4QmgS5WBDWxKFgLrhuk2ls9ke3NiQKEQk0CXy2ZNo0sivXpUTKrFJw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:BCI7/Tm1/JAlux/7J+zTrspyYBpOBJMaSQtXXyL84N8zOzt2BlR+zAfROELQVw=="
+[32m📩 4 → 1 (online, no save):[0m "base64:YJ5RklJbJUndZqzrtOHuy7rSkAjbPBqmQzgKAPW0aAm6TyaJm0l7rX81"
+[32m📩 4 → 1 (online, no save):[0m "base64:EMytu4G73TMIOMQWvn3Spm7plncv/lGiBDuTlUknFK2lwtfIBCzM0chGQLZLHHER"
+[32m📩 4 → 1 (online, no save):[0m "base64:PcSlX5ZZh1UCNySZIiUYvyRldlLzxwafdUKrAREAX3kE/mZ8y95xaUlBUyo="
+[32m📩 4 → 1 (online, no save):[0m "base64:kON8wAgTTzG5OPVpGMGaZ2YWGbZHftG6qEEhi8m5ftb4w2uch7ncbOn7Oz5w2Q=="
+[32m📩 4 → 1 (online, no save):[0m "base64:E4p6V0YQbVm42NA1efadpQaBcTKnpYlHvnwhMIBUps/FfOoE4fvC2cH8i4Nvv75vOtfrlQsYA0GmPQ=="
+[32m📩 4 → 1 (online, no save):[0m "base64:BGBghejxX0OUmsbvqtHsnskeRfOjqHnCVh6GoF6v7rm5CuBODNZCCw5TRHM82sYjx4yLQCC67PMA3w=="
+[32m📩 4 → 1 (online, no save):[0m "base64:y0pgGyW71KHchkqr0rZAQoFvhKkU0k50srcghe1Fa8tKB748BI/+sPyOmp7q6SdM2nXF4IUmuNPlgA=="
+[32m📩 4 → 1 (online, no save):[0m "base64:UV+XUg8YxfY+bItvTbV1m3O4I7fI27smdn9SqO8zg//RY6O23lEwkzdmFEIO3EZ1"
+[32m📩 4 → 1 (online, no save):[0m "base64:rRyigkAfC2JhVlIy9ZBKjZkXgWZ4WdxedLAqkVTzwJ6iTPh40HTRhOS2Xw8/IAOX5qvSVwdLh6gXLz/GeSkeXA=="
+[32m📩 4 → 1 (online, no save):[0m "base64:AGi6WSgItYwAEVJ7NGMqLBDTIKaE1xc+5GE5jwWO+Qc/zQemRcywX+1Yl7mTgSP9pLmVv+MITTv0VqrZ"
+[32m📩 1 → 4 (online, no save):[0m "base64:Sa+6YG7wbSJcJswTb0/tbf5FZGzI3AeqFnl7MONn+S5TgYUpXWWPPI5T"
+[32m📩 1 → 4 (online, no save):[0m "base64:VEMwbNL+bzTi3bpEhyXY1VBfXduN8i/2VSE9AuRa79FT8WhVHOgNFM0="
+User disconnected: 4, remaining users: 1
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:Z8u8VLbPmefjj4TpEJ0+GGuj5Ne4rug/UnDcHoZ0oVlUplOwCQeWbro="
+[32m📩 1 → 4 (offline, saved):[0m "base64:ZbZaYngpr3uI9Zco3MJDu7n2tRGiq8G6mnKpW0u6RvzkC57hdCfO5miMPf5IbNpK"
+[32m📩 1 → 4 (offline, saved):[0m "base64:5c/XT4vr4iBGK+tweOlnW6n9VZHvpPTDMlFzaV6dCb13YQdr1kbiYALV"
+[32m📩 1 → 4 (offline, saved):[0m "base64:lOUu2OYxSXvIkw4aHuq5VpxhBXa6sVryQzZ+56hTlQQrdwjku4khidUc9A=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:3KI5AOJ290GKnw2B990mgBTjjH8u8sbz3hBKYN9W2/UUzQn4g7eSi3Ml"
+New Socket.IO connection for user: 4, total users: 2
+[33mSent 5 unread messages to user 4[0m
+User disconnected: 4, remaining users: 1
+New Socket.IO connection for user: 4, total users: 2
+[33mSent 5 unread messages to user 4[0m
+User disconnected: 4, remaining users: 1
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:UqAzkD5zJKzaxv5+DtaEBkkMJqDP3Jz3dWMHJIGj5cs4eUiFb6vjf4w="
+[32m📩 1 → 4 (offline, saved):[0m "base64:yrHJyy4hta6s1ZI4SHR63gt+sd8Y8KT/c59aLpuS27sgxsI1lXPYyOGsqfbe9QVtCwc="
+[32m📩 1 → 2 (offline, saved):[0m "base64:FwQjEORBPvXQrCRGnr/OvjAHCgB8xT5Ozm1E6kbnSU0jvxzpZdge3pXS"
+[32m📩 1 → 2 (offline, saved):[0m "base64:99o9CSO0ITskunX9/5lHeVGovk02pgws2tqH12I1hPFExyPhMEe/BoY="
+[32m📩 1 → 2 (offline, saved):[0m "base64:O9TGLE7F27NKUqvkLuUm9s2orIkfjRyGpGyT9xJlj3hAcLa5Z25CSXk="
+[32m📩 1 → 2 (offline, saved):[0m "base64:vy93KMpBcgxaKhJGnv2n40CQI7rmOANWFQ0yhwGt1l4luzm/biR5Ptg="
+[32m📩 1 → 2 (offline, saved):[0m "base64:gekGoqpLzvztiWl9/vblSuzrznzJ4vYX1faH2xfr+hYOF1AMs0puGIQ="
+[32m📩 1 → 2 (offline, saved):[0m "base64:bSFHmr3FwqpYcR5ac1iJDkUtCYWCHNk5LdlrKz1nPrz7WkZK/BUUPB0="
+[32m📩 1 → 2 (offline, saved):[0m "base64:NxRvyxfylPU/ES5bGeh3QU9SLwTFZdxRpvSbVO6OJHo5Z9PSvRbsCMc="
+[32m📩 1 → 2 (offline, saved):[0m "base64:qLRt0K91FDjCcyJ+5Ad6YWyVVbIo5ZHJDIMjtSQSVNGZDEXRPWQ81Hg="
+[32m📩 1 → 2 (offline, saved):[0m "base64:/59gV7Rj231MruOwkNCGuv/AbsaEY3dTf/u3eNqvsom9wF3Ji3xOcsI="
+[32m📩 1 → 2 (offline, saved):[0m "base64:Hn6I3v5dLTJidDU/1VkmOU5aKk6vCJoR6bMsttsxNdus/4JWNWfRaO0="
+[32m📩 1 → 2 (offline, saved):[0m "base64:sgGh44XWgJDcxSp/gmTczUvRIf9IrYuur4yFm89XIb8uDJXrsH+aar4="
+[32m📩 1 → 2 (offline, saved):[0m "base64:mU8ualfuS6rH/wMwMe9XvR5NwU0uoGe6xUUGFY6DoiZHFWXogz7LTw0="
+[32m📩 1 → 2 (offline, saved):[0m "base64:gWumF+lQAtWmf47cNAE8fcHTwL+65xtUIowTai86dcp+o/VIRTqqYV8="
+[32m📩 1 → 2 (offline, saved):[0m "base64:nWhA+zB9ys4bK/hyXqrjUY60nfzVo6R0q5NZhnyahqOl64tkVXty1GA="
+[32m📩 1 → 2 (offline, saved):[0m "base64:qsrSW0wcO1vc/ooUnQv5VBVhZ/67UcBi/qYGJFkv5C5gWx+exGJ+30Y="
+[32m📩 1 → 2 (offline, saved):[0m "base64:llr7QG8A9BgwU1D5BAp4BjhRrhHiJrxMcSCKrJ/WZ3IjwOz0qDhs2nU="
+[32m📩 1 → 2 (offline, saved):[0m "base64:ny+xppf0fvZmDkXTO9khROwAflGRxii9l+EJF6VLYW91rI5ACR9bcNs="
+[32m📩 1 → 2 (offline, saved):[0m "base64:qyRDoU/XRShYxokJ4OhlziKWmvvQQhUtONX8sHlKCI5Vx6PTAFi/mds="
+[32m📩 1 → 2 (offline, saved):[0m "base64:RJuE5Ludc/MPNkdCf7tRKumocaDE3Tm2Nzo5oeexEzAeDUqMkQVsFRs="
+[32m📩 1 → 2 (offline, saved):[0m "base64:wQ6CLWTBO9XireQBf9F1e17syshfspnjQQ4q2isw1X1oJ0C6p1o/jI8="
+[32m📩 1 → 2 (offline, saved):[0m "base64:pTmylUNzsRuFozkPhLopq8ErtJrmnShsH7z8gubBQ+DGRG3Nr5mMf8Y="
+[32m📩 1 → 2 (offline, saved):[0m "base64:pdgHxEfx1bDoJyvxH8V770d4HfIjQX/Ort5FQHz4psAaJYsPVQuSOXE="
+[32m📩 1 → 2 (offline, saved):[0m "base64:aEoBvWeIdY8GdQV3lU6XvIPcLXfogNvJF12uty6k1tHNKIO6e3PocCA="
+[32m📩 1 → 2 (offline, saved):[0m "base64:GPd6+LfbZAt1Ch6zUsv2aGBTVpaHrWyVXlwuO1Ml3qGaWYhDsX10OZw="
+[32m📩 1 → 2 (offline, saved):[0m "base64:sxcdF679QSDlkDvRcIuA4VYn0tT6dz8gusejsh4a3u/HhRvutgYvLc7T"
+[32m📩 1 → 2 (offline, saved):[0m "base64:nGhxbsCJUnnqatUxUPJapkLck/NzwfPj/Hah+VWgooeUV31TXux3+pEr07YPXQ=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:y3cg3ZEyvLEdSXFv5pJEvUXGXBa3kyjo5Ns6mym9PShYEjACiECoFCg="
+[32m📩 1 → 2 (offline, saved):[0m "base64:GKgoVbiCRLZdfiH+1JZkM9+uCP8Udr9DAUN/11woXwVPxZKgQRYBJDM="
+[32m📩 1 → 2 (offline, saved):[0m "base64:GchYKtJPdSj+7gND25jbMtVV/jxYCx3QOM0YBoQO3/wj9YLp8hrpwnAEHzpcka8="
+[32m📩 1 → 2 (offline, saved):[0m "base64:H/oQd8EpvnSF0bXHjBw6hWzL8wR411m1gvGIbdvjCqnzdapoA2W6zJbyx9o="
+[32m📩 1 → 2 (offline, saved):[0m "base64:rMbgH15RHNz7oC1wAiGJ052WaEo0WI1kBxUCHCYqWuDMJr0MAWyccMH0"
+[32m📩 1 → 2 (offline, saved):[0m "base64:tYdEZjTwuT+hyxra8A30aH+wG3mJUvZ4cfzx2LYptCusZ+wzRrg1T3Q2"
+[32m📩 1 → 2 (offline, saved):[0m "base64:g1H/mzL0uvz3VBgP2qdOY0F498Ab+ICRXI4JQfm5A3zcRxubYD9tt3qh"
+[32m📩 1 → 2 (offline, saved):[0m "base64:hCAXMjihYw2AuAcoMeYQmDxosPrSiWZlUP2TMaVRfL3aQxebkBY2nPuZ"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:0Nyz2rRD5LrkvlPdNU/hz8MwPrsyGOUONtZd9ps4Bj8bPrd1nYgVAAnBDWHQ"
+[32m📩 1 → 4 (offline, saved):[0m "base64:eJDG0NAmpxMvhBestV1FNusEeFtzmqXKrGKCUN1sCRlKH6lfThb6RZxZrjBAPt/Nr+BCfA=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:ncoVNBVEaWQi8BdjINOAwVmCiY9q6yKRomCF+qTw+/EdYrsrmcMvac6xU6eZmg=="
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "YykUk/hrtKIjKAZ7dc3gBAxH3dZEUtaAF0fOFg2y0hk="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:A8T8YkjAAsh2IqVs/IKNOyX+DOH57DSx+WhA5xsxIb1NZJQA09MxLNg8"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:puOhHCNiZF1IWPmTnAf05PZCNAZQuZBTw5YtI6K6zawUtzbRROnXHLk6"
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:KvXZ1dlCUJonTVeLJ0g76iQxq/HeVrCXc0TysojG9DED3RnhACC8AzE="
+[32m📩 1 → 4 (offline, saved):[0m "base64:LVLPIFikT52fUgIzqPtHq9bn+goIzMEZnEqhBzf4Rcxq0DH/Jl7upwY/"
+[32m📩 1 → 4 (offline, saved):[0m "base64:4sPDzVWYdvmn7VrfO76z4xO5JWsupyjM71Qhe0Kgs1HWCzro3gZGiUyZjz4="
+[32m📩 1 → 4 (offline, saved):[0m "base64:IzK3H+x85LUm/Uiy/OJwisCDh2aU3NyJkaqEzYyEfavfTEO1YcpfjIN+pw=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:YSPBiV57RyayHWuq/WAdn+l3vHuRu+Alkr8LSFWSgrz9jxQonR9JubzA"
+[32m📩 1 → 4 (offline, saved):[0m "base64:xHCwOBgwa1dhaT/i0xuJf4Qq7nrQX5PWNfI3DQEwuC7BtdQZ0N3GX4OR"
+[32m📩 1 → 4 (offline, saved):[0m "base64:30Z8Y7+Lzczx2QPFJrqOaV9l+BBKOzjFHM0B2gjc3TflKBLWGiB2Ols="
+[32m📩 1 → 4 (offline, saved):[0m "base64:OlOzhTEmdZqRW0oK+DJ9Flz7LeeSnpJANWbwYTPlW9fvZ8b4EgNra8Yl"
+[32m📩 1 → 4 (offline, saved):[0m "base64:NXKD8a/AQXs8oFD/q+wkkmP1hQeISzx08AuhvqyT7tstin5uCyKjgK4="
+[32m📩 1 → 4 (offline, saved):[0m "base64:iC/ebQ1Yxa2aH0QNsMklwtDHQNhatv2nirGSuberHxMnLdFKQfaUKGQ="
+[32m📩 1 → 4 (offline, saved):[0m "base64:LZPAa4nIWPtD3JcixRHVTfCQDUteRZJMGvdc+VdJ0gJ/3yBZHSsiM2Q="
+[32m📩 1 → 4 (offline, saved):[0m "base64:MpnZSyxdE5ndR3UpfyrS0WZTJ/+I6I+iHt+JnYvRQ/+Ko3M0xdwvPUE="
+[32m📩 1 → 4 (offline, saved):[0m "base64:eMaB9ptVxfNLxWL3jl4trLb9BaUC/1Qkvvp6Q0wmiyqJkcqoyRSDts8="
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 2 (offline, saved):[0m "base64:9kN3eOh7nlf6GUjmFOT2DKYuHX+bF4smKtu2Ts7YDmgJbgaWMYj4OddI"
+[32m📩 1 → 2 (offline, saved):[0m "base64:cRBavDH0TwVMbn6h6V1NoS8X7c0aWD+nYHgIuZJzlSARHPpLSfMy/NU="
+[32m📩 1 → 2 (offline, saved):[0m "base64:RLLbp7C5ykZy+CyL6RYWc3V2crRTl1IyzYbHalmlSziTLXPt01k6Tp4="
+[32m📩 1 → 2 (offline, saved):[0m "base64:0Who91nCShWGLryc5LOrU6X99t/0YRjmxHW22ZySzGkdbD28xD5zVoI="
+[32m📩 1 → 2 (offline, saved):[0m "base64:v0bfo1gJ0whaL4yk+hh+bEV7DOG3D1DREaT6z7Vj1rq6X/4k9l3CEjA="
+[32m📩 1 → 2 (offline, saved):[0m "base64:khZNwhPQC684k8JnQr72fOy5d8AxGsMuLkoMNRf/RzTusjtIWLZORTVMlxjqlQ=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:Nz+8/WuQZfxMSfpIsEOhW0qzUrg+3KTQaDuyXlxIYis7h8TXuwQ/VGLgP5o="
+[32m📩 1 → 2 (offline, saved):[0m "base64:SrXTIfR3bwVdBLwB+4uoMHg3fZXUXBDoVayXx8i9pCuBSRTWC5VnhFGsJOM="
+[32m📩 1 → 2 (offline, saved):[0m "base64:RfY4+8DuAKd7E/kaBxMMhKPVRlpZ++DkkaMUz6yQ/vHx9vYXNNAULIg4UYs="
+[32m📩 1 → 2 (offline, saved):[0m "base64:OfmetpHP3u3pA+jg6qoNJ/uW+H0x25XnabzmxFa/o31WHqmqkYmRxQSlz0VCyQ=="
+[32m📩 1 → 2 (offline, saved):[0m "base64:lz7QHlQu4/eYZl28pAvvX4pI46Yoi1p6nkAsuOh3vCqJXZppyqn84Azm5BLj"
+[32m📩 1 → 2 (offline, saved):[0m "base64:KQF2vGI+iRj+x5Gk3vyT9qyW+dCCw6apy7xQXYAyfCukkZveb1Ltm3k="
+[32m📩 1 → 2 (offline, saved):[0m "base64:984Weolgi0cCKANnoOmTJsjwSuNQI8L+2bCRFuXO5btxkg4Fh8H5/Zg="
+[32m📩 1 → 2 (offline, saved):[0m "base64:Z/RilJyo2furJB9he4AhjcIKuXJHBG/k3BvRb3LKAoe4KlePCP26Ulk="
+[32m📩 1 → 2 (offline, saved):[0m "base64:PgIGpgefgbtZRqa9whdH9lI7Gg4Y1Lh+oNm9qJL5+FRhAPvYgS3uGm4="
+[32m📩 1 → 2 (offline, saved):[0m "base64:k7jpUM9ThWh5xOGehi+aApfHn28pKou7OKopo1eSRMJ3afsxC/bjMyk="
+[32m📩 1 → 2 (offline, saved):[0m "base64:hZTv9e27d/h48ec1cg30BOkxqgbQIgfYAe8kMkSCP5rhFFUcCAr+bLNQ"
+[32m📩 1 → 2 (offline, saved):[0m "base64:WnvmFm8Bfg0oVgt0nOkPLOrG2Uwty8RR2z9ZA0HpIp4A9wxMl+u8D48ZG9JgIiLp"
+[32m📩 1 → 2 (offline, saved):[0m "base64:3Cmm9fr/56InJk9kdVKxrCLaVYdVgfTg5er4GiFP6vdxoI436AQAJPIn4pw="
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "h36nLrj7HJv5uyYYNG7QA2Jsp1pHrJX0Qpnnfpm0jmw="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "U106TdNLAhh0XTyw9qjf4BANz2X1b6rSu34vNoa6F10="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "D7pjPb1tEsVZAWGl3vngxIj9fXkjGc5r8pZDKqjS+3E="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 0
+[36m🔑 1:[0m "1cRJNTBN/fFItRTeeFTcCUrduiv34JC5O2G5xItybQg="
+New Socket.IO connection for user: 1, total users: 1
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 4 (offline, saved):[0m "base64:y6PJZilGIZovoFo5RmS0x+bEFTjfQCM9NROnNBrYWsoNEuvZO4Spw2Yvj5g="
+[32m📩 1 → 4 (offline, saved):[0m "base64:AopE+YridfwP/+xNXTQ9VeMEEWNDMi6k4qUYtUOTStMlGiGtBslDZERr3oE="
+[32m📩 1 → 4 (offline, saved):[0m "base64:vtaDwA8OuOKuRQMssLfH5b4eoleS0rxgHNnRq7LsMSwv7n7UAM001BGbBED3Aw=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:c7RF1kDny5xZOktOxFK3kQWO4N5GOzTJ8ELxBIxwBvztby5VrjdIh7vcsw5nfg=="
+[32m📩 1 → 4 (offline, saved):[0m "base64:Q7aYLqUzpcFXrfftKzakD8Fy+hK+OkQtFTh6ibnxu5y409Qu0FIdNrH9uAld"
+User disconnected: 1, remaining users: 0
+[36m🔑 5:[0m "aksA/yYeyV+7MC6OmobHsovrThWX82b3CpDul9A07Vw="
+New Socket.IO connection for user: 5, total users: 1
+[33mSent 0 unread messages to user 5[0m
+[36m🔑 6:[0m "DEzEcMXCpfoNJfCb9ZQtZVge/pMewvo9eSeDqHjUWxQ="
+New Socket.IO connection for user: 6, total users: 2
+[33mSent 0 unread messages to user 6[0m
+[32m📩 5 → 6 (online, no save):[0m "base64:dbKplJa5HEWWZcF6qydaKcmax11sEgLjMzDs+sOYFbElkK3KrXXMVV0Aj9KvH0JeRWiemQ=="
+[32m📩 6 → 5 (online, no save):[0m "base64:gvIs62H2dshjhT3rPyRwIsH9XsfCbZ2rnN5Me/NWRzrngSEwjDKBt1COIFBvoIdE2rFmad2n"
+[32m📩 5 → 6 (online, no save):[0m "base64:38k1oC0D9dn3xrdTXqwlB65gbwf2nQRFzM46GOlW8+tNFGJfvMxHSQ7PAFtABJ6TAg=="
+[32m📩 6 → 5 (online, no save):[0m "base64:PGnJ9vpcHjBXEZ4+2kWcNOk9Mb4KHqdlUOZXVdwMCrrmE2hybUbBkmY2AknpLcsVryTOq0M="
+[32m📩 5 → 6 (online, no save):[0m "base64:B0syqWgG8mi5DONRCJTmj6UlE7DLpnMKNuvDqB/Ibjf6UtQzXePhJDZqDEr9StGjBqXOzg=="
+[32m📩 6 → 5 (online, no save):[0m "base64:WDrwcIJiqfYcXUyxJ/uzWdn3VmeJcPTBdoFpjuanCrQJgk1nY+VW3vdddfvkqgGWwOg="
+[32m📩 5 → 6 (online, no save):[0m "base64:04qeGHI0JPIGhJv1lwnsB/m5BiJhFu635THXIZqXcVq0l91lBAJ3bJS6I5ZI20ryCjk3dUFWMmvz4AbA0+JT"
+[32m📩 6 → 5 (online, no save):[0m "base64:8C6YnenELNMCCGW/bhHsjRUsucQAgsE0o2iZzA3SqIEObmSW6MPiGXKJ/PeDojue"
+[32m📩 5 → 6 (online, no save):[0m "base64:gb/YUVgkjncDRLggw2BoA82JXUE7oLo1AfVBr4oZx00lotzV54ZoY8Hd4x70azJr+V9OTDi0vO9PQkMGXsrWo+SYrfavmrWmS+oo2iqFDxxMo4vYa3rC"
+[32m📩 6 → 5 (online, no save):[0m "base64:gHG4UR81nj0+wcl4Svzmo4xTlh2Ukg8nnXsXveqXy4kIdvTqkDWZc7Ac"
+[32m📩 5 → 6 (online, no save):[0m "base64:bz0oQOafQBHqT2PQuhPJXmKEP8wUg7/tG/U5vWs59s3/1UKLSKjb+5/BJdfWoGaxbg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:rFsO80ScvBS8usdBHURGaGS7D9QoKS4VA3oTKn8hzWjwxD7xVXF/9Nw245I228JykR4="
+[32m📩 6 → 5 (online, no save):[0m "base64:m1okiWUdASaXy0EdCzI+VL2rarm93SQVDTWkAUejlw6p2R2eXxcTBqzFxLaGsfvKGg=="
+[32m📩 6 → 5 (online, no save):[0m "base64:0/IPRqWdFar6brw/q4Gg8nrL09uQOx96Ujo3Ot9yoaGsnhkH40KT0LnymkeOlI8J"
+[32m📩 5 → 6 (online, no save):[0m "base64:F6yxikM/IHNsd08eSiQ2X1Sfra2FM7GhEwo4i/7lNGWqm2wpEf66pUTXV911bw/uzJhxFg=="
+[32m📩 6 → 5 (online, no save):[0m "base64:69/0oypZNecHVRIbYrgNJehNaDHPYQ7RcFaoQgRSa5KpJsZM5pXr8Lj2t0q2F987VsaTAA=="
+[32m📩 5 → 6 (online, no save):[0m "base64:/WYPmHmjb2kfLCUzWy6FxuHjPUtPgFbK+8eRKmA77in1qXuVf06s8wZzM+q/Dpo4KRoc0j02WNiHA95IPp+g6zlPrUxMEw=="
+[32m📩 6 → 5 (online, no save):[0m "base64:8go76tHlpCjMvYiiieYX8p4kXn3UY4FVBvhLAOuVo7w+KCqOZKb0prrjEZveU2rouKH8SWq1AF0="
+[32m📩 5 → 6 (online, no save):[0m "base64:laUJ6BQkOZXcoauogjhDd0naU7ZWYtHpqbtZM8NMX6n8sxkU5uI6rZTLBaVnpusp3Ch/ErnX4g=="
+[32m📩 6 → 5 (online, no save):[0m "base64:j6cuA9wijzHNEw8yCP/EZNNrZ9XIrtQ7TYpKS2ikUKccj4AW4NDfhRBWPUgB+KyBm2UtXHo3lPQ="
+[32m📩 5 → 6 (online, no save):[0m "base64:VshfyeLRWEjAJnr5AML+864r3OIohr7IVzV6bks3/Sjjvt2mMWmG2xygAZci5XZo+iw="
+User disconnected: 6, remaining users: 1
+[36m🔑 6:[0m "6+8E7AzvDDrHW1M8jVRPqnuFBGMScbK/u9YEqlX6vTo="
+New Socket.IO connection for user: 6, total users: 2
+[33mSent 0 unread messages to user 6[0m
+[32m📩 5 → 6 (online, no save):[0m "base64:lGVsWkHJmfTQ0qnsFNQITJToN0zXsZEYl+Lt6YzKruC/xb46Z/NoiS0OqVFAmCw="
+[32m📩 6 → 5 (online, no save):[0m "base64:XAlLjTM8kcQh7cpuyYxegqkjwCqXRP7a3Rp1j/Z9+0YGuKVKkeYLPZhPMNY="
+[32m📩 6 → 5 (online, no save):[0m "base64:Y5mLlvxeIjxprdyY9BCNWhQRpw2a3NB3jkn8Q5J455tinf4csTZ1Dm97U/nIUdVE+Yw="
+User disconnected: 6, remaining users: 1
+[36m🔑 6:[0m "TB2HuAibaDLDVVhDlQBk5s1MfaXPxOMci/dOlerNaiY="
+New Socket.IO connection for user: 6, total users: 2
+[33mSent 0 unread messages to user 6[0m
+[32m📩 5 → 6 (online, no save):[0m "base64:icT0gZuS/Kq/gI8rLecrwr2eyIkUR/IRqUJRXSAcbYWNE3qpb59x6LGKMJ/yFXTh39b599Zq6P0UGHXn"
+[32m📩 6 → 5 (online, no save):[0m "base64:bXgv8M2omtbcTp+sA3lvLaBj02hVHMmxDRTIovl52cH0fwQEwCKE4Mf7wI9HFSdIQz4="
+[32m📩 6 → 5 (online, no save):[0m "base64:1OwxnnysT7b1NKaucJjdX68qtwdbdVvdmZw7DUKcWKUhBmQL4biSw4uOpw8="
+[32m📩 5 → 6 (online, no save):[0m "base64:faw0zHb8uoU6Ap1IGussKcgbXlYFuj0fM68GiH5R6fNFfbZ8TUC51N1poOl9d+G/QS8BXy4hWA=="
+[32m📩 6 → 5 (online, no save):[0m "base64:FJmNtPloZMzjPSt0M17NIqubjsYZHFuvowGD7rSsWGqzHU2i1ZVDqPL9kAg="
+[32m📩 5 → 6 (online, no save):[0m "base64:nc/Sz2haWeMVSy8HccTuB+hW2KvPXsNE4mx9T8JRdguat6bhUSMnddShKl7S2w=="
+[32m📩 5 → 6 (online, no save):[0m "base64:0OhTtinZ3ZCtHsiUUsbxTfNMvcZXMlXqaSfEyHNo/v3bAjHkPfU7/3NHM5jk+w=="
+[32m📩 5 → 6 (online, no save):[0m "base64:EChDkGRYGvUHml75M7P366dJ+J78KpDdOfjb+7bAliX+pXreEjAG2SqOEpY="
+[32m📩 5 → 6 (online, no save):[0m "base64:Lvgb/z6a4vkV93j0c5reLm1UTyvTrvrbiXLfy1PO+22GnQfV7S6o6rrFEEA="
+[32m📩 5 → 6 (online, no save):[0m "base64:T8CBblKblAOnBz/sgR0D6hM7mYDfEM07I0gq1RqfBh6tHDlHhpFnYVczTYc7iA=="
+[32m📩 5 → 6 (online, no save):[0m "base64:6wLpHkxhLVxrfHjeqIV9trMV3K9qMGDrxT6zIj/1kPhSqde+/VyNIKFm67Y="
+[32m📩 5 → 6 (online, no save):[0m "base64:1Ie8KQkA73tUvde/0bKgpu6+r+f6aNZ1S4DDSdZ+L3aHibLIlRe3h3oMJD4log=="
+[32m📩 5 → 6 (online, no save):[0m "base64:NjVUWKZa1L4MM2W4BKUvN8jMkzkVRDSMlGZZXIi4ATbvIy2OT9ECDY10wfI="
+[32m📩 5 → 6 (online, no save):[0m "base64:fNJLPp63Er6HN5H1WjC3OIZQNgXKCFa9DqeaPrERNuNCo+l6P875icKRMzU="
+[32m📩 5 → 6 (online, no save):[0m "base64:o0Q4MNQa6znZQr0NHVmu2LSFUzOdA28LLlmC9WXDczyDdPDQl4trqOkgIMAe+g=="
+[32m📩 5 → 6 (online, no save):[0m "base64:+6VMBdYkHNt561Qo4veK6fM1TY4EI7iWE/kmCfN4xsLixNC6ppU802ySPsg="
+[32m📩 5 → 6 (online, no save):[0m "base64:Pv2a1pigPkrMsGYUMbndAnYK7MENS/QPgfAz7+mQGXdIi0zU3Hg5Km29a8MVdA=="
+[32m📩 5 → 6 (online, no save):[0m "base64:uCjySJJOOhEUfEIr2qmrtw87vnaG9oKtN2+5qP1nD+4N75IkR/4NMVph"
+[32m📩 5 → 6 (online, no save):[0m "base64:UcTGDBENJbqgLwU42RPAzTC6Y8KoCTaaAEBv/OoPnxljTZ3/rBNenMtHVBcrKA=="
+[32m📩 5 → 6 (online, no save):[0m "base64:WWRmamHZiiEOfxfV7KZKWa1VNBObsTlibkeurLYrj1KgtCvVeCcxG28eqg+Fgg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:7nt6ltMGKNREzHaY2iOD8qxV8a+qLlOHau9bBz/u1c6pu3+bj57XekCkFLw="
+[32m📩 5 → 6 (online, no save):[0m "base64:jd/YTgUKNaREJS/kU+uj06OUEY40DQil84x5FTGjJWrsZQpjqcgl/GQ3250U/A=="
+[32m📩 5 → 6 (online, no save):[0m "base64:9OI8Mwhkh5gCXVw7cxVHMun2kR7OB11DZvYvi8FriDLrO3UHWFhyj6Du"
+[32m📩 5 → 6 (online, no save):[0m "base64:OREzYcxDxZVh9CrY5sxLax42dXlm5JyA3pdjabvRYinqbshSRirN77RiPwATCg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:Q/9BvKxsYTCOtpguUa4azeOkpo6AeXO8bDrxa7k6fKKgvNYdmmDTPY56DxU="
+[32m📩 5 → 6 (online, no save):[0m "base64:VZDK6RTc4/LLF2gito+ckPabaNgYVohleQNPgoN6SjCKHQtS3eL9fztew6T7hQ=="
+[32m📩 5 → 6 (online, no save):[0m "base64:9Dq6NNXdDzIUDOmlQVwys86A32LgQMM9mgXa/8nFjQziehpjyiCrvqisBhszyw=="
+[32m📩 5 → 6 (online, no save):[0m "base64:yqaRn1URsEZX2LDVCx9Ch1U5plRsba6NldGu8oEZildHah6ttYwmdz+G"
+[32m📩 5 → 6 (online, no save):[0m "base64:eLYoYUwsujLUqVgkHuo/9tq6NCsLw0jFK1ueIt3erPpI2RWd3/om/mVqcvBOng=="
+[32m📩 5 → 6 (online, no save):[0m "base64:FYfzSbsD6FAIDpngWxJrQ+EdhdJO1t3qe8BO9kkYPoSrFx5JsylSWMI5Smu3xg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:KsoY+sttKYTNziBTnWpZK/8Y43HxZ6WnPsNE1ftg5Yf2OSwlQe7BApWDtSg="
+[32m📩 5 → 6 (online, no save):[0m "base64:pHxSw9dyYEby9bSrvbiM74PJco5MWrVEYeZVbQpgh8U5J1v/vCBquDPS27tmQVFYRi6m04sA"
+User disconnected: 6, remaining users: 1
+New Socket.IO connection for user: 6, total users: 2
+[33mSent 0 unread messages to user 6[0m
+[32m📩 5 → 6 (online, no save):[0m "base64:9csHFGco//zAfdIztWkrUrHMT6W4Cm3agX9DcRll0e5RBhh6ZGAhay8gZ0uuG5eHPl+DF9FT"
+[32m📩 5 → 6 (online, no save):[0m "base64:dZXT1HxO9piBORy7229LxMIH9wn2TWMGXCivuzWBgaphzHqw7MMw0jM69LzOPFDGAV3lYsFn"
+[32m📩 5 → 6 (online, no save):[0m "base64:bSiPubIaffn/n1HNdQAwZbNVp6O6Hpq+l4HBTh3RI/EnVO2cpYKbvTs="
+[32m📩 5 → 6 (online, no save):[0m "base64:zr62XDXK/I7AIy8gqabj2uWwJa1YkpnQmPCOZEGgZJ2hQHr1X5n7SxE="
+[32m📩 5 → 6 (online, no save):[0m "base64:qXJzVRciplxLqOdsGrBjwtktFSSMXYYvJ0BtOsL2VFf5/SalDonaWk28OTRTWg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:SVJjG0NbXGty2cZ8HqVADz2CUnRdiMC1/lUi4qP7g0q3Qffvw/w5H8z6Jd3aKa2rrt5PEaqLlw=="
+[32m📩 5 → 6 (online, no save):[0m "base64:Lh66dBivXxgC1qn4RZFNhngP0InjdeRGCdiY0I3f/UzmKC2QV5dR6V4="
+[32m📩 6 → 1 (offline, saved):[0m "base64:ez+eFDCjKbVr66rnLhHtLx8vDTh5+V9oa9XdobYLD5WIY16AxV/t7AQ="
+[32m📩 5 → 6 (online, no save):[0m "base64:iOZHoU1+UotsnG8gZJL0ofHLQDyDmfbxmaMZK7b4JUoRG9/hMMz3s7EfHb9qlP4G4D1/+w=="
+[32m📩 5 → 6 (online, no save):[0m "base64:NS4vVt1JEaaWBTcoyX/mW59TzYc+FSobjMEuYmsgfBGDzYY2K+kkPJgrO234mQ=="
+[32m📩 5 → 6 (online, no save):[0m "base64:Cn26/uYNVdHRV9PwB+iJ/rkqZCPB+ao0xTh9TLZY1992jiXqwOQhPfJdrftmzA=="
+[32m📩 5 → 6 (online, no save):[0m "base64:2t5S8reyG1RmiJZbmVu98j2JG6YB0rD7+zcKAuUh0mVGZKHk9p7tMn/ClaAYyXNB"
+[32m📩 5 → 6 (online, no save):[0m "base64:bUTHQrYuErppV0nuz9+Db2YH00/LuC5vnsEK8zTCudyz6Rce3UQVz3keCeI="
+[32m📩 5 → 6 (online, no save):[0m "base64:RoY/k/B/zdlOGHcquavvPQekM80vXxpQEdKuCA5i05mbcKJUbe+7+NbvJOgo/w=="
+[32m📩 5 → 6 (online, no save):[0m "base64:9YEGXUwqVEY37xWCj5zd58jNyXfbI7BCVZd3rQqdoS7s/8o2rSg96WoV"
+[32m📩 5 → 6 (online, no save):[0m "base64:ZPsAi58zmEl7kllPVTL7HmVKumNRDLrrzVqgcAmN7wshuZmEqvdF93I2h6BG7w=="
+[32m📩 5 → 6 (online, no save):[0m "base64:j+T0ZDfmLzA4+n9aidyD+aaKLoXtQ8aCD3rJYha2kCFJNxjLn15011tYxJw="
+[32m📩 5 → 6 (online, no save):[0m "base64:4IFH7SswMsq9V05+uh2wfPvfzYjWSTP935bbvC5XhJAaFubVcYG84vjk0LKI1A=="
+[32m📩 5 → 6 (online, no save):[0m "base64:xdQmpE0Bpr2tBwYigkY60p9mKPLk+IB5lT+waH3DXVrRCKYAStMlEFnK"
+[32m📩 5 → 6 (online, no save):[0m "base64:Sq9cYPVTm9scrNq10WhYSs9WIlGGCEMNDz18y4Y0RahJthA15gdr5NHk6CYzzg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:fOc/smxemoiBgkFwEZKw5R9cMzFhvm5/QuqWL54+QcRli2hAyzAeKYPMhq4="
+[32m📩 5 → 6 (online, no save):[0m "base64:EZoqsBaxM8I6D8S6gm0EYKzj1lGsF9ngWkKaDfX9riiZYqdhI5AhbDTTYtyRGg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:vQ4WhI5Zv9VNfOrW6VQVLn13dHozHYfMearmLQAmQJRUW+/neg6Y6ekA"
+[32m📩 5 → 6 (online, no save):[0m "base64:C1uJZQyL9aExZXhgFzksld/sFZmmEGBfXFPHvQRqE7ipm7IZDf2Z89jlyCacSw=="
+[32m📩 5 → 6 (online, no save):[0m "base64:OPdD4bvC2L5nPZm05GUTGXD0YvdOGzkJ+KJWI6h/YI6q0Pco9ssnzhq4/roJzQ=="
+[32m📩 5 → 6 (online, no save):[0m "base64:mLAiYjaEvVMQTXTLw64GTXzrwk9VKqg6+lxA4EjMxf6tRVgMZVVQrqCmTlM="
+[32m📩 5 → 6 (online, no save):[0m "base64:TB5NCZL/HCMxG6JWx86erhOY8zK1gUlX5Twm6kYVIKAF52A5XOy0XVLIak6lJg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:RmaWloRFXHmwv6gz1dLlFXZPU7sgPn0NnNhC1GPTOpHBWQ8C5vPhaGAM"
+[32m📩 5 → 6 (online, no save):[0m "base64:4Brf1eu2MV4xglXRzniAPe+XQocPUpgXPi80Nea34oxsdVt4UOBOGdif0rYfdw=="
+[32m📩 5 → 6 (online, no save):[0m "base64:UoPpKNcSj7mI+l/RNw9nRMzDd6ixXvVwA5D3uqYSc4C7mqjMntiyPdB5HxGArg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:bArThwZHN+VdYgbsGr5wM2mSwPMrYUrXsCVhTGtNiYkczV0CMqre2iYaFkE="
+[32m📩 5 → 6 (online, no save):[0m "base64:jFoCiMUa84p1R4FoSLLhuGkGJ1iUv+X94I3S9dgOLDDunfFGfx79ovFUHkpmOg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:PDLLPWPkoGmlcLXM0nC19BolSoQ0lsPtoIqKC0odV6kSQvwBvBK9cL1Y"
+[32m📩 5 → 6 (online, no save):[0m "base64:x5whX1LrCw+hTuBUu3Di5H7/HKqJmjwqvFANE0bO4IDvr6pUQmtaSg6hRDVj4Q=="
+[32m📩 5 → 6 (online, no save):[0m "base64:TwfcrZiE68DoUCvtEcAbfIfjlgeZLFErYjTW5lbB1Q+iV/6AaBjh/IoylZo="
+[32m📩 5 → 6 (online, no save):[0m "base64:S6LhnWwn+ooHj4hb94DzAkaHFsgeoG6I3VrLtRgzW1tl04QuL6Hw0fwpqdD5Rg=="
+[32m📩 5 → 6 (online, no save):[0m "base64:7fNdyBy4jhk9nfkcjmC4Ue35nsWSZGPpjx5gEKAIK6Y8o5+oLM33rmUw"
+[32m📩 5 → 6 (online, no save):[0m "base64:49kOQ7l+vMygvl1yapK4fBMs1+E9ccpZKISLSwadpqtgLokGZrdNZcVxAy6S6w=="
+[32m📩 5 → 6 (online, no save):[0m "base64:ACUbWFVQ6i0l7sJnVo3B9sgs92MHo4URNuhovwcuHYBaTGTxKkBVLT5STrX+mQ=="
+[32m📩 5 → 6 (online, no save):[0m "base64:fUvS3lnR3dExbAate41HRxokj2Ga0K3Iulp5/kdiW7mG+tWs8nWbGdmFdB0="
+[32m📩 5 → 6 (online, no save):[0m "base64:Kuk/YIPV8RWECadvHaSjE+wpSGTGC2gSnRm+pnwtgbzI4IhNIMyryBi9VutBWA=="
+[32m📩 5 → 6 (online, no save):[0m "base64:mULdqq12jm8VJ5m92G/hUpsax6/mjTvx4DBj/9owY9wIwoUvJdP6/D5Jobw="
+[32m📩 5 → 6 (online, no save):[0m "base64:YebeBZNEcBjZe2C2JJnN9MtOluP/9ibQ7LFr1F4ksjlOkqGHlE+sezv88cs="
+[32m📩 5 → 6 (online, no save):[0m "base64:ssmIXD0QYZPcNJdanfxzwYhuyg8syHr+ltIQ5tOq/Td6LkcKOLXRucQmOKBIKw=="
+[32m📩 5 → 6 (online, no save):[0m "base64:BvkBb52MqDPTKj5/qWCz8Lns1KfXAaK0YUk36ILGlh99iJ1E0CKVKT7jJm0="
+[32m📩 5 → 6 (online, no save):[0m "base64:oAWjKXXrLU5+kWzdZDu3g4r+71KzdAXdI5b6hvCzzKVJiZ4ozPSRL5BVeA81kWa6"
+[32m📩 5 → 6 (online, no save):[0m "base64:5js1DGZh3yeMa6clJryF5mkcnfvVBnDd0pR8KPmVpXieYidwHoGGl3PqP75oCA=="
+[32m📩 6 → 5 (online, no save):[0m "base64:GQr9TKqbMU/HxikqZyipcVKQiA1UoleA2vykRBVvRvPsvL/naKVhMeSAICYlS5rh"
+[32m📩 6 → 5 (online, no save):[0m "base64:wpNP9EAwGyP2XlCbJU8MvZ8as4UiKpgkcyw1WXoBMRjcGmWWTT/76wk="
+[32m📩 6 → 5 (online, no save):[0m "base64:LlwZ8JfouXPuzQqy2WcXz+ncomcnOn2gTESUNxSYv28+mwq0djbVSA0="
+[32m📩 6 → 5 (online, no save):[0m "base64:js7gOLM2h9F2nyTwFDUC7dzp7JKwYtHXEWR36zm4Gj+Mnh/cqkWNQL8="
+[32m📩 6 → 5 (online, no save):[0m "base64:H9C6VMFnyA6joWbVt9eqQWmxvk5GJYs2XH0hM8LYaEKyZ/5U6P/2vno="
+[32m📩 6 → 5 (online, no save):[0m "base64:CGpL8pAdKacyZPdr6Kk5GxKNSe6qMNGRNRkdgpI092L7IKycpRQRaqw="
+[32m📩 6 → 5 (online, no save):[0m "base64:Yknu4lFfzEuW75bfqhru38c8pbja30VjayubEFyUMzxZEmEKvLb3g3c="
+[32m📩 6 → 5 (online, no save):[0m "base64:7jkRuIIIvfud4SssYz/8m7Tz4qTQNVOSKjDL1E7MD7CJ2urzlozxuik="
+[32m📩 6 → 5 (online, no save):[0m "base64:qxai161MBQIimfd34uxDbMme+jiwtO5Jw3kDTiZCxwim4W27qBwrNvM="
+[32m📩 6 → 5 (online, no save):[0m "base64:iuVgeShsA52zef2JL8kM66gmJdjNNgI5MCROYMuxow9lcvY5Q9IEESE="
+[32m📩 6 → 5 (online, no save):[0m "base64:uF4QnFr421UlWdvk+0bdQGrNzLzmlJzWKwPgUh8LY/qYmJSj4+DuS/I="
+User disconnected: 6, remaining users: 1
+New Socket.IO connection for user: 6, total users: 2
+[33mSent 0 unread messages to user 6[0m
+User disconnected: 6, remaining users: 1
+[36m🔑 1:[0m "ooqxLkZl3eM6eoF3DU2fdC9kyUV0Apr5nrjk/VeiHFY="
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 1 unread messages to user 1[0m
+[36m🗑️ Deleted after read: 6 → 1:[0m "base64:ez+eFDCjKbVr66rnLhHtLx8vDTh5+V9oa9XdobYLD5WIY16AxV/t7AQ="
+[32m📩 1 → 5 (online, no save):[0m "base64:g3ek2X0oG4+N7W2pfCGG08Mr/hg4rBtA1HlOamQfBNjRTkrxQyOjVYj3"
+[32m📩 5 → 1 (online, no save):[0m "base64:p8D+X7XA4HEiaY7YDaxWNqNIWe/gKI+1B5eokMuCA4WIOpX9xcJDjE5w4yM="
+User disconnected: 5, remaining users: 1
+New Socket.IO connection for user: 5, total users: 2
+[33mSent 0 unread messages to user 5[0m
+User disconnected: 5, remaining users: 1
+[36m🔑 7:[0m "QCqRCgc2j5XGGw1YixfCGJWd7Pt6t37Jjz/U1Xv1ChM="
+New Socket.IO connection for user: 7, total users: 2
+[33mSent 0 unread messages to user 7[0m
+User disconnected: 1, remaining users: 1
+[36m🔑 1:[0m "jV2l71sCL88ybXJR5Xe8fd1qBqW6C00glPDcK487bnc="
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 0 unread messages to user 1[0m
+[32m📩 1 → 7 (online, no save):[0m "base64:It0PuRPBrGnObtmRslWekOPhy4uhGavXK0SsKg9iVRnFTiKPitLu+9RBuTB/7nZUyASbNA=="
+[32m📩 7 → 1 (online, no save):[0m "base64:+zU2ojq/HDC/SlFib3yPdnym+RJwUu/QA5qYfXVQr9t7d2n+ThEIAuns56uFoSC8lE78kU8A"
+User disconnected: 7, remaining users: 1
+New Socket.IO connection for user: 7, total users: 2
+[33mSent 0 unread messages to user 7[0m
+[32m📩 7 → 1 (online, no save):[0m "base64:QR/hmjbbwQB7xckmYQeud9lRgIfhmn0BiqPrNl0Vr21hc6t2sXo5UMV/Un+TK3sA23k6"
+User disconnected: 1, remaining users: 1
+[32m📩 7 → 1 (offline, saved):[0m "base64:AYIT+yyyap2XNuuGRZoX2P3mJaPDN9VsyVl87OEenYBuabrXiQp2kzR/ESMNmayNxU68mNXtBYWX"
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 1 unread messages to user 1[0m
+[36m🗑️ Deleted after read: 7 → 1:[0m "base64:AYIT+yyyap2XNuuGRZoX2P3mJaPDN9VsyVl87OEenYBuabrXiQp2kzR/ESMNmayNxU68mNXtBYWX"
+[32m📩 7 → 1 (online, no save):[0m "base64:yGhTgX0V4O9oaRIdufLYw3mh/FSFpLU/76Cm5xu20p+OYO01Q9k1Ei2y9Y8="
+[32m📩 1 → 7 (online, no save):[0m "base64:ViMd2e8FtHmKKdJb2TonQ5pE4z/6mVb58E4xVgPWSYcUlqjPF/maRPJ/dN4="
+User disconnected: 1, remaining users: 1
+New Socket.IO connection for user: 1, total users: 2
+[33mSent 0 unread messages to user 1[0m
+User disconnected: 1, remaining users: 1
+User disconnected: 7, remaining users: 0

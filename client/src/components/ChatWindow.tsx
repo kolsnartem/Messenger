@@ -11,10 +11,9 @@ interface MessageItemProps {
     selectedChatId: string;
     onRetryDecryption: (message: Message) => void;
     measureRef: (node: Element | null) => void;
-    isEmptyChat: boolean;
 }
 
-const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isDarkTheme, selectedChatId, onRetryDecryption, measureRef, isEmptyChat }) => {
+const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isDarkTheme, selectedChatId, onRetryDecryption, measureRef }) => {
     const msg = message;
     return (
         <div
@@ -94,16 +93,8 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
     const [input, setInput] = useState<string>('');
     const inputAreaRef = useRef<HTMLDivElement>(null);
     const [inputAreaHeight, setInputAreaHeight] = useState(49);
-    const [isLoading, setIsLoading] = useState(true);
-    const isMountedRef = useRef(false);
     const isNearBottomRef = useRef(true);
-    const prevMessagesLengthRef = useRef(messages.length);
-    const scrollPositionRestored = useRef(false);
-    const previousChatIdRef = useRef<string | null>(null);
-    const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const scrollPositionRef = useRef<number | null>(null);
-    const isEmptyChatRef = useRef(messages.length === 0);
-    const messageListRef = useRef<HTMLDivElement>(null);
+    const lastVisibleIndexRef = useRef<number | null>(null);
 
     const CONTENT_PADDING_START = 17;
     const CONTENT_PADDING_END = 7;
@@ -133,56 +124,63 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
         return scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_THRESHOLD;
     }, [chatContainerRef, rowVirtualizer]);
 
+    const getLastVisibleIndex = useCallback(() => {
+        if (!chatContainerRef.current) return null;
+        const container = chatContainerRef.current;
+        const scrollTop = container.scrollTop;
+        const clientHeight = container.clientHeight;
+
+        const virtualItems = rowVirtualizer.getVirtualItems();
+        if (!virtualItems.length) return null;
+
+        // Знаходимо індекс останнього видимого повідомлення
+        for (let i = virtualItems.length - 1; i >= 0; i--) {
+            const item = virtualItems[i];
+            const itemBottom = item.start + item.size;
+            if (itemBottom <= scrollTop + clientHeight) {
+                return item.index;
+            }
+        }
+        return virtualItems[virtualItems.length - 1].index;
+    }, [rowVirtualizer]);
+
     const handleScroll = useCallback(() => {
         if (!chatContainerRef.current) return;
-        const scrollTop = chatContainerRef.current.scrollTop;
-        scrollPositionRef.current = scrollTop;
-        if (selectedChatId) {
-            localStorage.setItem(`chatScrollPos-${selectedChatId}`, scrollTop.toString());
-        }
+        lastVisibleIndexRef.current = getLastVisibleIndex();
         isNearBottomRef.current = checkNearBottom();
-    }, [selectedChatId, checkNearBottom]);
+    }, [checkNearBottom, getLastVisibleIndex]);
 
     const handleSend = () => {
         if (input.trim()) {
             onSendMessage(input);
             setInput('');
-            
-            // Always scroll to bottom after sending a message
-            setTimeout(() => {
-                rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), { align: 'end', behavior: 'auto' });
-                isNearBottomRef.current = true;
-            }, 50);
+            rowVirtualizer.scrollToIndex(messages.length, { align: 'end', behavior: 'auto' });
+            isNearBottomRef.current = true;
         }
     };
 
+    const saveScrollPosition = useCallback(() => {
+        if (selectedChatId && lastVisibleIndexRef.current !== null) {
+            localStorage.setItem(`chatScrollIndex-${selectedChatId}`, lastVisibleIndexRef.current.toString());
+        }
+    }, [selectedChatId]);
+
     const restoreScrollPosition = useCallback(() => {
-        if (!chatContainerRef.current || scrollPositionRestored.current || !selectedChatId) return;
-        try {
-            if (scrollPositionRef.current !== null && previousChatIdRef.current === selectedChatId) {
-                chatContainerRef.current.scrollTop = scrollPositionRef.current;
+        if (!chatContainerRef.current || !selectedChatId) return;
+
+        const savedIndex = localStorage.getItem(`chatScrollIndex-${selectedChatId}`);
+        if (savedIndex && messages.length > 0) {
+            const index = parseInt(savedIndex, 10);
+            if (index >= 0 && index < messages.length) {
+                rowVirtualizer.scrollToIndex(index, { align: 'end', behavior: 'auto' });
                 isNearBottomRef.current = checkNearBottom();
-                scrollPositionRestored.current = true;
-                return;
-            }
-            const savedScrollPos = localStorage.getItem(`chatScrollPos-${selectedChatId}`);
-            if (savedScrollPos && messages.length > 0) {
-                const scrollPos = parseInt(savedScrollPos, 10);
-                chatContainerRef.current.scrollTop = scrollPos;
-                scrollPositionRef.current = scrollPos;
-                isNearBottomRef.current = checkNearBottom();
-            } else if (messages.length > 0) {
+            } else {
                 rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
                 isNearBottomRef.current = true;
             }
-            scrollPositionRestored.current = true;
-        } catch (error) {
-            console.error('Error restoring scroll position:', error);
-            if (messages.length > 0) {
-                rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
-                isNearBottomRef.current = true;
-            }
-            scrollPositionRestored.current = true;
+        } else {
+            rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
+            isNearBottomRef.current = true;
         }
     }, [selectedChatId, messages.length, rowVirtualizer, checkNearBottom]);
 
@@ -205,76 +203,20 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
         const element = chatContainerRef.current;
         if (element) {
             element.addEventListener('scroll', handleScroll, { passive: true });
-            if (!isLoading && selectedChatId) {
-                restoreScrollPosition();
-            }
+            restoreScrollPosition();
         }
-        return () => element?.removeEventListener('scroll', handleScroll);
-    }, [chatContainerRef, handleScroll, restoreScrollPosition, isLoading, selectedChatId]);
-
-    useEffect(() => {
-        isEmptyChatRef.current = messages.length === 0;
-    }, [messages.length]);
-
-    useEffect(() => {
         return () => {
-            if (selectedChatId && chatContainerRef.current && scrollPositionRef.current !== null) {
-                localStorage.setItem(`chatScrollPos-${selectedChatId}`, scrollPositionRef.current.toString());
-            }
+            element?.removeEventListener('scroll', handleScroll);
+            saveScrollPosition();
         };
-    }, [selectedChatId]);
+    }, [chatContainerRef, handleScroll, restoreScrollPosition, saveScrollPosition, selectedChatId]);
 
     useEffect(() => {
-        if (loadingTimeoutRef.current) {
-            clearTimeout(loadingTimeoutRef.current);
-            loadingTimeoutRef.current = null;
-        }
-        if (selectedChatId !== previousChatIdRef.current) {
-            setIsLoading(true);
-            isMountedRef.current = false;
+        if (messages.length > 0 && isNearBottomRef.current) {
+            rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
             isNearBottomRef.current = true;
-            prevMessagesLengthRef.current = 0;
-            scrollPositionRestored.current = false;
-            scrollPositionRef.current = null;
-            loadingTimeoutRef.current = setTimeout(() => {
-                setIsLoading(false);
-            }, 1000);
-            previousChatIdRef.current = selectedChatId;
-        } else if (isLoading && messages.length > 0) {
-            setIsLoading(false);
         }
-        return () => {
-            if (loadingTimeoutRef.current) {
-                clearTimeout(loadingTimeoutRef.current);
-                loadingTimeoutRef.current = null;
-            }
-        };
-    }, [selectedChatId, messages.length]);
-
-    useEffect(() => {
-        const lastIndex = messages.length - 1;
-        if (lastIndex < 0 || !chatContainerRef.current) return;
-
-        const isInitialMount = !isMountedRef.current;
-        const messageAdded = messages.length > prevMessagesLengthRef.current;
-        const lastMessageIsMine = messageAdded && messages[lastIndex]?.isMine === true;
-
-        if (isInitialMount || lastMessageIsMine || (messageAdded && isNearBottomRef.current)) {
-            setTimeout(() => {
-                if (chatContainerRef.current) {
-                    rowVirtualizer.scrollToIndex(lastIndex, { align: 'end', behavior: 'auto' });
-                    isNearBottomRef.current = true;
-                }
-            }, 50);
-        }
-
-        if (!isMountedRef.current) {
-            setTimeout(() => {
-                isMountedRef.current = true;
-            }, 100);
-        }
-        prevMessagesLengthRef.current = messages.length;
-    }, [messages, rowVirtualizer, isLoading]);
+    }, [messages.length, rowVirtualizer]);
 
     if (!selectedChatId) {
         return (
@@ -306,35 +248,6 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
             }}
             id="chat-window-outer"
         >
-            {isLoading && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        background: isDarkTheme ? '#101010' : '#FFFFFF',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000,
-                    }}
-                >
-                    <div
-                        className="spinner-border"
-                        style={{
-                            width: '50px',
-                            height: '50px',
-                            borderWidth: '5px',
-                            borderColor: isDarkTheme ? '#00C79D' : '#00C7D4',
-                            borderRightColor: 'transparent',
-                        }}
-                        role="status"
-                    >
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            )}
-
             <style>{`
                 #chat-scroll-container {
                     -webkit-overflow-scrolling: touch;
@@ -481,13 +394,11 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                     overflowY: 'auto',
                     overflowX: 'hidden',
                     contain: 'layout style size',
-                    visibility: isLoading ? 'hidden' : 'visible',
                     display: 'flex',
-                    flexDirection: 'column-reverse', // Key change: Use column-reverse to keep new messages at bottom
+                    flexDirection: 'column-reverse',
                 }}
             >
                 <div
-                    ref={messageListRef}
                     style={{
                         height: `${rowVirtualizer.getTotalSize()}px`,
                         width: '100%',
@@ -506,7 +417,6 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                                 selectedChatId={selectedChatId}
                                 onRetryDecryption={onRetryDecryption}
                                 measureRef={rowVirtualizer.measureElement}
-                                isEmptyChat={isEmptyChatRef.current}
                             />
                         );
                     })}
@@ -549,7 +459,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                 </div>
             </div>
 
-            {(unreadMessagesCount > 0 || showScrollDown) && !isLoading && (
+            {(unreadMessagesCount > 0 || showScrollDown) && (
                 <div
                     onClick={() => {
                         rowVirtualizer.scrollToIndex(messages.length - 1, {
