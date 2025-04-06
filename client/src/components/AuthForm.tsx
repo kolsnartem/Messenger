@@ -3,9 +3,8 @@ import { TweetNaClKeyPair } from '../types';
 import axios, { AxiosError } from 'axios';
 import CryptoJS from 'crypto-js';
 import * as nacl from 'tweetnacl';
-// Import icons from react-icons
 import { FaGithub, FaInstagram, FaTelegram } from 'react-icons/fa';
-import { RiUser3Line, RiLockLine } from "react-icons/ri"; // Іконки вже імпортовано
+import { RiUser3Line, RiLockLine } from "react-icons/ri";
 
 interface ApiErrorResponse {
   error?: string;
@@ -13,7 +12,7 @@ interface ApiErrorResponse {
 
 interface AuthFormProps {
   isDarkTheme: boolean;
-  onAuthSuccess: (userId: string, userEmail: string, tweetNaclKeyPair?: TweetNaClKeyPair) => void;
+  onAuthSuccess: (userId: string, userEmail: string, password: string) => void;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
@@ -24,32 +23,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // --- Код useEffect без змін ---
-    const viewportMeta = document.createElement('meta');
+    const viewportMeta: HTMLMetaElement = document.createElement('meta');
     viewportMeta.name = 'viewport';
-    viewportMeta.content =
-      'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
     document.head.appendChild(viewportMeta);
 
-    const style = document.createElement('style');
+    const style: HTMLStyleElement = document.createElement('style');
     style.innerHTML = `
-      input, textarea, select, button {
-        font-size: 16px;
-        touch-action: manipulation;
-      }
-      body, html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-        touch-action: none;
-      }
-      .safe-area-container {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-      }
+      input, textarea, select, button { font-size: 16px; touch-action: manipulation; }
+      body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; touch-action: none; }
+      .safe-area-container { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
     `;
     document.head.appendChild(style);
 
@@ -67,25 +50,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
         const touch2 = e.touches[1];
         const currentDistance = calculateDistance(touch1, touch2);
 
-        if (initialDistance === null) {
-          initialDistance = currentDistance;
-        }
-
+        if (initialDistance === null) initialDistance = currentDistance;
         const distanceChange = Math.abs(currentDistance - initialDistance);
-        if (distanceChange > 10) {
-          e.preventDefault();
-        }
+        if (distanceChange > 10) e.preventDefault();
       }
     };
 
-    const handleTouchEnd = () => {
-      initialDistance = null;
-    };
+    const handleTouchEnd = () => initialDistance = null;
 
     const preventMultiTouch = (e: TouchEvent) => {
-      if (e.touches.length > 1) {
-        e.preventDefault();
-      }
+      if (e.touches.length > 1) e.preventDefault();
     };
 
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -98,14 +72,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
       document.removeEventListener('touchstart', preventMultiTouch);
       document.removeEventListener('touchend', handleTouchEnd);
       document.removeEventListener('touchcancel', handleTouchEnd);
-      // Перевірка на існування елементів перед видаленням
       if (viewportMeta.parentNode) viewportMeta.parentNode.removeChild(viewportMeta);
       if (style.parentNode) style.parentNode.removeChild(style);
     };
   }, []);
 
   const handleAuth = async () => {
-    // --- Код handleAuth без змін ---
     if (!email || !password) {
       setErrorMessage('Please fill in all fields');
       return;
@@ -123,28 +95,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
         { email, password: hashedPassword }
       );
 
-      let tweetNaclKeyPair: TweetNaClKeyPair | undefined;
-
       if (!isLogin) {
-        const newKeyPair = nacl.box.keyPair();
+        const seed = new Uint8Array(Buffer.from(CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex), 'hex').slice(0, 32));
+        const newKeyPair = nacl.box.keyPair.fromSecretKey(seed); // Коректний виклик
         await axios.put('https://100.64.221.88:4000/update-keys', {
           userId: res.data.id,
           publicKey: Buffer.from(newKeyPair.publicKey).toString('base64'),
         });
-
-        tweetNaclKeyPair = newKeyPair;
-        localStorage.setItem(
-          'tweetnaclKeyPair',
-          JSON.stringify({
-            publicKey: Array.from(newKeyPair.publicKey),
-            secretKey: Array.from(newKeyPair.secretKey),
-          })
-        );
+        localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
+          publicKey: Array.from(newKeyPair.publicKey),
+          secretKey: Array.from(newKeyPair.secretKey),
+        }));
       }
 
       localStorage.setItem('userId', res.data.id);
       localStorage.setItem('userEmail', email);
-      onAuthSuccess(res.data.id, email, tweetNaclKeyPair);
+      localStorage.setItem('password', password);
+      onAuthSuccess(res.data.id, email, password);
     } catch (err) {
       const errorText = (err as AxiosError<ApiErrorResponse>).response?.data?.error || 'Unknown error';
       setErrorMessage(`Error: ${errorText}`);
@@ -154,14 +121,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
   };
 
   const toggleAuthMode = () => {
-    // --- Код toggleAuthMode без змін ---
     setIsLogin(!isLogin);
     setErrorMessage(null);
     setEmail('');
     setPassword('');
   };
 
-  // --- Стилі ---
   const containerStyle: React.CSSProperties = {
     width: '100%',
     height: '100vh',
@@ -181,7 +146,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
     perspective: '1000px',
     margin: '0 auto',
     position: 'relative',
-    height: '300px', // Висота контейнера для анімації
+    height: '300px',
   };
 
   const baseFormStyle: React.CSSProperties = {
@@ -194,17 +159,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
     position: 'absolute',
     top: 0,
     left: 0,
-    backfaceVisibility: 'hidden', // Для плавної анімації обертання
+    backfaceVisibility: 'hidden',
   };
 
-  const formStyle: React.CSSProperties = { // Стиль для видимої форми (логін)
+  const formStyle: React.CSSProperties = {
     ...baseFormStyle,
     transform: isLogin ? 'rotateY(0deg)' : 'rotateY(180deg)',
     opacity: isLogin ? 1 : 0,
     zIndex: isLogin ? 1 : 0,
   };
 
-  const altFormStyle: React.CSSProperties = { // Стиль для невидимої форми (реєстрація)
+  const altFormStyle: React.CSSProperties = {
     ...baseFormStyle,
     transform: isLogin ? 'rotateY(-180deg)' : 'rotateY(0deg)',
     opacity: isLogin ? 0 : 1,
@@ -213,7 +178,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    padding: '12px 12px 12px 40px', // Змінено: Додано лівий відступ для іконки
+    padding: '12px 12px 12px 40px',
     border: 'none',
     borderRadius: '8px',
     background: isDarkTheme ? '#1E1E1E' : '#F3F4F6',
@@ -268,210 +233,71 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
     textAlign: 'center',
   };
 
-  // --- Стиль для іконок в полях вводу ---
   const inputIconStyle: React.CSSProperties = {
-      position: 'absolute',
-      left: '15px', // Відступ зліва
-      top: '50%', // Центрування по вертикалі
-      transform: 'translateY(-50%)', // Точне центрування
-      color: isDarkTheme ? '#8a9aa3' : '#6c757d', // Колір як у плейсхолдера
-      pointerEvents: 'none', // Не заважати кліку
-      zIndex: 2 // Перекривати фон інпуту
+    position: 'absolute',
+    left: '15px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: isDarkTheme ? '#8a9aa3' : '#6c757d',
+    pointerEvents: 'none',
+    zIndex: 2
   };
 
-  // --- Рендеринг ---
   return (
     <div className="safe-area-container" style={containerStyle}>
       <div style={formContainerStyle}>
-        {/* Login Form */}
         <div style={formStyle}>
-          <h2
-            style={{
-              textAlign: 'center',
-              marginBottom: '20px',
-              color: isDarkTheme ? '#fff' : '#2c3e50',
-              fontSize: '22px',
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-            }}
-          >
+          <h2 style={{ textAlign: 'center', marginBottom: '20px', color: isDarkTheme ? '#fff' : '#2c3e50', fontSize: '22px', fontWeight: 600, letterSpacing: '0.5px' }}>
             Welcome Back
           </h2>
-
-          {errorMessage && (
-            <div
-              style={{
-                color: '#e74c3c',
-                textAlign: 'center',
-                marginBottom: '15px',
-                fontSize: '14px',
-              }}
-            >
-              {errorMessage}
-            </div>
-          )}
-
+          {errorMessage && <div style={{ color: '#e74c3c', textAlign: 'center', marginBottom: '15px', fontSize: '14px' }}>{errorMessage}</div>}
           <div style={{ position: 'relative', marginBottom: '18px' }}>
-             <RiUser3Line style={inputIconStyle} />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Username"
-              required
-              style={inputStyle}
-            />
+            <RiUser3Line style={inputIconStyle} />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Username" required style={inputStyle} />
           </div>
-
           <div style={{ position: 'relative', marginBottom: '18px' }}>
-             <RiLockLine style={inputIconStyle} />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              required
-              style={inputStyle}
-            />
+            <RiLockLine style={inputIconStyle} />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required style={inputStyle} />
           </div>
-
           <button onClick={handleAuth} disabled={isLoading} style={buttonStyle}>
             {isLoading ? <span style={{ marginRight: '8px' }}>⏳</span> : null}
             Log In
           </button>
-
-          {/* --- Змінено блок перемикання --- */}
-          <div
-            onClick={toggleAuthMode}
-            style={{
-              textAlign: 'center',
-              marginTop: '15px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              transition: 'color 0.3s ease',
-              touchAction: 'manipulation',
-            }}
-          >
-            <span style={{ color: isDarkTheme ? '#ccc' : '#666' }}>
-              New here?{' '}
-            </span>
-            <span style={{ color: '#00C7D4' }}>
-              Sign Up
-            </span>
+          <div onClick={toggleAuthMode} style={{ textAlign: 'center', marginTop: '15px', fontSize: '14px', cursor: 'pointer', transition: 'color 0.3s ease', touchAction: 'manipulation' }}>
+            <span style={{ color: isDarkTheme ? '#ccc' : '#666' }}>New here? </span>
+            <span style={{ color: '#00C7D4' }}>Sign Up</span>
           </div>
-          {/* --- Кінець зміненого блоку --- */}
         </div>
 
-        {/* Register Form */}
         <div style={altFormStyle}>
-          <h2
-            style={{
-              textAlign: 'center',
-              marginBottom: '20px',
-              color: isDarkTheme ? '#fff' : '#2c3e50',
-              fontSize: '22px',
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-            }}
-          >
+          <h2 style={{ textAlign: 'center', marginBottom: '20px', color: isDarkTheme ? '#fff' : '#2c3e50', fontSize: '22px', fontWeight: 600, letterSpacing: '0.5px' }}>
             Create Account
           </h2>
-
-          {errorMessage && (
-            <div
-              style={{
-                color: '#e74c3c',
-                textAlign: 'center',
-                marginBottom: '15px',
-                fontSize: '14px',
-              }}
-            >
-              {errorMessage}
-            </div>
-          )}
-
+          {errorMessage && <div style={{ color: '#e74c3c', textAlign: 'center', marginBottom: '15px', fontSize: '14px' }}>{errorMessage}</div>}
           <div style={{ position: 'relative', marginBottom: '18px' }}>
-             <RiUser3Line style={inputIconStyle} />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Username"
-              required
-              style={inputStyle}
-            />
+            <RiUser3Line style={inputIconStyle} />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Username" required style={inputStyle} />
           </div>
-
           <div style={{ position: 'relative', marginBottom: '18px' }}>
-             <RiLockLine style={inputIconStyle} />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              required
-              style={inputStyle}
-            />
+            <RiLockLine style={inputIconStyle} />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required style={inputStyle} />
           </div>
-
           <button onClick={handleAuth} disabled={isLoading} style={buttonStyle}>
             {isLoading ? <span style={{ marginRight: '8px' }}>⏳</span> : null}
             Sign Up
           </button>
-
-          {/* --- Змінено блок перемикання --- */}
-          <div
-            onClick={toggleAuthMode}
-            style={{
-              textAlign: 'center',
-              marginTop: '15px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              transition: 'color 0.3s ease',
-              touchAction: 'manipulation',
-            }}
-          >
-            <span style={{ color: isDarkTheme ? '#ccc' : '#666' }}>
-              Already have an account?{' '}
-            </span>
-            <span style={{ color: '#00C7D4' }}>
-              Log In
-            </span>
+          <div onClick={toggleAuthMode} style={{ textAlign: 'center', marginTop: '15px', fontSize: '14px', cursor: 'pointer', transition: 'color 0.3s ease', touchAction: 'manipulation' }}>
+            <span style={{ color: isDarkTheme ? '#ccc' : '#666' }}>Already have an account? </span>
+            <span style={{ color: '#00C7D4' }}>Log In</span>
           </div>
-          {/* --- Кінець зміненого блоку --- */}
         </div>
       </div>
 
-      {/* Footer with Icons and Copyright Notice */}
       <div style={footerStyle}>
         <div style={iconContainerStyle}>
-          {/* GitHub Icon */}
-          <a
-            href="https://github.com/kolsnartem/Messenger"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={iconLinkStyle}
-          >
-            <FaGithub size={24} />
-          </a>
-          {/* Instagram Icon */}
-          <a
-            href="https://instagram.com/kolsnartem"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={iconLinkStyle}
-          >
-            <FaInstagram size={24} />
-          </a>
-          {/* Telegram Icon */}
-          <a
-            href="https://t.me/kolsnartem"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={iconLinkStyle}
-          >
-            <FaTelegram size={24} />
-          </a>
+          <a href="https://github.com/kolsnartem/Messenger" target="_blank" rel="noopener noreferrer" style={iconLinkStyle}><FaGithub size={24} /></a>
+          <a href="https://instagram.com/kolsnartem" target="_blank" rel="noopener noreferrer" style={iconLinkStyle}><FaInstagram size={24} /></a>
+          <a href="https://t.me/kolsnartem" target="_blank" rel="noopener noreferrer" style={iconLinkStyle}><FaTelegram size={24} /></a>
         </div>
         <div style={copyrightStyle}>© 2025 Open Source Messenger</div>
       </div>

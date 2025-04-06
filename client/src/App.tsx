@@ -17,6 +17,7 @@ import { RiP2PFill, RiSearchLine } from "react-icons/ri";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { TbMenuDeep } from "react-icons/tb";
 import toast, { Toaster } from 'react-hot-toast';
+import CryptoJS from 'crypto-js';
 
 interface ApiErrorResponse {
   error?: string;
@@ -29,7 +30,7 @@ const fixPublicKey = (key: Uint8Array): Uint8Array => {
   return key;
 };
 
-const initializeTweetNaclKeys = async (userId: string | null): Promise<TweetNaClKeyPair> => {
+const initializeTweetNaclKeys = async (userId: string | null, password: string): Promise<TweetNaClKeyPair> => {
   const stored = localStorage.getItem('tweetnaclKeyPair');
   if (stored && userId) {
     try {
@@ -41,7 +42,10 @@ const initializeTweetNaclKeys = async (userId: string | null): Promise<TweetNaCl
     }
   }
 
-  const newKeyPair = nacl.box.keyPair();
+  const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+  const seed = new Uint8Array(Buffer.from(hashedPassword, 'hex').slice(0, 32));
+  const newKeyPair = nacl.box.keyPair.fromSecretKey(seed);
+
   localStorage.setItem('tweetnaclKeyPair', JSON.stringify({
     publicKey: Array.from(newKeyPair.publicKey),
     secretKey: Array.from(newKeyPair.secretKey),
@@ -94,9 +98,7 @@ const App: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(() => {
     const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) {
-      return storedTheme === 'dark';
-    }
+    if (storedTheme) return storedTheme === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
@@ -202,7 +204,7 @@ const App: React.FC = () => {
   }, [callState.isCalling]);
 
   useEffect(() => {
-    const style = document.createElement('style');
+    const style: HTMLStyleElement = document.createElement('style');
     style.textContent = `
       @keyframes float-up {
         0% { transform: translateY(0); opacity: 1; }
@@ -213,14 +215,11 @@ const App: React.FC = () => {
     `;
     document.head.appendChild(style);
     return () => {
-      document.head.removeChild(style);
+      if (style.parentNode) {
+        document.head.removeChild(style);
+      }
     };
   }, []);
-
-  useEffect(() => {
-    if (!userId || tweetNaclKeyPair) return;
-    initializeKeys();
-  }, [userId]);
 
   const fetchSenderPublicKey = async (senderId: string): Promise<string> => {
     let key = publicKeysCache.get(senderId) || localStorage.getItem(`publicKey_${senderId}`) || '';
@@ -242,21 +241,43 @@ const App: React.FC = () => {
     return key;
   };
 
-  const decryptMessage = async (encryptedText: string, senderId: string): Promise<string> => {
+  const decryptMessage = async (encryptedText: string, senderId: string, receiverId?: string): Promise<string> => {
     if (!encryptedText.startsWith('base64:') || !tweetNaclKeyPair) return encryptedText;
     const data = Buffer.from(encryptedText.slice(7), 'base64');
     const nonce = data.subarray(0, nacl.box.nonceLength);
     const cipher = data.subarray(nacl.box.nonceLength);
-    const senderPublicKey = await fetchSenderPublicKey(senderId);
-    if (!senderPublicKey) return "[Unable to decrypt: missing public key]";
-    const theirPublicKey = fixPublicKey(new Uint8Array(Buffer.from(senderPublicKey, 'base64')));
-    const decrypted = nacl.box.open(new Uint8Array(cipher), new Uint8Array(nonce), theirPublicKey, tweetNaclKeyPair.secretKey);
-    return decrypted ? new TextDecoder().decode(decrypted) : "[Encrypted with old key]";
+
+    let theirPublicKey: Uint8Array;
+    if (senderId === userId && receiverId) {
+      const contactPublicKey = await fetchSenderPublicKey(receiverId);
+      if (!contactPublicKey) return "[Unable to decrypt: missing receiver public key]";
+      theirPublicKey = fixPublicKey(new Uint8Array(Buffer.from(contactPublicKey, 'base64')));
+    } else {
+      const senderPublicKey = await fetchSenderPublicKey(senderId);
+      if (!senderPublicKey) return "[Unable to decrypt: missing sender public key]";
+      theirPublicKey = fixPublicKey(new Uint8Array(Buffer.from(senderPublicKey, 'base64')));
+    }
+
+    const decrypted = nacl.box.open(
+      new Uint8Array(cipher),
+      new Uint8Array(nonce),
+      theirPublicKey,
+      tweetNaclKeyPair.secretKey
+    );
+    return decrypted ? new TextDecoder().decode(decrypted) : "[Unable to decrypt]";
   };
 
   const decryptMessageText = async (message: Message): Promise<string> => {
-    if (message.userId === userId) return getSentMessage(message.id, message.contactId || selectedChatId || '') || message.text;
-    return message.text.startsWith('base64:') ? await decryptMessage(message.text, message.userId) : message.text;
+    if (message.userId === userId) {
+      const storedText = getSentMessage(message.id, message.contactId || selectedChatId || '');
+      if (storedText) return storedText;
+    }
+
+    if (message.text.startsWith('base64:') && tweetNaclKeyPair) {
+      return await decryptMessage(message.text, message.userId, message.contactId);
+    }
+
+    return message.text;
   };
 
   const reDecryptMessages = async (chatId: string) => {
@@ -340,9 +361,7 @@ const App: React.FC = () => {
       localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
       if (selectedChatId === chatId) {
         setMessages(updatedMessages);
-        if (isAtBottom()) {
-          await markAsRead(userId!, chatId);
-        }
+        if (isAtBottom()) await markAsRead(userId!, chatId);
       } else {
         setUnreadMessages(prev => {
           const newMap = new Map(prev);
@@ -454,8 +473,8 @@ const App: React.FC = () => {
   const toggleVideo = () => videoCallServiceRef.current?.toggleVideo(!callState.isVideoEnabled);
   const toggleMicrophone = () => videoCallServiceRef.current?.toggleMicrophone(!callState.isMicrophoneEnabled);
 
-  const initializeKeys = async () => {
-    const keyPair = await initializeTweetNaclKeys(userId);
+  const initializeKeys = async (password: string) => {
+    const keyPair = await initializeTweetNaclKeys(userId, password);
     setTweetNaclKeyPair(keyPair);
     setIsKeysLoaded(true);
   };
@@ -485,11 +504,8 @@ const App: React.FC = () => {
         const updatedContacts = [...prev];
         decryptedChats.forEach(serverContact => {
           const existingIndex = updatedContacts.findIndex(c => c.id === serverContact.id);
-          if (existingIndex >= 0) {
-            updatedContacts[existingIndex] = { ...updatedContacts[existingIndex], ...serverContact };
-          } else {
-            updatedContacts.push(serverContact);
-          }
+          if (existingIndex >= 0) updatedContacts[existingIndex] = { ...updatedContacts[existingIndex], ...serverContact };
+          else updatedContacts.push(serverContact);
         });
         localStorage.setItem('contacts', JSON.stringify(updatedContacts));
         return updatedContacts;
@@ -517,19 +533,6 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!userId) return;
-    if (!tweetNaclKeyPair) {
-      initializeKeys().then(() => {
-        fetchData();
-      });
-    } else if (isKeysLoaded) {
-      fetchData();
-      const interval = setInterval(fetchData, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [userId, selectedChatId, tweetNaclKeyPair, isKeysLoaded]);
-
-  useEffect(() => {
     if (!userId || !tweetNaclKeyPair || !socketRef.current) return;
 
     socketRef.current.on('message', handleIncomingMessage);
@@ -551,9 +554,7 @@ const App: React.FC = () => {
         )
       );
 
-      if (selectedChatId === updatedUserId) {
-        await reDecryptMessages(selectedChatId);
-      }
+      if (selectedChatId === updatedUserId) await reDecryptMessages(selectedChatId);
     });
 
     return () => {
@@ -572,16 +573,13 @@ const App: React.FC = () => {
     }
   }, [searchQuery, userId]);
 
-  const handleAuthSuccess = async (id: string, email: string, newTweetNaclKeyPair?: TweetNaClKeyPair) => {
+  const handleAuthSuccess = async (id: string, email: string, password: string) => {
     setUserId(id);
     setUserEmail(email);
     localStorage.setItem('userEmail', email);
     toast.success('Login successful!');
-    let keyPair = newTweetNaclKeyPair;
-    if (!keyPair) {
-      keyPair = await initializeTweetNaclKeys(id);
-      setTweetNaclKeyPair(keyPair);
-    }
+    await initializeKeys(password);
+    fetchData();
   };
 
   const fetchContact = async (contactId: string): Promise<Contact> => {
@@ -611,7 +609,7 @@ const App: React.FC = () => {
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
       return updatedContacts;
     });
-    if (!tweetNaclKeyPair) await initializeKeys();
+    if (!tweetNaclKeyPair) await initializeKeys(localStorage.getItem('password') || '');
 
     const cachedMessages = JSON.parse(localStorage.getItem(`chat_${contact.id}`) || '[]');
     try {
@@ -712,7 +710,7 @@ const App: React.FC = () => {
         `}
       </style>
       <Toaster
-        position="top-center"
+        position="bottom-center"
         reverseOrder={false}
         toastOptions={{
           style: {
