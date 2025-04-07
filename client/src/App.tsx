@@ -151,7 +151,11 @@ const App: React.FC = () => {
     });
     socketRef.current.on('message-read', ({ messageId, contactId }) => {
       if (selectedChatId === contactId) {
-        setMessages(prev => prev.map(m => m.id === messageId ? { ...m, isRead: 1 } : m));
+        setMessages(prev => {
+          const updatedMessages = prev.map(m => m.id === messageId ? { ...m, isRead: 1 } : m);
+          localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
+          return updatedMessages;
+        });
       }
       setUnreadMessages(prev => {
         const newMap = new Map(prev);
@@ -590,6 +594,11 @@ const App: React.FC = () => {
   };
 
   const handleContactSelect = async (contact: Contact) => {
+    setUnreadMessages(prev => {
+      const newMap = new Map(prev);
+      newMap.set(contact.id, 0);
+      return newMap;
+    });
     setMessages([]);
     setSelectedChatId(contact.id);
     localStorage.setItem('selectedChatId', contact.id);
@@ -627,11 +636,6 @@ const App: React.FC = () => {
       localStorage.setItem(`chat_${contact.id}`, JSON.stringify(combinedMessages));
       if (isAtBottom() && fetchedMessages.length > 0) {
         await markAsRead(userId!, contact.id);
-        setUnreadMessages(prev => {
-          const newMap = new Map(prev);
-          newMap.set(contact.id, 0);
-          return newMap;
-        });
       }
     } catch (error) {
       console.error('Failed to fetch messages from server:', error);
