@@ -46,7 +46,7 @@ const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isD
                 <div
                     className="message-bubble"
                     style={{
-                        background: msg.isMine ? (isDarkTheme ? '#005C4B' : '#DCF8C6') : (isDarkTheme ? '#3a3a3a' : '#FFFFFF'),
+                        background: msg.isMine ? (isDarkTheme ? '#005C4B' : '#DCF8C6') : (isDarkTheme ? '#3a3a3a' : '#E8F1FF'),
                         color: isDarkTheme ? '#E0E0E0' : '#333',
                         borderRadius: msg.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                         maxWidth: '75%',
