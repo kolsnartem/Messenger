@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { Contact, ChatListProps } from '../types';
 
 interface ChatListPropsExtended extends ChatListProps {
@@ -10,6 +10,9 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
   const touchStartY = useRef<number | null>(null);
   const touchStartTime = useRef<number | null>(null);
   const previousScrollPosition = useRef<number>(0);
+  
+  // Додаємо локальний стан для відстеження прочитаних чатів
+  const [viewedChats, setViewedChats] = useState<Set<string>>(new Set());
 
   // Sort contacts by lastMessage timestamp (newest first)
   const sortedContacts = useMemo(() => {
@@ -19,6 +22,17 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
       return timeB - timeA; // Descending order (newest first)
     });
   }, [contacts]);
+
+  // Ефект для відстеження переглянутих чатів
+  useEffect(() => {
+    if (selectedChatId) {
+      setViewedChats(prev => {
+        const updated = new Set(prev);
+        updated.add(selectedChatId);
+        return updated;
+      });
+    }
+  }, [selectedChatId]);
 
   useEffect(() => {
     const container = chatListRef.current;
@@ -79,11 +93,23 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
 
     if (deltaY < 10 && deltaTime < 300) {
       previousScrollPosition.current = container.scrollTop;
-      onSelectChat(contact);
+      handleChatSelection(contact);
     }
 
     touchStartY.current = null;
     touchStartTime.current = null;
+  };
+
+  // Новий обробник для вибору чату, що відстежує прочитані повідомлення
+  const handleChatSelection = (contact: Contact) => {
+    // Позначаємо чат як переглянутий при виборі
+    setViewedChats(prev => {
+      const updated = new Set(prev);
+      updated.add(contact.id);
+      return updated;
+    });
+    
+    onSelectChat(contact);
   };
 
   return (
@@ -103,8 +129,14 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
     >
       {sortedContacts.map((contact) => {
         const unreadCount = unreadMessages.get(contact.id) || 0;
-        // Only show unread indicator if there are unread messages and they're not marked as read
-        const hasUnread = (unreadCount > 0 || (contact.lastMessage?.isRead === 0 && contact.lastMessage?.userId === contact.id));
+        
+        // Показуємо індикатор, лише якщо є непрочитані повідомлення 
+        // І цей чат ще не було переглянуто
+        const hasUnread = (unreadCount > 0 || 
+                          (contact.lastMessage?.isRead === 0 && 
+                           contact.lastMessage?.userId === contact.id)) && 
+                          !viewedChats.has(contact.id);
+                          
         const isSelected = selectedChatId === contact.id;
 
         return (
@@ -120,7 +152,7 @@ const ChatList: React.FC<ChatListPropsExtended> = ({ contacts, selectedChatId, i
                 if (container) {
                   previousScrollPosition.current = container.scrollTop;
                 }
-                onSelectChat(contact);
+                handleChatSelection(contact);
               }
             }}
             style={{

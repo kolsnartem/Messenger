@@ -15,6 +15,16 @@ interface MessageItemProps {
 
 const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isDarkTheme, selectedChatId, onRetryDecryption, measureRef }) => {
     const msg = message;
+    const [isProcessed, setIsProcessed] = useState(!msg.text.startsWith('base64:'));
+
+    // Автоматично викликаємо розшифрування при рендері повідомлення
+    useEffect(() => {
+        if (msg.text.startsWith('base64:') && !isProcessed) {
+            onRetryDecryption(msg);
+            setIsProcessed(true);
+        }
+    }, [msg, isProcessed, onRetryDecryption]);
+
     return (
         <div
             key={`${selectedChatId}-${msg.id}-${msg.timestamp}`}
@@ -27,6 +37,7 @@ const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isD
                 left: 0,
                 width: '100%',
                 transform: `translateY(${virtualRow.start}px)`,
+                transition: 'transform 0.1s ease-out', // Плавний перехід
                 padding: '2px 10px',
                 boxSizing: 'border-box',
             }}
@@ -52,6 +63,7 @@ const MessageItem: React.FC<MessageItemProps> = memo(({ virtualRow, message, isD
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onRetryDecryption(msg);
+                                setIsProcessed(true);
                             }}
                             style={{
                                 fontSize: '0.8rem',
@@ -95,6 +107,10 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
     const [inputAreaHeight, setInputAreaHeight] = useState(49);
     const isNearBottomRef = useRef(true);
     const lastVisibleIndexRef = useRef<number | null>(null);
+    const highestReadIndexRef = useRef<number>(-1);
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const [newMessagesCount, setNewMessagesCount] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
 
     const CONTENT_PADDING_START = 17;
     const CONTENT_PADDING_END = 7;
@@ -108,6 +124,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
         overscan: 15,
         paddingStart: CONTENT_PADDING_START,
         paddingEnd: CONTENT_PADDING_END,
+        initialOffset: messages.length > 0 ? (messages.length - 1) * estimateSize() : 0, // Початковий офсет
     });
 
     const virtualItems = rowVirtualizer.getVirtualItems();
@@ -115,6 +132,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
     const mainBackground = isDarkTheme ? '#101010' : '#FFFFFF';
     const headerBackground = isDarkTheme ? '#101010' : '#FFFFFF';
     const inputFieldBackground = isDarkTheme ? '#1E1E1E' : '#F3F4F6';
+    const spinnerColor = isDarkTheme ? '#00C7D4' : '#00C7D4';
 
     const checkNearBottom = useCallback(() => {
         if (!chatContainerRef?.current) return true;
@@ -133,7 +151,6 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
         const virtualItems = rowVirtualizer.getVirtualItems();
         if (!virtualItems.length) return null;
 
-        // Знаходимо індекс останнього видимого повідомлення
         for (let i = virtualItems.length - 1; i >= 0; i--) {
             const item = virtualItems[i];
             const itemBottom = item.start + item.size;
@@ -144,24 +161,47 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
         return virtualItems[virtualItems.length - 1].index;
     }, [rowVirtualizer]);
 
+    const updateNewMessagesCount = useCallback(() => {
+        if (!chatContainerRef.current) return;
+        const lastVisibleIndex = getLastVisibleIndex();
+        if (lastVisibleIndex !== null) {
+            highestReadIndexRef.current = Math.max(highestReadIndexRef.current, lastVisibleIndex);
+            if (lastVisibleIndex < messages.length - 1) {
+                const newCount = messages.length - 1 - highestReadIndexRef.current;
+                setNewMessagesCount(newCount > 0 ? newCount : 0);
+            } else {
+                setNewMessagesCount(0);
+            }
+        }
+    }, [messages.length, getLastVisibleIndex]);
+
     const handleScroll = useCallback(() => {
         if (!chatContainerRef.current) return;
         lastVisibleIndexRef.current = getLastVisibleIndex();
         isNearBottomRef.current = checkNearBottom();
-    }, [checkNearBottom, getLastVisibleIndex]);
+        const isAtBottom = checkNearBottom();
+        setShowScrollButton(!isAtBottom);
+        updateNewMessagesCount();
+    }, [checkNearBottom, getLastVisibleIndex, updateNewMessagesCount]);
 
     const handleSend = () => {
         if (input.trim()) {
             onSendMessage(input);
             setInput('');
-            rowVirtualizer.scrollToIndex(messages.length, { align: 'end', behavior: 'auto' });
+            requestAnimationFrame(() => {
+                rowVirtualizer.scrollToIndex(messages.length, { align: 'end', behavior: 'auto' });
+            });
             isNearBottomRef.current = true;
+            setShowScrollButton(false);
+            setNewMessagesCount(0);
+            highestReadIndexRef.current = messages.length - 1;
         }
     };
 
     const saveScrollPosition = useCallback(() => {
         if (selectedChatId && lastVisibleIndexRef.current !== null) {
             localStorage.setItem(`chatScrollIndex-${selectedChatId}`, lastVisibleIndexRef.current.toString());
+            localStorage.setItem(`highestReadIndex-${selectedChatId}`, highestReadIndexRef.current.toString());
         }
     }, [selectedChatId]);
 
@@ -169,20 +209,22 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
         if (!chatContainerRef.current || !selectedChatId) return;
 
         const savedIndex = localStorage.getItem(`chatScrollIndex-${selectedChatId}`);
-        if (savedIndex && messages.length > 0) {
-            const index = parseInt(savedIndex, 10);
-            if (index >= 0 && index < messages.length) {
-                rowVirtualizer.scrollToIndex(index, { align: 'end', behavior: 'auto' });
-                isNearBottomRef.current = checkNearBottom();
-            } else {
-                rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
-                isNearBottomRef.current = true;
-            }
-        } else {
-            rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
-            isNearBottomRef.current = true;
+        const savedHighestReadIndex = localStorage.getItem(`highestReadIndex-${selectedChatId}`);
+        
+        if (savedHighestReadIndex) {
+            highestReadIndexRef.current = parseInt(savedHighestReadIndex, 10);
         }
-    }, [selectedChatId, messages.length, rowVirtualizer, checkNearBottom]);
+
+        requestAnimationFrame(() => {
+            const index = savedIndex ? parseInt(savedIndex, 10) : messages.length - 1;
+            rowVirtualizer.scrollToIndex(Math.min(index, messages.length - 1), {
+                align: 'end',
+                behavior: 'auto',
+            });
+            isNearBottomRef.current = checkNearBottom();
+            updateNewMessagesCount();
+        });
+    }, [selectedChatId, messages.length, rowVirtualizer, checkNearBottom, updateNewMessagesCount]);
 
     useEffect(() => {
         const currentInputAreaRef = inputAreaRef.current;
@@ -213,10 +255,35 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
 
     useEffect(() => {
         if (messages.length > 0 && isNearBottomRef.current) {
-            rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
+            requestAnimationFrame(() => {
+                rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'auto' });
+            });
             isNearBottomRef.current = true;
+            setShowScrollButton(false);
+            highestReadIndexRef.current = messages.length - 1;
+            setNewMessagesCount(0);
+        } else {
+            updateNewMessagesCount();
         }
-    }, [messages.length, rowVirtualizer]);
+    }, [messages.length, rowVirtualizer, updateNewMessagesCount]);
+
+    // Автоматично розшифровуємо всі повідомлення з base64 при їх завантаженні
+    useEffect(() => {
+        const encryptedMessages = messages.filter(msg => msg.text.startsWith('base64:'));
+        encryptedMessages.forEach(msg => {
+            onRetryDecryption(msg);
+        });
+    }, [messages, onRetryDecryption, selectedChatId]);
+
+    // Додаємо ефект завантаження
+    useEffect(() => {
+        setIsLoading(true);
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 300); // Коротка затримка для відображення спінера під час рендерингу
+        
+        return () => clearTimeout(timer);
+    }, [selectedChatId]);
 
     if (!selectedChatId) {
         return (
@@ -304,11 +371,11 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                     padding: 0;
                     border-top: 1px solid ${isDarkTheme ? '#1E1E1E' : '#F3F4F6'};
                     width: 100%;
-                    box-sizing: border-box;
-                    z-index: 1000;
-                    display: flex;
-                    align-items: center;
-                    height: 49px;
+                    box-sizing: 'border-box',
+                    z-index: 1000,
+                    display: 'flex',
+                    align-items: 'center',
+                    height: 49px,
                 }
                 .input-inner-container {
                     display: flex;
@@ -342,7 +409,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                     padding: 0;
                     display: flex;
                     align-items: center;
-                    justify-content: center;
+                    justifyContent: center;
                     color: ${isDarkTheme ? '#fff' : '#212529'};
                     cursor: pointer;
                     transition: color 0.2s;
@@ -359,7 +426,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                     height: 38px;
                     display: flex;
                     align-items: center;
-                    justify-content: center;
+                    justifyContent: center;
                     cursor: pointer;
                     transition: background 0.1s ease;
                     padding: 0.375rem 0.75rem;
@@ -378,13 +445,60 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                 .input-placeholder-light::placeholder {
                     color: #6c757d;
                 }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                .spinner {
+                    display: inline-block;
+                    width: 50px;
+                    height: 50px;
+                    border: 4px solid rgba(0, 0, 0, 0.1);
+                    border-radius: 50%;
+                    border-top-color: ${spinnerColor};
+                    animation: spin 1s ease-in-out infinite;
+                }
+                .spinner-container {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: ${mainBackground};
+                    z-index: 1010;
+                    transition: opacity 0.3s ease-out;
+                }
+                .messages-container {
+                    visibility: hidden;
+                    transition: visibility 0s 0.3s;
+                }
+                .messages-container.visible {
+                    visibility: visible;
+                    transition: visibility 0s;
+                }
             `}</style>
 
+            {/* Контейнер для спінера */}
+            <div 
+                className="spinner-container" 
+                style={{ 
+                    opacity: isLoading ? 1 : 0,
+                    pointerEvents: isLoading ? 'auto' : 'none',
+                }}
+            >
+                <div className="spinner"></div>
+            </div>
+
+            {/* Контейнер для повідомлень */}
             <div
                 ref={chatContainerRef}
                 id="chat-scroll-container"
                 role="log"
                 aria-live="polite"
+                className={`messages-container ${!isLoading ? 'visible' : ''}`}
                 style={{
                     position: 'absolute',
                     top: '3px',
@@ -459,7 +573,7 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                 </div>
             </div>
 
-            {(unreadMessagesCount > 0 || showScrollDown) && (
+            {newMessagesCount > 0 && (
                 <div
                     onClick={() => {
                         rowVirtualizer.scrollToIndex(messages.length - 1, {
@@ -467,6 +581,52 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                             behavior: 'smooth',
                         });
                         isNearBottomRef.current = true;
+                        setShowScrollButton(false);
+                        setNewMessagesCount(0);
+                        highestReadIndexRef.current = messages.length - 1;
+                        onScrollToBottom(true);
+                    }}
+                    style={{
+                        position: 'fixed',
+                        bottom: floatingButtonBottom,
+                        left: '20px',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: isDarkTheme ? 'rgba(60,60,60,0.8)' : 'rgba(255,255,255,0.9)',
+                        backdropFilter: 'blur(3px)',
+                        color: isDarkTheme ? '#eee' : '#333',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        zIndex: 1001,
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
+                        transition: 'opacity 0.3s ease, transform 0.3s ease, bottom 0.2s ease-out',
+                        opacity: newMessagesCount > 0 ? 1 : 0,
+                        transform: newMessagesCount > 0 ? 'scale(1)' : 'scale(0.8)',
+                        pointerEvents: newMessagesCount > 0 ? 'auto' : 'none',
+                    }}
+                    title={`${newMessagesCount} new messages`}
+                    aria-label={`${newMessagesCount} new messages`}
+                >
+                    {newMessagesCount}
+                </div>
+            )}
+
+            {showScrollButton && (
+                <div
+                    onClick={() => {
+                        rowVirtualizer.scrollToIndex(messages.length - 1, {
+                            align: 'end',
+                            behavior: 'smooth',
+                        });
+                        isNearBottomRef.current = true;
+                        setShowScrollButton(false);
+                        setNewMessagesCount(0);
+                        highestReadIndexRef.current = messages.length - 1;
                         onScrollToBottom(true);
                     }}
                     style={{
@@ -482,26 +642,18 @@ const ChatWindow: React.FC<VirtualChatWindowProps> = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: unreadMessagesCount > 0 ? '14px' : '0',
-                        fontWeight: 'bold',
                         cursor: 'pointer',
                         zIndex: 1001,
                         boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
                         transition: 'opacity 0.3s ease, transform 0.3s ease, bottom 0.2s ease-out',
-                        opacity: unreadMessagesCount > 0 || showScrollDown ? 1 : 0,
-                        transform: unreadMessagesCount > 0 || showScrollDown ? 'scale(1)' : 'scale(0.8)',
-                        pointerEvents: unreadMessagesCount > 0 || showScrollDown ? 'auto' : 'none',
+                        opacity: showScrollButton ? 1 : 0,
+                        transform: showScrollButton ? 'scale(1)' : 'scale(0.8)',
+                        pointerEvents: showScrollButton ? 'auto' : 'none',
                     }}
-                    title={unreadMessagesCount > 0 ? `${unreadMessagesCount} new...` : 'Scroll to bottom'}
-                    aria-label={
-                        unreadMessagesCount > 0 ? `${unreadMessagesCount} new messages` : 'Scroll to bottom'
-                    }
+                    title="Scroll to bottom"
+                    aria-label="Scroll to bottom"
                 >
-                    {unreadMessagesCount > 0 ? (
-                        unreadMessagesCount
-                    ) : (
-                        <FaAngleDown style={{ width: '20px', height: '20px' }} aria-hidden="true" />
-                    )}
+                    <FaAngleDown style={{ width: '20px', height: '20px' }} aria-hidden="true" />
                 </div>
             )}
         </div>

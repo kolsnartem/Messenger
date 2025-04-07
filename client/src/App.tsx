@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSwipeable } from 'react-swipeable';
 import { Contact, Message, TweetNaClKeyPair } from './types';
 import ChatList from './components/ChatList';
 import ChatWindow from './components/ChatWindow';
@@ -688,13 +689,23 @@ const App: React.FC = () => {
     setP2PRequest(null);
   };
 
+  const swipeHandlers = useSwipeable({
+    onSwipedRight: (eventData) => {
+      if (selectedChatId && eventData.initial[0] < 50) {
+        setSelectedChatId(null);
+      }
+    },
+    trackMouse: true,
+    delta: 50,
+  });
+
   const themeClass = isDarkTheme ? 'bg-black text-light' : 'bg-light text-dark';
   const headerBackground = isDarkTheme ? '#101010' : '#FFFFFF';
 
   if (!userId) return <AuthForm isDarkTheme={isDarkTheme} onAuthSuccess={handleAuthSuccess} />;
 
   return (
-    <div className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+    <div {...swipeHandlers} className={`d-flex flex-column ${themeClass}`} style={{ height: '100vh', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
       <style>
         {`
           .chat-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid ${isDarkTheme ? '#1E1E1E' : '#F3F4F6'}; cursor: pointer; }
