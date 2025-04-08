@@ -26,6 +26,7 @@ export interface Message {
   encryptedText?: string;
   lastMessage?: Message | null;
   error?: boolean;
+  type?: 'text' | 'image' | 'file';
 }
 
 export interface Contact {

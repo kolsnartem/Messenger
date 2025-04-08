@@ -169,6 +169,7 @@ const App: React.FC = () => {
       console.log('Socket disconnected');
       toast.error('Disconnected from server');
     });
+    socketRef.current.on('message', handleIncomingMessage); // Додано для обробки вхідних повідомлень
     videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
       setCallState(prev => ({ ...prev, ...state, callDuration: prev.callDuration || 0, reactions: prev.reactions || [] }));
     });
@@ -472,6 +473,40 @@ const App: React.FC = () => {
       if (isP2PActive) p2pServiceRef.current?.requestIceRestart();
     }
   }, [userId, selectedChatId, tweetNaclKeyPair, isP2PActive]);
+
+  const sendFile = useCallback(async (file: File) => {
+    if (!userId || !selectedChatId || !socketRef.current) {
+      console.error('Cannot send file:', { userId, selectedChatId, socketExists: !!socketRef.current });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userId', userId);
+    formData.append('contactId', selectedChatId);
+
+    try {
+      const response = await axios.post<{ success: boolean; message: Message }>('https://100.64.221.88:4000/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const { message } = response.data;
+      sentMessageIds.current.add(message.id);
+
+      // Оновлюємо повідомлення та контакти
+      setMessages(prev => {
+        const updatedMessages = [...prev, { ...message, isMine: true }].sort((a, b) => a.timestamp - b.timestamp);
+        localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
+        return updatedMessages;
+      });
+      await updateContactsWithLastMessage({ ...message, isMine: true });
+
+      toast.success('File sent successfully!');
+    } catch (error) {
+      console.error('Failed to send file:', error);
+      toast.error('Failed to send file');
+    }
+  }, [userId, selectedChatId]);
 
   const initiateCall = (videoEnabled: boolean) => videoCallServiceRef.current?.initiateCall(selectedChatId!, videoEnabled);
   const endCall = () => videoCallServiceRef.current?.endCall(true);
@@ -853,6 +888,7 @@ const App: React.FC = () => {
             onScrollToBottom={scrollToBottom}
             chatContainerRef={chatContainerRef}
             onSendMessage={sendMessage}
+            onSendFile={sendFile} // Додано проп для відправки файлів
           />
         )}
         {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} unreadMessages={unreadMessages} />}
