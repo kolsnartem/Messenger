@@ -493,7 +493,7 @@ const App: React.FC = () => {
       const { message } = response.data;
       sentMessageIds.current.add(message.id);
 
-      // Оновлюємо повідомлення та контакти
+      
       setMessages(prev => {
         const updatedMessages = [...prev, { ...message, isMine: true }].sort((a, b) => a.timestamp - b.timestamp);
         localStorage.setItem(`chat_${selectedChatId}`, JSON.stringify(updatedMessages));
