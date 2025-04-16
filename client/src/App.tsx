@@ -888,7 +888,7 @@ const App: React.FC = () => {
             onScrollToBottom={scrollToBottom}
             chatContainerRef={chatContainerRef}
             onSendMessage={sendMessage}
-            onSendFile={sendFile} // Додано проп для відправки файлів
+            onSendFile={sendFile} 
           />
         )}
         {!selectedChatId && <ChatList contacts={contacts} selectedChatId={selectedChatId} isDarkTheme={isDarkTheme} onSelectChat={handleContactSelect} unreadMessages={unreadMessages} />}
