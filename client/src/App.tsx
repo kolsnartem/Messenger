@@ -39,7 +39,7 @@ const initializeTweetNaclKeys = async (userId: string | null, password: string):
       const keyPair = { publicKey: new Uint8Array(publicKey), secretKey: new Uint8Array(secretKey) };
       return keyPair;
     } catch (error) {
-      console.error('Error validating stored key pair:', error);
+      console.error('Error validating stored key pairr:', error);
     }
   }
 
