@@ -45,3 +45,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 server/uploads/
+server/messenger.db
+server/server.log
+server/uploads/
