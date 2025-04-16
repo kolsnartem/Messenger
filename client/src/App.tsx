@@ -759,31 +759,33 @@ const App: React.FC = () => {
           .call-icon:disabled { cursor: not-allowed; opacity: 0.5; }
         `}
       </style>
-      <Toaster
-        position="bottom-center"
-        reverseOrder={false}
-        toastOptions={{
-          style: {
-            background: isDarkTheme ? '#333' : '#fff',
-            color: isDarkTheme ? '#fff' : '#000',
-            border: isDarkTheme ? '1px solid #333' : '1px solid #fff',
-            padding: '10px 20px',
-            borderRadius: '8px',
-          },
-          success: {
-            style: {
-              background: isDarkTheme ? '#2d6b2d' : '#d4edda',
-              color: isDarkTheme ? '#fff' : '#155724',
-            },
-          },
-          error: {
-            style: {
-              background: isDarkTheme ? '#6b2d2d' : '#f8d7da',
-              color: isDarkTheme ? '#fff' : '#721c24',
-            },
-          },
-        }}
-      />
+     {/* 
+<Toaster
+  position="bottom-center"
+  reverseOrder={false}
+  toastOptions={{
+    style: {
+      background: isDarkTheme ? '#333' : '#fff',
+      color: isDarkTheme ? '#fff' : '#000',
+      border: isDarkTheme ? '1px solid #333' : '1px solid #fff',
+      padding: '10px 20px',
+      borderRadius: '8px',
+    },
+    success: {
+      style: {
+        background: isDarkTheme ? '#2d6b2d' : '#d4edda',
+        color: isDarkTheme ? '#fff' : '#155724',
+      },
+    },
+    error: {
+      style: {
+        background: isDarkTheme ? '#6b2d2d' : '#f8d7da',
+        color: isDarkTheme ? '#fff' : '#721c24',
+      },
+    },
+  }}
+/> 
+*/}
 
       <div className="p-0" style={{ position: 'fixed', top: 0, left: 0, right: 0, background: headerBackground, zIndex: 20, height: '96px', borderBottom: isDarkTheme ? '1px solid #1E1E1E' : '1px solid #F3F4F6' }}>
         <div className="d-flex justify-content-between align-items-center p-2" style={{ height: '42px' }}>
