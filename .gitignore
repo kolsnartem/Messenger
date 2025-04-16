@@ -25,6 +25,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 server/server.log
+/client/client.log
 
 # === System Files ===
 .DS_Store
