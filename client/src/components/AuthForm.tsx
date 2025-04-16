@@ -97,7 +97,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isDarkTheme, onAuthSuccess }) => {
 
       if (!isLogin) {
         const seed = new Uint8Array(Buffer.from(CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex), 'hex').slice(0, 32));
-        const newKeyPair = nacl.box.keyPair.fromSecretKey(seed); // Коректний виклик
+        const newKeyPair = nacl.box.keyPair.fromSecretKey(seed); 
         await axios.put('https://100.64.221.88:4000/update-keys', {
           userId: res.data.id,
           publicKey: Buffer.from(newKeyPair.publicKey).toString('base64'),

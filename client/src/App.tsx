@@ -169,7 +169,7 @@ const App: React.FC = () => {
       console.log('Socket disconnected');
       toast.error('Disconnected from server');
     });
-    socketRef.current.on('message', handleIncomingMessage); // Додано для обробки вхідних повідомлень
+    socketRef.current.on('message', handleIncomingMessage);
     videoCallServiceRef.current = new VideoCallService(socketRef.current, userId, (state: CallState) => {
       setCallState(prev => ({ ...prev, ...state, callDuration: prev.callDuration || 0, reactions: prev.reactions || [] }));
     });

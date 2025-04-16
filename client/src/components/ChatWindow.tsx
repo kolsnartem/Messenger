@@ -234,7 +234,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       onSendFile(file);
-      if (fileInputRef.current) fileInputRef.current.value = ''; // Очищаємо інпут
+      if (fileInputRef.current) fileInputRef.current.value = ''; 
     }
   };
 
